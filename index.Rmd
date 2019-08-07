@@ -1,4 +1,5 @@
 ---
+pagetitle: "Outline"
 title: | 
   | Introduction to R for Demographers
   | \vspace{1.5cm} \LARGE\emph{Workshop outline}
@@ -7,7 +8,6 @@ author: |
   | 19-23 August, 2019
   | Tim Riffe
   | Max-Planck-Institute for Demographic Research
-date: "8/6/2019"
 output:
   html_document:
     number_sections: yes
@@ -32,10 +32,11 @@ The aim of this workshop is to provide solid foundations for demographers to use
 
 A day will consist in interactive demonstration lasting around 3 hours in the morning, and exercises demonstrating concepts in afternoon. Troubleshooting will take place throughout. Participants should have the most recent versions of `Rstudio` and `R` installed.
 
-## Schedule (subject to updates)
+## Schedule 
+(subject to updates)
 
 ### Week 1
-[Session 1](https://timriffe.github.io/RforUNPD2019/docs/Day1.html) (Monday, 19 Aug)
+[Session 1](Day1) (Monday, 19 Aug)
 
 1. Introduction to R and RStudio
 2. Using the editor: main characteristics of RStudio, packages
@@ -43,7 +44,7 @@ A day will consist in interactive demonstration lasting around 3 hours in the mo
 4. Basic operations: assigning, subsetting
 5. Using functions, getting help
 
-Session 2 (Tuesday, 20 Aug)
+[Session 2](Day2) (Tuesday, 20 Aug)
 
 1. common data types and structures
 2. reshaping, sorting, and grouping
@@ -51,14 +52,14 @@ Session 2 (Tuesday, 20 Aug)
 4. never write the same code twice
 5. documenting functions
 
-Session 3 (Wednesday, 21 Aug)
+[Session 3](Day3) (Wednesday, 21 Aug)
 
 1. descriptive statistics
 2. base plotting concepts and ggplot2
 3. overview of DemoTools function and how to use them
 4. learn coding from DemoTools functions
 
-Session 4 (Thursday, 22 Aug)
+[Session 4](Day4) (Thursday, 22 Aug)
 
 1. Conditional execution (if, ifelse, etc)
 2. for-loops
@@ -66,7 +67,7 @@ Session 4 (Thursday, 22 Aug)
 4. More on writing functions & debugging
 5. operating on groups
 
-Session 5 (Friday, 23 Aug)
+[Session 5](Day5) (Friday, 23 Aug)
 
 1. R markdown for legible reproducibility
 2. tidyverse concepts 
