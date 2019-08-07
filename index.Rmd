@@ -10,7 +10,7 @@ author: |
   | Max-Planck-Institute for Demographic Research
 output:
   html_document:
-    number_sections: yes
+    number_sections: no
     toc: yes
 params:
   output_dir: "../RforUNPD2019/docs"
