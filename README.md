@@ -7,15 +7,15 @@ This repository contains all code and R markdown files used to prepare sessions.
 
 [Workshop Outline](https://timriffe.github.io/RforUNPD2019)
 
-[Day 1, Monday](https://timriffe.github.io/RforUNPD2019/Day1)
+[Day 1, Monday, Aug. 19](https://timriffe.github.io/RforUNPD2019/Day1)
 
-[Day 2, Tuesday](https://timriffe.github.io/RforUNPD2019/Day2)
+[Day 2, Tuesday, Aug. 20](https://timriffe.github.io/RforUNPD2019/Day2)
 
-[Day 3, Wednesday](https://timriffe.github.io/RforUNPD2019/Day3)
+[Day 3, Wednesday, Aug. 21](https://timriffe.github.io/RforUNPD2019/Day3)
 
-[Day 4, Thursday](https://timriffe.github.io/RforUNPD2019/Day4)
+[Day 4, Thursday, Aug. 22](https://timriffe.github.io/RforUNPD2019/Day4)
 
-[Day 5, Friday](https://timriffe.github.io/RforUNPD2019/Day5)
+[Day 5, Friday, Aug. 23](https://timriffe.github.io/RforUNPD2019/Day5)
 
 Materials for ad hoc lectures in the second week (August 26-30) will be produced in situ, and they will be linked here as appropriate.
 
