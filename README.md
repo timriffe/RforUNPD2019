@@ -1,11 +1,9 @@
 # Workshop: Introduction to R for Demographers
 Held at the United Nations Population Division, August 19-30, 2019.
 
-Instructor: Tim Riffe (Max-Planck-Institute for Demographic Research )
+Instructor: Tim Riffe ([Max-Planck-Institute for Demographic Research](https://www.demogr.mpg.de/en/institute/staff_directory_1899/timothy_riffe_2198.htm) )
 
-
-
-This repository contains all code and markdown files used to prepare sessions. It will also contain code we produce live in session, to be cleaned annotated each day after lectures and uploaded here. Materials prepared for each session are also rendered as html viewable in your browser.
+This repository contains all code and R markdown files used to prepare sessions. It will also contain code we produce live in session, to be cleaned annotated each day after lectures and uploaded here. Materials prepared for each session are also rendered as html viewable in your browser.
 
 [Workshop Outline](https://timriffe.github.io/RforUNPD2019)
 
