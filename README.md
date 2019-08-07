@@ -16,6 +16,7 @@ This repository contains all code and markdown files used to prepare sessions. I
 [Day 5, Friday](https://timriffe.github.io/RforUNPD2019/Day5)
 
 Materials for ad hoc lectures in the second week (August 26-30) will be produced in situ, and they will be linked here as appropriate.
+
 ---
 permalink: /index.html
 ---
