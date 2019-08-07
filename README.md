@@ -3,8 +3,7 @@ Held at the United Nations Population Division, August 19-30, 2019.
 
 Instructor: Tim Riffe (Max-Planck-Institute for Demographic Research )
 
-![](assets/MPIDR_square_color.png)
-![](assets/UN_emblem_blue.png)
+
 
 This repository contains all code and markdown files used to prepare sessions. It will also contain code we produce live in session, to be cleaned annotated each day after lectures and uploaded here. Materials prepared for each session are also rendered as html viewable in your browser.
 
@@ -22,7 +21,8 @@ This repository contains all code and markdown files used to prepare sessions. I
 
 Materials for ad hoc lectures in the second week (August 26-30) will be produced in situ, and they will be linked here as appropriate.
 
-You can ignore the junk below here.
+![](assets/MPIDR_square_color.png)
+![](assets/UN_emblem_blue.png)
 
 ---
 permalink: /index.html
