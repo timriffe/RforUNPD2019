@@ -21,9 +21,11 @@ This repository contains all code and markdown files used to prepare sessions. I
 
 Materials for ad hoc lectures in the second week (August 26-30) will be produced in situ, and they will be linked here as appropriate.
 
+This workshop is carried out as part of a project commissioned by the [UN Population Division](http://www.un.org/en/development/desa/population/) and financed by the [Bill and Melinda Gates Foundation](https://www.gatesfoundation.org/) as part of the [Making Family Planning Count](http://www.un.org/en/development/desa/population/projects/making-family-planning-count/index.shtml) project. 
+
 ![](assets/MPIDR_square_color.png)
 ![](assets/UN_emblem_blue.png)
-
+![](assets/Bill-&-Melinda-Gates-Foundation-Logo.png)
 ---
 permalink: /index.html
 ---
