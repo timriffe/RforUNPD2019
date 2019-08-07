@@ -1,4 +1,5 @@
 ---
+pagetitle: "Day 2"
 title: | 
   | Introduction to R for Demographers
   | \vspace{1.5cm} \LARGE\emph{Workshop outline}
