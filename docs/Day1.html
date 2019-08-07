@@ -374,14 +374,98 @@ Max-Planck-Institute for Demographic Research</div></h4>
 
 <div id="TOC">
 <ul>
-<li><a href="#content-to-be-added"><span class="toc-section-number">1</span> Content to be added</a></li>
+<li><a href="#about-me"><span class="toc-section-number">1</span> About me</a></li>
+<li><a href="#about-this-workshop"><span class="toc-section-number">2</span> About this workshop</a></li>
+<li><a href="#r-and-the-rstudio-environment"><span class="toc-section-number">3</span> <code>R</code> and the <code>Rstudio</code> environment</a></li>
+<li><a href="#r-basics"><span class="toc-section-number">4</span> <code>R</code> basics</a><ul>
+<li><a href="#r-sessions"><span class="toc-section-number">4.1</span> <code>R</code> sessions</a></li>
+<li><a href="#objects"><span class="toc-section-number">4.2</span> Objects</a><ul>
+<li><a href="#object-creation"><span class="toc-section-number">4.2.1</span> Object creation</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#tidy-data"><span class="toc-section-number">5</span> <em>tidy</em> data</a></li>
 </ul>
 </div>
 
 <a href="https://github.com/timriffe/RforUNPD2019" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#70B7FD; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
 <style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
-<div id="content-to-be-added" class="section level1">
-<h1><span class="header-section-number">1</span> Content to be added</h1>
+<div id="about-me" class="section level1">
+<h1><span class="header-section-number">1</span> About me</h1>
+<p>Hi, I’m Tim Riffe, a US-American, <a href="https://ced.uab.cat/">CED</a>-educated (Spain) demographer living in Germany and working at the <a href="https://www.demogr.mpg.de/en/">MPIDR</a>. I’ve been hooked on <code>R</code> since 2009 when I did <a href="https://www.eds-demography.org/">EDSD</a>, and have since authored several packages, mostly that do demographic things, but sometimes that do plotting things, and I’ve even written a <a href="https://github.com/timriffe/DemoTools">package</a> or <a href="https://github.com/timriffe/DDSQLtools">two</a> for you (<a href="https://github.com/timriffe/DemoTools/graphs/contributors">with help</a> of course). My own research data preparation, analyses, analytic plotting, and presentation-quality plotting are all done in <code>R</code>. I’ve lead workshops and courses such as this one, but yours will be unique and more ambitious.</p>
+</div>
+<div id="about-this-workshop" class="section level1">
+<h1><span class="header-section-number">2</span> About this workshop</h1>
+<p>In the past <code>R</code> introductions such as this were done exclusively using the tools of so-called base-<code>R</code>, with the objective of putting new users on the path to programming. Nowadays it is becoming more common to teach intro to <code>R</code> from a data analyst perspective, namely to use the already-implemented tools and frameworks of <code>R</code> to just get things done efficiently without really needing to get into the nitty gritty of programming. Such courses tend to use the <a href="https://www.tidyverse.org/">tidyverse</a> framework</p>
+<p>Your route to being an <code>R</code> data analyst/visualizer could be via Base programming, as it was for me, but it is a longer road than simply jumping into the <code>tidyverse</code>. I will try to give you introduction to both things.</p>
+<p>So this is what we’re going to do: We’ll spend today doing the tidyverse approach, and then in following sessions we’ll shift gears to base-<code>R</code> programming in order to introduce some concepts that will augment your abilities and ultimately your experience of <code>R</code>. These will most importantly include function-writing, loops, and conditional execution. New concepts will be introduced in an interactive type-along way. After a few examples of each new concept, I’ll always try to loop back to the <em>tidy</em> approach, slipping in new tidy concepts.</p>
+<p>This is an absolute intro course, I don’t expect you’ll have any experience with <code>R</code> or have even heard of these concepts. I do expect that you’re familiar with other statistical packages or programming languages at an advanced level, so I’ll try to use analogies where possible. I expect you’ll be able to keep up if you type along and take notes as we go, and if you ask questions and tell me to stop, slow down, or repeat when needed. Real learning will happen when you try to apply these concepts on your own, and for this reason I’ll give afternoon exercises, which we’ll then solve together. Often I will set myself up for apparent failure by not having worked through a solution in advance, and you’ll see me induce errors and use help resources in a natural way. It’s important to see this messy side of programming so that you also learn to make natural use of such resources.</p>
+</div>
+<div id="r-and-the-rstudio-environment" class="section level1">
+<h1><span class="header-section-number">3</span> <code>R</code> and the <code>Rstudio</code> environment</h1>
+<p><code>R</code> is a language. You should download and install the latest version from here: <a href="https://cran.r-project.org/">https://cran.r-project.org/</a> – pick the one that runs on your operating system.</p>
+<p><code>R</code> is simple and lightweight. It’s possible to work directly in its console, or even from the terminal, but we’ll instead use a very user-friendly application to interract with it:</p>
+<p><code>Rstudio</code> is an application. You should download and install the latest version from here: <a href="https://www.rstudio.com/products/rstudio/download/">https://www.rstudio.com/products/rstudio/download/</a> – again, look at the OS specs and pick the one that pairs well with your operating system.</p>
+<p><code>Rstudio</code> is many things at once. It is a file manager, a script editor, a document editor, an instance of <code>R</code>, a data viewer, even a web browser. This is where we’ll do everything. We will be working often in the form of <code>R</code><em>markdown</em> documents, which allows us to mix code, output, and text in a single file. This very document was written in <code>R</code> markdown, and it can generate nice-looking documents in Word, html, or pdf. We’ll get started right away with this. The other way we’ll write code is in <code>R</code> scripts, which are just text files with the <code>.R</code> or <code>.r</code> file extension.</p>
+
+<p>TO-DO list for the demonstration: 1. Rstudio viewers. 2. arithmetic in the console. 3. start a <code>.project</code> for this module. 4. make a folder for Monday. 5. make a new <code>R</code> markdown file for session. 6. show how to use <code>R</code> from markdown. 7. knit. 8. yell hurrah.</p>
+<p>Much of the <code>R</code> interaction we do in this first week of the workshop will be <em>from</em> Rmarkdown. This will become second nature, and you can take that with you.</p>
+</div>
+<div id="r-basics" class="section level1">
+<h1><span class="header-section-number">4</span> <code>R</code> basics</h1>
+<p><code>R</code> is a <em>functional</em> programming language. You can think of functions in different ways– they’re like the way functions are used in mathematics, <span class="math inline">\(f()\)</span>, or you could think of them as little programs. You give the function input (data, instructions), and then it does something with that and returns output.</p>
+<p>Here’s a cheap example:</p>
+<pre class="r"><code>sum(1,2,3,4)</code></pre>
+<pre><code>## [1] 10</code></pre>
+<p><em>sum</em> is just the name of the function instead of <span class="math inline">\(f\)</span>, and just the same, we enclose its inputs in round parentheses. <code>R</code> has many many such functions available to you. They can be combined in many many ways, and you can write your own functions too. If you get the hang of it, you’ll find that functions can help you structure thought and analyses. We’ll learn a lot about them later this week, but we’ll start using them today without thinking about it much. We call <code>R</code> a functional language because everything gets done in <code>R</code> using functions, and because functions always behave consistently: a given set of inputs (arguments) always returns the same output.</p>
+<div id="r-sessions" class="section level2">
+<h2><span class="header-section-number">4.1</span> <code>R</code> sessions</h2>
+<p>We often speak of <code>R</code> sessions, a given interactive instance of <code>R</code>. For the most part <code>R</code> sessions are in-memory. If you have a dataset (or many) loaded into a session, then these are stored as <em>objects</em> in your workspace or <em>environment</em>. You can have a clean or a cluttery environment. You can take a look at what’s in your environment in the <code>environment</code> tab of Rstudio (upper right corner by default). When you close an instance of <code>R</code> you can save your environment as-is, or you can lose it. I recommend <em>not</em> saving it. Otherwise you’ll end up with lots of file baggage. It’s more efficient and less bug-prone to save code and data in files than to save a bunch of saved <code>R</code> sessions. You can wipe your session free in Rstudio by selecting <code>Restart R</code> under <code>session</code> tab, or <code>Ctrl + Shift + F10</code>, or by executing <code>rstudioapi::restartSession()</code> in the console.</p>
+</div>
+<div id="objects" class="section level2">
+<h2><span class="header-section-number">4.2</span> Objects</h2>
+<p>In an interactive <code>R</code> session, you can have different pieces of data, <em>objects</em>, and <code>R</code> has different kinds of these, most of which are data structures.</p>
+<ol style="list-style-type: decimal">
+<li><code>vector</code>s store a single data type.</li>
+<li><code>matrix</code> or <code>array</code>s are higher dimensional vectors.</li>
+<li><code>data.frame</code>s (and many similar things) are tables, each column is a vector, but the columns can be different data types.</li>
+<li><code>list</code>s are hierarchical data structures, where neither dimension nor data type need to be uniform.</li>
+<li><code>function</code>s aren’t data, but they are objects</li>
+</ol>
+<p>And many more…</p>
+<p>Today we’ll use <code>vector</code>s and <code>data.frame</code>s.</p>
+<div id="object-creation" class="section level3">
+<h3><span class="header-section-number">4.2.1</span> Object creation</h3>
+<p>You can make an object by <em>assigning</em> to its name, like this:</p>
+<pre class="r"><code>my_new_object &lt;- rnorm(n = 10, mean = 0, sd = 1)
+my_new_object</code></pre>
+<pre><code>##  [1]  0.7504067 -0.6841720  0.1095976 -0.2201945  0.1461100  0.1932837
+##  [7]  0.7792279 -1.2216933 -0.6787315  0.1215793</code></pre>
+<p>Here we have created a new object <code>my_new_object</code> by assigning (<code>&lt;-</code>) the output of the function <code>rnorm()</code> (ten random draws from a standard normal distribution). See how we use <code>rnorm()</code> there? This function has three <em>arguments</em> (i.e. parameters), in this case intuitively named if you’ve ever taken an intro statistics class. Now the object <code>my_new_object</code> is simply available to use throughout the remainder of this <code>R</code> session, yay.</p>
+<p><code>R</code> objects can be many kinds of things. Functions are objects, but so are vectors (that’s what <code>my_new_object</code> is), and other things, and they can come in all shapes, sizes, and structures. Today, from now on, we’ll work with a kind of object called a <code>data.frame</code>, and its young cousin the <code>tibble</code>. These are like a rectangular spreadsheet, or like a dataset in <code>Stata</code>: <code>data.frame</code>s have rows and columns, and there can be different kinds of data between columns, but only one kind of data within a column.</p>
+<p>Let’s get a <code>data.frame</code> to play with: Hans Rosling’s famous data, which you can get as follows: First we download and install an <code>R</code> package (library) called <code>gapminder</code> using the function <code>install.packages()</code>. You only need to do this once to get the package.</p>
+<pre class="r"><code>install.packages(&quot;gapminder&quot;)</code></pre>
+<p><code>R</code> has thousands of packages, built by developers and users alike. Many packages are even written by researchers to make research easier. <code>R</code> has a big community of users and developers: let’s find it in different places online…</p>
+
+<p>So some people created <code>gapminder</code> somewhere, uploaded it to <code>R</code>’s central repository, and then we installed it on our machines straight from an <code>R</code> session. Now you can load the package using the <code>library()</code> function. This loads the contents of the package into memory, i.e. makes them objects in your <code>R</code> session. The main object in this package is a <code>data.frame</code> called <code>gapminder</code>. There are different ways to take a look at it.</p>
+<pre class="r"><code>library(gapminder)</code></pre>
+
+<p>Or you could get metadata about the object from <code>str()</code> (structure). This tells us that we have 1704 observations (rows) of 6 variables, and then it tells us the variable (column) names, what kind of data it is (<code>Factor</code> = categorical, <code>int</code> = integer, <code>num</code> = numeric), and a sample of the first few observations in each.</p>
+<pre class="r"><code>str(gapminder)</code></pre>
+<pre><code>## Classes &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;:    1704 obs. of  6 variables:
+##  $ country  : Factor w/ 142 levels &quot;Afghanistan&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ continent: Factor w/ 5 levels &quot;Africa&quot;,&quot;Americas&quot;,..: 3 3 3 3 3 3 3 3 3 3 ...
+##  $ year     : int  1952 1957 1962 1967 1972 1977 1982 1987 1992 1997 ...
+##  $ lifeExp  : num  28.8 30.3 32 34 36.1 ...
+##  $ pop      : int  8425333 9240934 10267083 11537966 13079460 14880372 12881816 13867957 16317921 22227415 ...
+##  $ gdpPercap: num  779 821 853 836 740 ...</code></pre>
+<p>We will mostly work with <code>data.frames</code> or data-frame-like objects. To do so, we’ll use the <em>tidyverse</em> toolkit, which is a collection of packages, so let’s make sure we get that installed and loaded.</p>
+<pre class="r"><code>install.packages(&quot;tidyverse&quot;)</code></pre>
+<pre class="r"><code>library(tidyverse)</code></pre>
+</div>
+</div>
+</div>
+<div id="tidy-data" class="section level1">
+<h1><span class="header-section-number">5</span> <em>tidy</em> data</h1>
 </div>
 
 

@@ -28,6 +28,122 @@ header-includes:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Content to be added
+# About me
+				
+Hi, I'm Tim Riffe, a US-American, [CED](https://ced.uab.cat/)-educated (Spain) demographer living in Germany and working at the [MPIDR](https://www.demogr.mpg.de/en/). I've been hooked on `R` since 2009 when I did [EDSD](https://www.eds-demography.org/), and have since authored several packages, mostly that do demographic things, but sometimes that do plotting things, and I've even written a [package](https://github.com/timriffe/DemoTools) or [two](https://github.com/timriffe/DDSQLtools) for you ([with help](https://github.com/timriffe/DemoTools/graphs/contributors) of course). My own research data preparation, analyses, analytic plotting, and presentation-quality plotting are all done in `R`. I've lead workshops and courses such as this one, but yours will be unique and more ambitious.
+				
+# About this workshop
+
+In the past `R` introductions such as this were done exclusively using the tools of so-called base-`R`, with the objective of putting new users on the path to programming. Nowadays it is becoming more common to teach intro to `R` from a data analyst perspective, namely to use the already-implemented tools and frameworks of `R` to just get things done efficiently without really needing to get into the nitty gritty of programming. Such courses tend to use the  [tidyverse](https://www.tidyverse.org/) framework 
+
+Your route to being an `R` data analyst/visualizer could be via Base programming, as it was for me, but it is a longer road than simply jumping into the `tidyverse`. I will try to give you introduction to both things.
+
+So this is what we're going to do: We'll spend today doing the tidyverse approach, and then in following sessions we'll shift gears to base-`R` programming in order to introduce some concepts that will augment your abilities and ultimately your experience of `R`. These will most importantly include function-writing, loops, and conditional execution. New concepts will be introduced in an interactive type-along way. After a few examples of each new concept, I'll always try to loop back to the *tidy* approach, slipping in new tidy concepts. 
+
+This is an absolute intro course, I don't expect you'll have any experience with `R` or have even heard of these concepts. I do expect that you're familiar with other statistical packages or programming languages at an advanced level, so I'll try to use analogies where possible. I expect you'll be able to keep up if you type along and take notes as we go, and if you ask questions and tell me to stop, slow down, or repeat when needed. Real learning will happen when you try to apply these concepts on your own, and for this reason I'll give afternoon exercises, which we'll then solve together. Often I will set myself up for apparent failure by not having worked through a solution in advance, and you'll see me induce errors and use help resources in a natural way. It's important to see this messy side of programming so that you also learn to make natural use of such resources.
+
+# `R` and the `Rstudio` environment
+
+`R` is a language. You should download and install the latest version from here:
+[https://cran.r-project.org/](https://cran.r-project.org/) -- pick the one that runs on your operating system.
+
+`R` is simple and lightweight. It's possible to work directly in its console, or even from the terminal, but we'll instead use a very user-friendly application to interract with it:
+
+`Rstudio` is an application. You should download and install the latest version from here:
+[https://www.rstudio.com/products/rstudio/download/](https://www.rstudio.com/products/rstudio/download/) -- again, look at the OS specs and pick the one that pairs well with your operating system.
+
+`Rstudio` is many things at once. It is a file manager, a script editor, a document editor, an instance of `R`, a data viewer, even a web browser. This is where we'll do everything. We will be working often in the form of `R`*markdown* documents, which allows us to mix code, output, and text in a single file. This very document was written in `R` markdown, and it can generate nice-looking documents in Word, html, or pdf. We'll get started right away with this. The other way we'll write code is in `R` scripts, which are just text files with the `.R` or `.r` file extension.
+
+\begin{center}
+*** Brief intermission for Rstudio tour and demonstration ***
+\end{center}
+
+TO-DO list for the demonstration:
+1. Rstudio viewers.
+2. arithmetic in the console.
+3. start a `.project` for this module.
+4. make a folder for Monday.
+5. make a new `R` markdown file for session.
+6. show how to use `R` from markdown.
+7. knit.
+8. yell hurrah.
+
+Much of the `R` interaction we do in this first week of the workshop will be *from* Rmarkdown. This will become second nature, and you can take that with you.
+
+# `R` basics
+
+`R` is a *functional* programming language. You can think of functions in different ways-- they're like the way functions are used in mathematics, $f()$, or you could think of them as little programs. You give the function input (data, instructions), and then it does something with that and returns output.
+
+Here's a cheap example:
+```{r}
+sum(1,2,3,4)
+```
+*sum* is just the name of the function instead of $f$, and just the same, we enclose its inputs in round parentheses. `R` has many many such functions available to you. They can be combined in many many ways, and you can write your own functions too. If you get the hang of it, you'll find that functions can help you structure thought and analyses. We'll learn a lot about them later this week, but we'll start using them today without thinking about it much. We call `R` a functional language because everything gets done in `R` using functions, and because functions always behave consistently: a given set of inputs (arguments) always returns the same output.
+
+## `R` sessions
+We often speak of `R` sessions, a given interactive instance of `R`. For the most part `R` sessions are in-memory. If you have a dataset (or many) loaded into a session, then these are stored as *objects* in your workspace or *environment*. You can have a clean or a cluttery environment. You can take a look at what's in your environment in the `environment` tab of Rstudio (upper right corner by default). When you close an instance of `R` you can save your environment as-is, or you can lose it. I recommend *not* saving it. Otherwise you'll end up with lots of file baggage. It's more efficient and less bug-prone to save code and data in files than to save a bunch of saved `R` sessions. You can wipe your session free in Rstudio by selecting `Restart R` under `session` tab, or `Ctrl + Shift + F10`, or by executing `rstudioapi::restartSession()` in the console.
+
+## Objects
+In an interactive `R` session, you can have different pieces of data, *objects*, and `R` has different kinds of these, most of which are data structures. 
+
+1. `vector`s store a single data type.
+2. `matrix` or `array`s are higher dimensional vectors.
+3. `data.frame`s (and many similar things) are tables, each column is a vector, but the columns can be different data types.
+4. `list`s are hierarchical data structures, where neither dimension nor data type need to be uniform.
+5. `function`s aren't data, but they are objects
+
+And many more...
+
+Today we'll use `vector`s and `data.frame`s.
+
+### Object creation
+You can make an object by *assigning* to its name, like this:
+```{r}
+my_new_object <- rnorm(n = 10, mean = 0, sd = 1)
+my_new_object
+```
+
+Here we have created a new object `my_new_object` by assigning (`<-`) the output of the function `rnorm()` (ten random draws from a standard normal distribution). See how we use `rnorm()` there? This function has three *arguments* (i.e. parameters), in this case intuitively named if you've ever taken an intro statistics class. Now the object `my_new_object` is simply available to use throughout the remainder of this `R` session, yay. 
+
+`R` objects can be many kinds of things. Functions are objects, but so are vectors (that's what `my_new_object` is), and other things, and they can come in all shapes, sizes, and structures. Today, from now on, we'll work with a kind of object called a `data.frame`, and its young cousin the `tibble`. These are like a rectangular spreadsheet, or like a dataset in `Stata`: `data.frame`s have rows and columns, and there can be different kinds of data between columns, but only one kind of data within a column.
+
+Let's get a `data.frame` to play with: Hans Rosling's famous data, which you can get as follows: First we download and install an `R` package (library) called `gapminder` using the function `install.packages()`. You only need to do this once to get the package.
+
+```{r, eval = FALSE}
+install.packages("gapminder")
+```
+
+`R` has thousands of packages, built by developers and users alike. Many packages are even written by researchers to make research easier. `R` has a big community of users and developers: let's find it in different places online...
+
+\begin{center}
+*** Time-out to find the `R` community ***
+\end{center}
+
+So some people created `gapminder` somewhere, uploaded it to `R`'s central repository, and then we installed it on our machines straight from an `R` session. Now you can load the package using the `library()` function. This loads the contents of the package into memory, i.e. makes them objects in your `R` session. The main object in this package is a `data.frame` called `gapminder`. There are different ways to take a look at it. 
+
+```{r}
+library(gapminder)
+```
+
+\begin{center}
+*** Clicky demonstration of viewing data ***
+\end{center}
+
+Or you could get metadata about the object from `str()` (structure). This tells us that we have 1704 observations (rows) of 6 variables, and then it tells us the variable (column) names, what kind of data it is (`Factor` = categorical, `int` = integer, `num` = numeric), and a sample of the first few observations in each.
+
+```{r}
+str(gapminder)
+```
+
+We will mostly work with `data.frames` or data-frame-like objects. To do so, we'll use the *tidyverse* toolkit, which is a collection of packages, so let's make sure we get that installed and loaded.
+
+```{r, eval = FALSE}
+install.packages("tidyverse")
+```
+
+```{r, message = FALSE}
+library(tidyverse)
+```
+# *tidy* data
 
 
