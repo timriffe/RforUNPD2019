@@ -30,15 +30,15 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # About me
 				
-Hi, I'm Tim Riffe, a US-American, [CED](https://ced.uab.cat/)-educated (Spain) demographer living in Germany and working at the [MPIDR](https://www.demogr.mpg.de/en/). I've been hooked on `R` since 2009 when I did [EDSD](https://www.eds-demography.org/), and have since authored several packages, mostly that do demographic things, but sometimes that do plotting things, and I've even written a [package](https://github.com/timriffe/DemoTools) or [two](https://github.com/timriffe/DDSQLtools) for you ([with help](https://github.com/timriffe/DemoTools/graphs/contributors) of course). My own research data preparation, analyses, analytic plotting, and presentation-quality plotting are all done in `R`. I've lead workshops and courses such as this one, but yours will be unique and more ambitious.
+Hi, I'm Tim Riffe, a US-American, [CED](https://ced.uab.cat/)-educated (Spain) demographer living in Germany and working at the [MPIDR](https://www.demogr.mpg.de/en/). I've been hooked on `R` since 2009 when I did [EDSD](https://www.eds-demography.org/), and have since authored several packages, mostly that do demographic things, but sometimes that do plotting things, and I've even written a [package](https://github.com/timriffe/DemoTools) or [two](https://github.com/timriffe/DDSQLtools) for you ([with help](https://github.com/timriffe/DemoTools/graphs/contributors) of course). My own research data preparation, analyses, analytic plotting, and presentation-quality plotting are all done in `R`. I've led [workshops](https://github.com/timriffe/BSSD2019Module1) and [courses](https://github.com/timriffe/DemoED) such as this one, but yours will be unique and more ambitious.
 				
 # About this workshop
 
-In the past `R` introductions such as this were done exclusively using the tools of so-called base-`R`, with the objective of putting new users on the path to programming. Nowadays it is becoming more common to teach intro to `R` from a data analyst perspective, namely to use the already-implemented tools and frameworks of `R` to just get things done efficiently without really needing to get into the nitty gritty of programming. Such courses tend to use the  [tidyverse](https://www.tidyverse.org/) framework 
+In the past `R` introductions such as this were done exclusively using the tools of so-called base-`R`, with the objective of putting new users on the path to programming. Nowadays it is becoming more common to teach intro to `R` from a data analyst perspective, namely to use the already-implemented tools and frameworks of `R` to just get things done efficiently without really needing to get into the nitty gritty of programming. Such courses tend to use the [tidyverse](https://www.tidyverse.org/) framework 
 
 Your route to being an `R` data analyst/visualizer could be via Base programming, as it was for me, but it is a longer road than simply jumping into the `tidyverse`. I will try to give you introduction to both things.
 
-So this is what we're going to do: We'll spend today doing the tidyverse approach, and then in following sessions we'll shift gears to base-`R` programming in order to introduce some concepts that will augment your abilities and ultimately your experience of `R`. These will most importantly include function-writing, loops, and conditional execution. New concepts will be introduced in an interactive type-along way. After a few examples of each new concept, I'll always try to loop back to the *tidy* approach, slipping in new tidy concepts. 
+So this is what we're going to do: Today we'll go through some very basic basics and then dip into the tidyverse approach, and then in following sessions we'll shift gears to base-`R` programming in order to introduce some concepts that will augment your abilities and ultimately your experience of `R`. These will most importantly include function-writing, loops, and conditional execution. New concepts will be introduced in an interactive type-along way. After a few examples of each new concept, I'll always try to loop back to the *tidy* approach, slipping in new tidy concepts. 
 
 This is an absolute intro course, I don't expect you'll have any experience with `R` or have even heard of these concepts. I do expect that you're familiar with other statistical packages or programming languages at an advanced level, so I'll try to use analogies where possible. I expect you'll be able to keep up if you type along and take notes as we go, and if you ask questions and tell me to stop, slow down, or repeat when needed. Real learning will happen when you try to apply these concepts on your own, and for this reason I'll give afternoon exercises, which we'll then solve together. Often I will set myself up for apparent failure by not having worked through a solution in advance, and you'll see me induce errors and use help resources in a natural way. It's important to see this messy side of programming so that you also learn to make natural use of such resources.
 
@@ -83,7 +83,7 @@ sum(1,2,3,4)
 ## `R` sessions
 We often speak of `R` sessions, a given interactive instance of `R`. For the most part `R` sessions are in-memory. If you have a dataset (or many) loaded into a session, then these are stored as *objects* in your workspace or *environment*. You can have a clean or a cluttery environment. You can take a look at what's in your environment in the `environment` tab of Rstudio (upper right corner by default). When you close an instance of `R` you can save your environment as-is, or you can lose it. I recommend *not* saving it. Otherwise you'll end up with lots of file baggage. It's more efficient and less bug-prone to save code and data in files than to save a bunch of saved `R` sessions. You can wipe your session free in Rstudio by selecting `Restart R` under `session` tab, or `Ctrl + Shift + F10`, or by executing `rstudioapi::restartSession()` in the console.
 
-## Objects
+## `R` uses *objects*
 In an interactive `R` session, you can have different pieces of data, *objects*, and `R` has different kinds of these, most of which are data structures. 
 
 1. `vector`s store a single data type.
@@ -96,7 +96,7 @@ And many more...
 
 Today we'll use `vector`s and `data.frame`s.
 
-### Object creation
+## Creating objects
 You can make an object by *assigning* to its name, like this:
 ```{r}
 my_new_object <- rnorm(n = 10, mean = 0, sd = 1)
@@ -105,7 +105,8 @@ my_new_object
 
 Here we have created a new object `my_new_object` by assigning (`<-`) the output of the function `rnorm()` (ten random draws from a standard normal distribution). See how we use `rnorm()` there? This function has three *arguments* (i.e. parameters), in this case intuitively named if you've ever taken an intro statistics class. Now the object `my_new_object` is simply available to use throughout the remainder of this `R` session, yay. 
 
-`R` objects can be many kinds of things. Functions are objects, but so are vectors (that's what `my_new_object` is), and other things, and they can come in all shapes, sizes, and structures. Today, from now on, we'll work with a kind of object called a `data.frame`, and its young cousin the `tibble`. These are like a rectangular spreadsheet, or like a dataset in `Stata`: `data.frame`s have rows and columns, and there can be different kinds of data between columns, but only one kind of data within a column.
+## the gapminder `data.frame`
+Let's work with a nicely formatted `data.frame`. These are like a rectangular spreadsheet, or like a dataset in `Stata`: `data.frame`s have rows and columns, and there can be different kinds of data between columns, but only one kind of data within a column.
 
 Let's get a `data.frame` to play with: Hans Rosling's famous data, which you can get as follows: First we download and install an `R` package (library) called `gapminder` using the function `install.packages()`. You only need to do this once to get the package.
 
