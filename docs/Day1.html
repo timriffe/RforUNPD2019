@@ -379,9 +379,12 @@ Max-Planck-Institute for Demographic Research</div></h4>
 <li><a href="#r-and-the-rstudio-environment"><span class="toc-section-number">3</span> <code>R</code> and the <code>Rstudio</code> environment</a></li>
 <li><a href="#r-basics"><span class="toc-section-number">4</span> <code>R</code> basics</a><ul>
 <li><a href="#r-sessions"><span class="toc-section-number">4.1</span> <code>R</code> sessions</a></li>
-<li><a href="#r-uses-objects"><span class="toc-section-number">4.2</span> <code>R</code> uses <em>objects</em></a></li>
-<li><a href="#creating-objects"><span class="toc-section-number">4.3</span> Creating objects</a></li>
-<li><a href="#the-gapminder-data.frame"><span class="toc-section-number">4.4</span> the gapminder <code>data.frame</code></a></li>
+<li><a href="#r-is-functional"><span class="toc-section-number">4.2</span> <code>R</code> is functional</a></li>
+<li><a href="#r-uses-objects"><span class="toc-section-number">4.3</span> <code>R</code> uses <em>objects</em></a></li>
+<li><a href="#creating-objects"><span class="toc-section-number">4.4</span> Creating objects</a></li>
+<li><a href="#more-on-functions"><span class="toc-section-number">4.5</span> More on functions</a></li>
+<li><a href="#reading-help-files"><span class="toc-section-number">4.6</span> Reading help files</a></li>
+<li><a href="#the-gapminder-data.frame"><span class="toc-section-number">4.7</span> the gapminder <code>data.frame</code></a></li>
 </ul></li>
 <li><a href="#tidy-data"><span class="toc-section-number">5</span> <em>tidy</em> data</a></li>
 </ul>
@@ -405,24 +408,27 @@ Max-Planck-Institute for Demographic Research</div></h4>
 <p><code>R</code> is a language. You should download and install the latest version from here: <a href="https://cran.r-project.org/">https://cran.r-project.org/</a> – pick the one that runs on your operating system.</p>
 <p><code>R</code> is simple and lightweight. It’s possible to work directly in its console, or even from the terminal, but we’ll instead use a very user-friendly application to interract with it:</p>
 <p><code>Rstudio</code> is an application. You should download and install the latest version from here: <a href="https://www.rstudio.com/products/rstudio/download/">https://www.rstudio.com/products/rstudio/download/</a> – again, look at the OS specs and pick the one that pairs well with your operating system.</p>
-<p><code>Rstudio</code> is many things at once. It is a file manager, a script editor, a document editor, an instance of <code>R</code>, a data viewer, even a web browser. This is where we’ll do everything. We will be working often in the form of <code>R</code><em>markdown</em> documents, which allows us to mix code, output, and text in a single file. This very document was written in <code>R</code> markdown, and it can generate nice-looking documents in Word, html, or pdf. We’ll get started right away with this. The other way we’ll write code is in <code>R</code> scripts, which are just text files with the <code>.R</code> or <code>.r</code> file extension.</p>
+<p><code>Rstudio</code> is many things at once. It is a file manager, a script editor, a document editor, an instance of <code>R</code>, a data viewer, even a web browser. This is where we’ll do everything. We will be working often in the form of <code>R</code><em>markdown</em> documents, which allows us to mix code, output, and text in a single file. This very document was written in <code>R</code> markdown, and it can generate nice-looking documents in Word, html, or pdf (I’m not exactly taking advantage of all its bells and whistles). We’ll get started right away with this. The other way we’ll write code is in <code>R</code> scripts, which are just text files with the <code>.R</code> or <code>.r</code> file extension.</p>
 
-<p>TO-DO list for the demonstration: 1. Rstudio viewers. 2. arithmetic in the console. 3. start a <code>.project</code> for this module. 4. make a folder for Monday. 5. make a new <code>R</code> markdown file for session. 6. show how to use <code>R</code> from markdown. 7. knit. 8. yell hurrah.</p>
-<p>Much of the <code>R</code> interaction we do in this first week of the workshop will be <em>from</em> Rmarkdown. This will become second nature, and you can take that with you.</p>
+<p>TO-DO list for the demonstration: 1. Rstudio panes and tabs 2. arithmetic in the console 3. start a <code>.project</code> for this workshop 4. make a folder for Day 1, Monday 5. make a new <code>R</code> markdown file for this session 6. show how to use <code>R</code> from markdown 7. knit 8. yell hurrah</p>
+<p>Much of the <code>R</code> interaction we do in this first week of the workshop will be <em>from</em> Rmarkdown. This will become second nature, and you can take that with you. I’ll comment other Rstudio features as we go.</p>
 </div>
 <div id="r-basics" class="section level1">
 <h1><span class="header-section-number">4</span> <code>R</code> basics</h1>
-<p><code>R</code> is a <em>functional</em> programming language. You can think of functions in different ways– they’re like the way functions are used in mathematics, <span class="math inline">\(f()\)</span>, or you could think of them as little programs. You give the function input (data, instructions), and then it does something with that and returns output.</p>
-<p>Here’s a cheap example:</p>
-<pre class="r"><code>sum(1,2,3,4)</code></pre>
-<pre><code>## [1] 10</code></pre>
-<p><em>sum</em> is just the name of the function instead of <span class="math inline">\(f\)</span>, and just the same, we enclose its inputs in round parentheses. <code>R</code> has many many such functions available to you. They can be combined in many many ways, and you can write your own functions too. If you get the hang of it, you’ll find that functions can help you structure thought and analyses. We’ll learn a lot about them later this week, but we’ll start using them today without thinking about it much. We call <code>R</code> a functional language because everything gets done in <code>R</code> using functions, and because functions always behave consistently: a given set of inputs (arguments) always returns the same output.</p>
 <div id="r-sessions" class="section level2">
 <h2><span class="header-section-number">4.1</span> <code>R</code> sessions</h2>
 <p>We often speak of <code>R</code> sessions, a given interactive instance of <code>R</code>. For the most part <code>R</code> sessions are in-memory. If you have a dataset (or many) loaded into a session, then these are stored as <em>objects</em> in your workspace or <em>environment</em>. You can have a clean or a cluttery environment. You can take a look at what’s in your environment in the <code>environment</code> tab of Rstudio (upper right corner by default). When you close an instance of <code>R</code> you can save your environment as-is, or you can lose it. I recommend <em>not</em> saving it. Otherwise you’ll end up with lots of file baggage. It’s more efficient and less bug-prone to save code and data in files than to save a bunch of saved <code>R</code> sessions. You can wipe your session free in Rstudio by selecting <code>Restart R</code> under <code>session</code> tab, or <code>Ctrl + Shift + F10</code>, or by executing <code>rstudioapi::restartSession()</code> in the console.</p>
 </div>
+<div id="r-is-functional" class="section level2">
+<h2><span class="header-section-number">4.2</span> <code>R</code> is functional</h2>
+<p><code>R</code> is a <em>functional</em> programming language. You can think of functions in different ways– they’re like the way functions are used in mathematics, <span class="math inline">\(f()\)</span>, or you could think of them as little programs. You give the function input (data, instructions), and then it does something with that and returns output.</p>
+<p>Here’s a cheap example:</p>
+<pre class="r"><code>sum(1,2,3,4)</code></pre>
+<pre><code>## [1] 10</code></pre>
+<p><em>sum</em> is just the name of the function instead of <span class="math inline">\(f()\)</span>, and just the same, we enclose its inputs in round parentheses. <code>R</code> has many many such functions available to you. They can be combined in many many ways, and you can write your own functions too. If you get the hang of it, you’ll find that functions can help you structure thought and analyses. We’ll learn a lot about them later this week, but we’ll start using them today without thinking about it much. We call <code>R</code> a functional language because everything gets done in <code>R</code> using functions, and because functions always behave consistently: a given set of inputs (arguments) always returns the same output.</p>
+</div>
 <div id="r-uses-objects" class="section level2">
-<h2><span class="header-section-number">4.2</span> <code>R</code> uses <em>objects</em></h2>
+<h2><span class="header-section-number">4.3</span> <code>R</code> uses <em>objects</em></h2>
 <p>In an interactive <code>R</code> session, you can have different pieces of data, <em>objects</em>, and <code>R</code> has different kinds of these, most of which are data structures.</p>
 <ol style="list-style-type: decimal">
 <li><code>vector</code>s store a single data type.</li>
@@ -432,19 +438,39 @@ Max-Planck-Institute for Demographic Research</div></h4>
 <li><code>function</code>s aren’t data, but they are objects</li>
 </ol>
 <p>And many more…</p>
-<p>Today we’ll use <code>vector</code>s and <code>data.frame</code>s.</p>
+<p>Today we’ll use <code>vector</code>s and <code>data.frame</code>s, and some nuanced cousins of the <code>data.frame</code>.</p>
 </div>
 <div id="creating-objects" class="section level2">
-<h2><span class="header-section-number">4.3</span> Creating objects</h2>
-<p>You can make an object by <em>assigning</em> to its name, like this:</p>
-<pre class="r"><code>my_new_object &lt;- rnorm(n = 10, mean = 0, sd = 1)
-my_new_object</code></pre>
-<pre><code>##  [1]  5.730990e-01  8.595948e-01  5.845155e-01  6.082497e-01 -1.202448e+00
-##  [6] -9.272881e-01  2.209528e-01  3.668143e-01  1.309938e+00  1.893258e-06</code></pre>
-<p>Here we have created a new object <code>my_new_object</code> by assigning (<code>&lt;-</code>) the output of the function <code>rnorm()</code> (ten random draws from a standard normal distribution). See how we use <code>rnorm()</code> there? This function has three <em>arguments</em> (i.e. parameters), in this case intuitively named if you’ve ever taken an intro statistics class. Now the object <code>my_new_object</code> is simply available to use throughout the remainder of this <code>R</code> session, yay.</p>
+<h2><span class="header-section-number">4.4</span> Creating objects</h2>
+<p>You can make an object by <em>assigning</em> (<code>&lt;-</code>) to its name, like this:</p>
+<pre class="r"><code>a &lt;- 2</code></pre>
+<p>Now we have a scalar, a vector with one element. This element consists in the integer value 2. The new object is called <code>a</code>. Not <code>A</code>! <strong><code>R</code> is case sensitive</strong>. You can see <code>a</code> pop up in the environment tab, with some extra meta information. <code>a</code> can be used like so:</p>
+<pre class="r"><code>a+1</code></pre>
+<pre><code>## [1] 3</code></pre>
+<pre class="r"><code>a^2</code></pre>
+<pre><code>## [1] 4</code></pre>
+<p>You can also remove <code>a</code> like so:</p>
+<pre class="r"><code>rm(a)</code></pre>
+</div>
+<div id="more-on-functions" class="section level2">
+<h2><span class="header-section-number">4.5</span> More on functions</h2>
+<p>You can also assign the output straight from a function. For example:</p>
+<pre class="r"><code>nums &lt;- rnorm(n = 10, mean = 0, sd = 1)
+nums</code></pre>
+<pre><code>##  [1] -0.2625578 -1.7374526  1.0278352  0.1723649 -0.1975631  1.1073391
+##  [7]  1.6262453  3.7221080  0.4823833 -1.1135958</code></pre>
+<p>Here we have created a new object <code>nums</code> by assigning the output of the function <code>rnorm()</code> (ten random draws from a standard normal distribution). See how we use <code>rnorm()</code> there? This function has three <em>arguments</em> (i.e. parameters), in this case intuitively named if you’ve ever taken an intro statistics class. Now the object <code>nums</code> is simply available to use throughout the remainder of this <code>R</code> session, yay.</p>
+</div>
+<div id="reading-help-files" class="section level2">
+<h2><span class="header-section-number">4.6</span> Reading help files</h2>
+<p>You can learn about a particular function in different ways. <code>R</code> functions are usually documented, and we can see the help file by typing <code>?</code> in front of the function name in the console:</p>
+<pre class="r"><code>?rnorm</code></pre>
+<p>Do this live and see how the help page opens by default in the lower right pane in <code>Rstudio</code>. Such help pages are structured, and it’s worth learning their basic parts so you can make good use of them. The <strong>Description</strong> section tells you the purpose, and is short and to the point. The <strong>Usage</strong> section tells you how a function <em>call</em> might look like if all arguments are used. For <code>rnorm()</code> we see <code>rnorm(n, mean = 0, sd = 1)</code>. From this we learn that <code>n</code> is a necessary argument, whereas <code>mean</code> and <code>sd</code> have default values of 0 and 1, and are therefore <em>optional</em> arguments. You can get more information about what’s expected of the arguments in the <strong>Arguments</strong> section. The <strong>Details</strong> section gives further information on methods and other things you might want to be aware of. The <strong>Value</strong> section describes function output, and it might be structured. The <strong>Examples</strong> section is probably the most immediately useful, as it gives working examples that often gives hints on how to set things up to effectively use the function.</p>
+<p>Even so, sometimes help files are terse. If the reason you’re reading them is an error or warning, then you can often find answers in <a href="https://stackoverflow.com/questions/tagged/r">Stack Overflow</a>. You can also save yourself the trouble of copying and pasting error messages into a search engine by using the <code>searcher</code> package.</p>
+<p>TO BE CONTINUED.</p>
 </div>
 <div id="the-gapminder-data.frame" class="section level2">
-<h2><span class="header-section-number">4.4</span> the gapminder <code>data.frame</code></h2>
+<h2><span class="header-section-number">4.7</span> the gapminder <code>data.frame</code></h2>
 <p>Let’s work with a nicely formatted <code>data.frame</code>. These are like a rectangular spreadsheet, or like a dataset in <code>Stata</code>: <code>data.frame</code>s have rows and columns, and there can be different kinds of data between columns, but only one kind of data within a column.</p>
 <p>Let’s get a <code>data.frame</code> to play with: Hans Rosling’s famous data, which you can get as follows: First we download and install an <code>R</code> package (library) called <code>gapminder</code> using the function <code>install.packages()</code>. You only need to do this once to get the package.</p>
 <pre class="r"><code>install.packages(&quot;gapminder&quot;)</code></pre>

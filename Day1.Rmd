@@ -52,36 +52,37 @@ This is an absolute intro course, I don't expect you'll have any experience with
 `Rstudio` is an application. You should download and install the latest version from here:
 [https://www.rstudio.com/products/rstudio/download/](https://www.rstudio.com/products/rstudio/download/) -- again, look at the OS specs and pick the one that pairs well with your operating system.
 
-`Rstudio` is many things at once. It is a file manager, a script editor, a document editor, an instance of `R`, a data viewer, even a web browser. This is where we'll do everything. We will be working often in the form of `R`*markdown* documents, which allows us to mix code, output, and text in a single file. This very document was written in `R` markdown, and it can generate nice-looking documents in Word, html, or pdf. We'll get started right away with this. The other way we'll write code is in `R` scripts, which are just text files with the `.R` or `.r` file extension.
+`Rstudio` is many things at once. It is a file manager, a script editor, a document editor, an instance of `R`, a data viewer, even a web browser. This is where we'll do everything. We will be working often in the form of `R`*markdown* documents, which allows us to mix code, output, and text in a single file. This very document was written in `R` markdown, and it can generate nice-looking documents in Word, html, or pdf (I'm not exactly taking advantage of all its bells and whistles). We'll get started right away with this. The other way we'll write code is in `R` scripts, which are just text files with the `.R` or `.r` file extension.
 
 \begin{center}
 *** Brief intermission for Rstudio tour and demonstration ***
 \end{center}
 
 TO-DO list for the demonstration:
-1. Rstudio viewers.
-2. arithmetic in the console.
-3. start a `.project` for this module.
-4. make a folder for Monday.
-5. make a new `R` markdown file for session.
-6. show how to use `R` from markdown.
-7. knit.
-8. yell hurrah.
+1. Rstudio panes and tabs
+2. arithmetic in the console
+3. start a `.project` for this workshop
+4. make a folder for Day 1, Monday
+5. make a new `R` markdown file for this session
+6. show how to use `R` from markdown
+7. knit
+8. yell hurrah
 
-Much of the `R` interaction we do in this first week of the workshop will be *from* Rmarkdown. This will become second nature, and you can take that with you.
+Much of the `R` interaction we do in this first week of the workshop will be *from* Rmarkdown. This will become second nature, and you can take that with you. I'll comment other Rstudio features as we go.
 
 # `R` basics
 
+## `R` sessions
+We often speak of `R` sessions, a given interactive instance of `R`. For the most part `R` sessions are in-memory. If you have a dataset (or many) loaded into a session, then these are stored as *objects* in your workspace or *environment*. You can have a clean or a cluttery environment. You can take a look at what's in your environment in the `environment` tab of Rstudio (upper right corner by default). When you close an instance of `R` you can save your environment as-is, or you can lose it. I recommend *not* saving it. Otherwise you'll end up with lots of file baggage. It's more efficient and less bug-prone to save code and data in files than to save a bunch of saved `R` sessions. You can wipe your session free in Rstudio by selecting `Restart R` under `session` tab, or `Ctrl + Shift + F10`, or by executing `rstudioapi::restartSession()` in the console.
+
+## `R` is functional
 `R` is a *functional* programming language. You can think of functions in different ways-- they're like the way functions are used in mathematics, $f()$, or you could think of them as little programs. You give the function input (data, instructions), and then it does something with that and returns output.
 
 Here's a cheap example:
 ```{r}
 sum(1,2,3,4)
 ```
-*sum* is just the name of the function instead of $f$, and just the same, we enclose its inputs in round parentheses. `R` has many many such functions available to you. They can be combined in many many ways, and you can write your own functions too. If you get the hang of it, you'll find that functions can help you structure thought and analyses. We'll learn a lot about them later this week, but we'll start using them today without thinking about it much. We call `R` a functional language because everything gets done in `R` using functions, and because functions always behave consistently: a given set of inputs (arguments) always returns the same output.
-
-## `R` sessions
-We often speak of `R` sessions, a given interactive instance of `R`. For the most part `R` sessions are in-memory. If you have a dataset (or many) loaded into a session, then these are stored as *objects* in your workspace or *environment*. You can have a clean or a cluttery environment. You can take a look at what's in your environment in the `environment` tab of Rstudio (upper right corner by default). When you close an instance of `R` you can save your environment as-is, or you can lose it. I recommend *not* saving it. Otherwise you'll end up with lots of file baggage. It's more efficient and less bug-prone to save code and data in files than to save a bunch of saved `R` sessions. You can wipe your session free in Rstudio by selecting `Restart R` under `session` tab, or `Ctrl + Shift + F10`, or by executing `rstudioapi::restartSession()` in the console.
+*sum* is just the name of the function instead of $f()$, and just the same, we enclose its inputs in round parentheses. `R` has many many such functions available to you. They can be combined in many many ways, and you can write your own functions too. If you get the hang of it, you'll find that functions can help you structure thought and analyses. We'll learn a lot about them later this week, but we'll start using them today without thinking about it much. We call `R` a functional language because everything gets done in `R` using functions, and because functions always behave consistently: a given set of inputs (arguments) always returns the same output.
 
 ## `R` uses *objects*
 In an interactive `R` session, you can have different pieces of data, *objects*, and `R` has different kinds of these, most of which are data structures. 
@@ -94,16 +95,41 @@ In an interactive `R` session, you can have different pieces of data, *objects*,
 
 And many more...
 
-Today we'll use `vector`s and `data.frame`s.
+Today we'll use `vector`s and `data.frame`s, and some nuanced cousins of the `data.frame`.
 
 ## Creating objects
-You can make an object by *assigning* to its name, like this:
+You can make an object by *assigning* (`<-`) to its name, like this:
 ```{r}
-my_new_object <- rnorm(n = 10, mean = 0, sd = 1)
-my_new_object
+a <- 2
+```
+Now we have a scalar, a vector with one element. This element consists in the integer value 2. The new object is called `a`. Not `A`! **`R` is case sensitive**. You can see `a` pop up in the environment tab, with some extra meta information. `a` can be used like so:
+```{r}
+a+1
+a^2
+```
+You can also remove `a` like so:
+```{r}
+rm(a)
 ```
 
-Here we have created a new object `my_new_object` by assigning (`<-`) the output of the function `rnorm()` (ten random draws from a standard normal distribution). See how we use `rnorm()` there? This function has three *arguments* (i.e. parameters), in this case intuitively named if you've ever taken an intro statistics class. Now the object `my_new_object` is simply available to use throughout the remainder of this `R` session, yay. 
+## More on functions
+You can also assign the output straight from a function. For example:
+```{r}
+nums <- rnorm(n = 10, mean = 0, sd = 1)
+nums
+```
+Here we have created a new object `nums` by assigning the output of the function `rnorm()` (ten random draws from a standard normal distribution). See how we use `rnorm()` there? This function has three *arguments* (i.e. parameters), in this case intuitively named if you've ever taken an intro statistics class. Now the object `nums` is simply available to use throughout the remainder of this `R` session, yay. 
+
+## Reading help files
+You can learn about a particular function in different ways. `R` functions are usually documented, and we can see the help file by typing `?` in front of the function name in the console:
+```{r, eval = FALSE}
+?rnorm
+```
+Do this live and see how the help page opens by default in the lower right pane in `Rstudio`. Such help pages are structured, and it's worth learning their basic parts so you can make good use of them. The **Description** section tells you the purpose, and is short and to the point. The **Usage** section tells you how a function *call* might look like if all arguments are used. For `rnorm()` we see `rnorm(n, mean = 0, sd = 1)`. From this we learn that `n` is a necessary argument, whereas `mean` and `sd` have default values of 0 and 1, and are therefore *optional* arguments. You can get more information about what's expected of the arguments in the **Arguments** section. The **Details** section gives further information on methods and other things you might want to be aware of. The **Value** section describes function output, and it might be structured. The **Examples** section is probably the most immediately useful, as it gives working examples that often gives hints on how to set things up to effectively use the function.
+
+Even so, sometimes help files are terse. If the reason you're reading them is an error or warning, then you can often find answers in [Stack Overflow](https://stackoverflow.com/questions/tagged/r). You can also save yourself the trouble of copying and pasting error messages into a search engine by using the `searcher` package.
+
+TO BE CONTINUED.
 
 ## the gapminder `data.frame`
 Let's work with a nicely formatted `data.frame`. These are like a rectangular spreadsheet, or like a dataset in `Stata`: `data.frame`s have rows and columns, and there can be different kinds of data between columns, but only one kind of data within a column.
