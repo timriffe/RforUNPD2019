@@ -111,6 +111,9 @@ You can also remove `a` like so:
 ```{r}
 rm(a)
 ```
+Assignment also works using `=`, so whether to use `<-` or not is mostly an aesthetic choice. `=` is used to specify arguments, so perhaps to avoid confusion you'd prefer `=` for everything, but I personally like to keep concepts separate where possible.
+
+This way of object creation is general, for all types and sizes of objects. You will see it used everywhere you look in `R`.
 
 ## More on functions
 You can also assign the output straight from a function. For example:
@@ -129,7 +132,23 @@ Do this live and see how the help page opens by default in the lower right pane 
 
 Even so, sometimes help files are terse. If the reason you're reading them is an error or warning, then you can often find answers in [Stack Overflow](https://stackoverflow.com/questions/tagged/r). You can also save yourself the trouble of copying and pasting error messages into a search engine by using the `searcher` package.
 
-TO BE CONTINUED.
+You only need to install it once.
+```{r, eval = FALSE}
+install.packages("searcher")
+```
+
+The following works in live `R` sessions, but not from an `Rmarkdown` chunk in my experience, FYI.
+```{r, eval = FALSE}
+library(searcher)
+sum + mean # invoke an error
+search_google() # by default searches this error
+```
+
+# Tools for data analysis
+The above basics are incomplete, but applicable no matter what approach you take to `R` programming. Notably missing is an overview to subsetting and selecting, and this is because it depends on your approach. Now we're going to get started using some basic tools from the `tidyverse`, `ggplot` construction basics and `dplyr` data processing pipelines in particular so we'll see how a variety of operations work in the tidy approach.
+
+## tidy data
+*Tidy* data refers to tables of a particular layout, with one observation per row and one variable per column.
 
 ## the gapminder `data.frame`
 Let's work with a nicely formatted `data.frame`. These are like a rectangular spreadsheet, or like a dataset in `Stata`: `data.frame`s have rows and columns, and there can be different kinds of data between columns, but only one kind of data within a column.

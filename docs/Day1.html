@@ -384,9 +384,9 @@ Max-Planck-Institute for Demographic Research</div></h4>
 <li><a href="#creating-objects"><span class="toc-section-number">4.4</span> Creating objects</a></li>
 <li><a href="#more-on-functions"><span class="toc-section-number">4.5</span> More on functions</a></li>
 <li><a href="#reading-help-files"><span class="toc-section-number">4.6</span> Reading help files</a></li>
-<li><a href="#the-gapminder-data.frame"><span class="toc-section-number">4.7</span> the gapminder <code>data.frame</code></a></li>
 </ul></li>
-<li><a href="#tidy-data"><span class="toc-section-number">5</span> <em>tidy</em> data</a></li>
+<li><a href="#the-gapminder-data.frame"><span class="toc-section-number">5</span> the gapminder <code>data.frame</code></a></li>
+<li><a href="#tidy-data"><span class="toc-section-number">6</span> <em>tidy</em> data</a></li>
 </ul>
 </div>
 
@@ -451,14 +451,16 @@ Max-Planck-Institute for Demographic Research</div></h4>
 <pre><code>## [1] 4</code></pre>
 <p>You can also remove <code>a</code> like so:</p>
 <pre class="r"><code>rm(a)</code></pre>
+<p>Assignment also works using <code>=</code>, so whether to use <code>&lt;-</code> or not is mostly an aesthetic choice. <code>=</code> is used to specify arguments, so perhaps to avoid confusion you’d prefer <code>=</code> for everything, but I personally like to keep concepts separate where possible.</p>
+<p>This way of object creation is general, for all types and sizes of objects. You will see it used everywhere you look in <code>R</code>.</p>
 </div>
 <div id="more-on-functions" class="section level2">
 <h2><span class="header-section-number">4.5</span> More on functions</h2>
 <p>You can also assign the output straight from a function. For example:</p>
 <pre class="r"><code>nums &lt;- rnorm(n = 10, mean = 0, sd = 1)
 nums</code></pre>
-<pre><code>##  [1] -0.2625578 -1.7374526  1.0278352  0.1723649 -0.1975631  1.1073391
-##  [7]  1.6262453  3.7221080  0.4823833 -1.1135958</code></pre>
+<pre><code>##  [1]  0.34113913 -1.19869844 -1.82194678  0.94536316 -0.33027437
+##  [6] -1.42831676  0.78036431  0.16859897 -0.14431645  0.03957556</code></pre>
 <p>Here we have created a new object <code>nums</code> by assigning the output of the function <code>rnorm()</code> (ten random draws from a standard normal distribution). See how we use <code>rnorm()</code> there? This function has three <em>arguments</em> (i.e. parameters), in this case intuitively named if you’ve ever taken an intro statistics class. Now the object <code>nums</code> is simply available to use throughout the remainder of this <code>R</code> session, yay.</p>
 </div>
 <div id="reading-help-files" class="section level2">
@@ -467,10 +469,16 @@ nums</code></pre>
 <pre class="r"><code>?rnorm</code></pre>
 <p>Do this live and see how the help page opens by default in the lower right pane in <code>Rstudio</code>. Such help pages are structured, and it’s worth learning their basic parts so you can make good use of them. The <strong>Description</strong> section tells you the purpose, and is short and to the point. The <strong>Usage</strong> section tells you how a function <em>call</em> might look like if all arguments are used. For <code>rnorm()</code> we see <code>rnorm(n, mean = 0, sd = 1)</code>. From this we learn that <code>n</code> is a necessary argument, whereas <code>mean</code> and <code>sd</code> have default values of 0 and 1, and are therefore <em>optional</em> arguments. You can get more information about what’s expected of the arguments in the <strong>Arguments</strong> section. The <strong>Details</strong> section gives further information on methods and other things you might want to be aware of. The <strong>Value</strong> section describes function output, and it might be structured. The <strong>Examples</strong> section is probably the most immediately useful, as it gives working examples that often gives hints on how to set things up to effectively use the function.</p>
 <p>Even so, sometimes help files are terse. If the reason you’re reading them is an error or warning, then you can often find answers in <a href="https://stackoverflow.com/questions/tagged/r">Stack Overflow</a>. You can also save yourself the trouble of copying and pasting error messages into a search engine by using the <code>searcher</code> package.</p>
-<p>TO BE CONTINUED.</p>
+<p>You only need to install it once.</p>
+<pre class="r"><code>install.packages(&quot;searcher&quot;)</code></pre>
+<p>The following works in live <code>R</code> sessions, but not from an <code>Rmarkdown</code> chunk in my experience, FYI.</p>
+<pre class="r"><code>library(searcher)
+sum + mean # invoke an error
+search_google() # by default searches this error</code></pre>
 </div>
-<div id="the-gapminder-data.frame" class="section level2">
-<h2><span class="header-section-number">4.7</span> the gapminder <code>data.frame</code></h2>
+</div>
+<div id="the-gapminder-data.frame" class="section level1">
+<h1><span class="header-section-number">5</span> the gapminder <code>data.frame</code></h1>
 <p>Let’s work with a nicely formatted <code>data.frame</code>. These are like a rectangular spreadsheet, or like a dataset in <code>Stata</code>: <code>data.frame</code>s have rows and columns, and there can be different kinds of data between columns, but only one kind of data within a column.</p>
 <p>Let’s get a <code>data.frame</code> to play with: Hans Rosling’s famous data, which you can get as follows: First we download and install an <code>R</code> package (library) called <code>gapminder</code> using the function <code>install.packages()</code>. You only need to do this once to get the package.</p>
 <pre class="r"><code>install.packages(&quot;gapminder&quot;)</code></pre>
@@ -492,9 +500,8 @@ nums</code></pre>
 <pre class="r"><code>install.packages(&quot;tidyverse&quot;)</code></pre>
 <pre class="r"><code>library(tidyverse)</code></pre>
 </div>
-</div>
 <div id="tidy-data" class="section level1">
-<h1><span class="header-section-number">5</span> <em>tidy</em> data</h1>
+<h1><span class="header-section-number">6</span> <em>tidy</em> data</h1>
 </div>
 
 
