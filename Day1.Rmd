@@ -176,14 +176,14 @@ sum + mean # invoke an error
 search_google() # by default searches this error
 ```
 
-# Tools for data analysis
+# Tidyverse basics
 The above basics are incomplete, but applicable no matter what approach you take to `R` programming. Notably missing is an overview to subsetting and selecting, and this is because it depends on your approach. Now we're going to get started using some basic tools from the `tidyverse`, `ggplot` construction basics and `dplyr` data processing pipelines in particular so we'll see how a variety of operations work in the tidy approach. In later sessions we'll see some more traditional methods of filtering and selection.
 
 ## tidy data
-*Tidy* data refers to tables of a particular layout, with one observation per row and one variable per column. 
+*Tidy* data refers to tables of a particular layout, with one observation per row and one variable per column. Tidy datasets processed using tidyverse tools allow for fast and understandable analyses that in many cases require no programming, whereas it often takes a certain amount of head-scratching (programming) to analyze not-tidy datasets. 
 
 ### Example of tidy data
-For example, you're probably all familiar with HMD lifetables: This data is tidy. If you were to take all the HMD single age lifetables and stack them, adding new grouping columns for Sex and Country, then this would still be tidy. That is, a single HMD observation consists in a unique combination of Country, Sex, Year, and Age. Each lifetable column is a variable, so the tidy way to store them is the traditional way: in columns. 
+For example, you're probably all familiar with HMD lifetables [@HMD]: This data is tidy. If you were to take all the HMD single age lifetables and stack them, adding new grouping columns for Sex and Country, then this would still be tidy. That is, a single HMD observation consists in a unique combination of Country, Sex, Year, and Age. Each lifetable column is a variable, so the tidy way to store them is the traditional way: in columns. 
 
 ### Examples of not tidy data.
 1. The DemoData database is not tidy: it's much longer than tidy data. All variables are stacked, and the variable type (qx, lx, counts, etc) is coded in an additional grouping column. This is efficient for storage, given that not every observation has every variable. It is not efficient for interactive programming because observations are potentially scattered over rows.
@@ -195,10 +195,11 @@ For example, you're probably all familiar with HMD lifetables: This data is tidy
 Different data structures exist for various reasons, but in the end tidy data facilitates the kind of thinking and operations needed for flexible data analyses and visualization.
 
 ## the gapminder `data.frame`
-Let's work with a tidy `data.frame`. These are like a rectangular spreadsheet, or like a dataset in `Stata`: `data.frame`s have rows and columns, and there can be different kinds of data between columns, but only one kind of data within a column. Load it in case you didn't before:
+Let's work with a tidy `data.frame`. These are like a rectangular spreadsheet, or like a dataset in `Stata`: `data.frame`s have rows and columns, and there can be different kinds of data between columns, but only one kind of data within a column. Load it along with `tidyverse` in case you didn't before:
 
 ```{r}
 library(gapminder)
+library(tidyverse)
 ```
 
 There are different ways to get orient yourself with a new data object.
@@ -207,18 +208,81 @@ There are different ways to get orient yourself with a new data object.
 *** Clicky demonstration of viewing data ***
 \end{center}
 
-Or you could get metadata about the object from `str()` (structure). This tells us that we have 1704 observations (rows) of 6 variables, and then it tells us the variable (column) names, what kind of data it is (`Factor` = categorical, `int` = integer, `num` = numeric), and a sample of the first few observations in each.
+Or you could get metadata about the object from `str()` (structure), or `glimpse()` from the tidyverse. This tells us that we have 1704 observations (rows) of 6 variables, and then it tells us the variable (column) names, what kind of data it is (`Factor` = categorical, `int` = integer, `num` = numeric), and a sample of the first few observations in each.
 
 ```{r}
 str(gapminder)
 ```
 
-In the *tidyverse*, we mostly work with `data.frames` or data-frame-like objects. 
+## Basic `ggplot2` with the gapminder data
+Tidy datasets such as this can also be visualized without further ado using a systematic grammar [@wilkinson2012grammar] implemented in the `ggplot2` package ( @wickham2016ggplot2, this loads automatically with `tidyverse`). The `gapminder` examples I'll give today and tomorrow are either gratuitously lifted or modified from @healy2018data, which you can either purchase as the book (I'll show it to you), or refer to the free version online: [www.socviz.co](www.socviz.co). It's a fabulous book. Let's take a first look:
+
+```{r}
+ggplot(gapminder, mapping = aes(x = gdpPercap, y = lifeExp, color = continent)) + 
+	geom_point() 
 ```
 
-```{r, message = FALSE}
-library(tidyverse)
+The `ggplot()` function *maps* variables in the `gapminder` dataset to either coordinates (x,y) or aesthetics (for example color). This sets up the plot metadata, but it does not plot the data because we didn't tell it how to do so: this final step is done by adding a point geometry `geom_point()` 
+
+```{r}
+library(scales)
+ggplot(gapminder, mapping = aes(x = gdpPercap, y = lifeExp, color = continent)) + 
+	geom_point() +
+	scale_x_log10(labels = dollar)
 ```
-# *tidy* data
+
+It turns out that by specifying a nice large set of possible mappings, coordinate systems, geoms, and discrete and continous options for scaling mappings, that you can create just about any plot. For other tricky ones, there are usually packages available. Here's a nice overview of `ggplot2` functionality: [https://www.rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf](https://www.rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf)
+
+My objective now is to show you a few different geoms and ways of doing panels in `ggplot2`. 
+
+For example, we can also add in a smoother to see the global trend:
+```{r}
+ggplot(gapminder, mapping = aes(x = gdpPercap, y = lifeExp)) + 
+	geom_point(mapping = aes(color = continent)) +
+	geom_smooth(method = "loess") +
+	scale_x_log10(labels = dollar)
+```
+
+See how geoms can also have their own special mapping? Had we left color in the first mapping, then everything that follows would have been split on continent. See:
+
+```{r}
+ggplot(gapminder, mapping = aes(x = gdpPercap, y = lifeExp, color = continent)) + 
+	geom_point() +
+	geom_smooth(method = "loess") +
+	scale_x_log10(labels = dollar)
+```
+Wow, that's a noisy plot! What if instead of color we just split it into subplots by continent?
+```{r}
+ggplot(gapminder, mapping = aes(x = gdpPercap, y = lifeExp)) + 
+	geom_point() +
+	geom_smooth(method = "loess") +
+	scale_x_log10(labels = dollar) + 
+	facet_wrap(~continent)
+```
+We get panel plots like this by specifying a layout formula in `facet_wrap()`, where `~` separates left and right sides of the fomula, where left usually means rows in a panel layout and right means columns. Since there's nothing on the left it just orders the continents. Color is no longer needed since the groups are separated.
+
+There is a time variable in this dataset that we've basically been ignoring. How about a `gdpPercap` time series?
+
+```{r}
+ggplot(gapminder, mapping = aes(x = year, y = gdpPercap, by = country)) +
+	geom_line() 
+```
+```{r}
+ggplot(gapminder, mapping = aes(x = year, y = gdpPercap, by = country)) +
+	geom_line() +
+	facet_wrap(~continent)
+```
+
+# Exercises
+
+**\large Exercise 1.1: ** 
+Try making the gapminder scatterplot with different smoothing methods: i) on the whole dataset and ii) by continent. You can find out the other methods by reading the help file, typing `?geom_smooth`
+**\large Exercise 1.2 **
+Here's a way to remove some rows from a dataset:
+```{r}
+gaps <- filter(gapminder, continent != "Oceania")
+```
+Try subsetting `gapminder` to just the first and last years (and also removing Oceania). Plot the density of log gdpPercap by continents (tip: `fill = continent`). They will overlap (tip: try `alpha = .5` to make them transparent). Make a 2-panel plot showing how these distributions changed between 1952 and 2007.
+# References {-}
 
 
