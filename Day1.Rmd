@@ -217,6 +217,7 @@ str(gapminder)
 ## Basic `ggplot2` with the gapminder data
 Tidy datasets such as this can also be visualized without further ado using a systematic grammar [@wilkinson2012grammar] implemented in the `ggplot2` package ( @wickham2016ggplot2, this loads automatically with `tidyverse`). The `gapminder` examples I'll give today and tomorrow are either gratuitously lifted or modified from @healy2018data, which you can either purchase as the book (I'll show it to you), or refer to the free version online: [www.socviz.co](www.socviz.co). It's a fabulous book. Let's take a first look:
 
+### *Map* to aesthetics
 ```{r}
 ggplot(gapminder, mapping = aes(x = gdpPercap, y = lifeExp, color = continent)) + 
 	geom_point() 
@@ -224,6 +225,7 @@ ggplot(gapminder, mapping = aes(x = gdpPercap, y = lifeExp, color = continent)) 
 
 The `ggplot()` function *maps* variables in the `gapminder` dataset to either coordinates (x,y) or aesthetics (for example color). This sets up the plot metadata, but it does not plot the data because we didn't tell it how to do so: this final step is done by adding a point geometry `geom_point()` 
 
+### Adjust axis scales
 ```{r}
 library(scales)
 ggplot(gapminder, mapping = aes(x = gdpPercap, y = lifeExp, color = continent)) + 
@@ -233,6 +235,7 @@ ggplot(gapminder, mapping = aes(x = gdpPercap, y = lifeExp, color = continent)) 
 
 It turns out that by specifying a nice large set of possible mappings, coordinate systems, geoms, and discrete and continous options for scaling mappings, that you can create just about any plot. For other tricky ones, there are usually packages available. Here's a nice overview of `ggplot2` functionality: [https://www.rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf](https://www.rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf)
 
+### `geom`s and `facet`s
 My objective now is to show you a few different geoms and ways of doing panels in `ggplot2`. 
 
 For example, we can also add in a smoother to see the global trend:
@@ -252,6 +255,7 @@ ggplot(gapminder, mapping = aes(x = gdpPercap, y = lifeExp, color = continent)) 
 	scale_x_log10(labels = dollar)
 ```
 Wow, that's a noisy plot! What if instead of color we just split it into subplots by continent?
+
 ```{r}
 ggplot(gapminder, mapping = aes(x = gdpPercap, y = lifeExp)) + 
 	geom_point() +
@@ -263,10 +267,13 @@ We get panel plots like this by specifying a layout formula in `facet_wrap()`, w
 
 There is a time variable in this dataset that we've basically been ignoring. How about a `gdpPercap` time series?
 
+Too busy?
 ```{r}
 ggplot(gapminder, mapping = aes(x = year, y = gdpPercap, by = country)) +
 	geom_line() 
 ```
+
+Use facetting to seprate the continents
 ```{r}
 ggplot(gapminder, mapping = aes(x = year, y = gdpPercap, by = country)) +
 	geom_line() +
@@ -275,14 +282,14 @@ ggplot(gapminder, mapping = aes(x = year, y = gdpPercap, by = country)) +
 
 # Exercises
 
-**\large Exercise 1.1: ** 
-Try making the gapminder scatterplot with different smoothing methods: i) on the whole dataset and ii) by continent. You can find out the other methods by reading the help file, typing `?geom_smooth`
-**\large Exercise 1.2 **
-Here's a way to remove some rows from a dataset:
+1. Try making the gapminder scatterplot with different smoothing methods: i) on the whole dataset and ii) by continent. You can find out the other methods by reading the help file, typing `?geom_smooth`
+
+2. Here's a way to remove some rows from a dataset:
 ```{r}
 gaps <- filter(gapminder, continent != "Oceania")
 ```
-Try subsetting `gapminder` to just the first and last years (and also removing Oceania). Plot the density of log gdpPercap by continents (tip: `fill = continent`). They will overlap (tip: try `alpha = .5` to make them transparent). Make a 2-panel plot showing how these distributions changed between 1952 and 2007.
+Try subsetting `gapminder` to just the first and last years (and also removing Oceania). Plot the density of log `gdpPercap` by continents (tip: `fill = continent`). They will overlap (tip: try `alpha = .5` to make them transparent). Make a 2-panel plot showing how these distributions changed between 1952 and 2007.
+
 # References {-}
 
 
