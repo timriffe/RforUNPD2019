@@ -399,7 +399,7 @@ Max-Planck-Institute for Demographic Research</div></h4>
 </ul></li>
 </ul></li>
 <li><a href="#exercises"><span class="toc-section-number">6</span> Exercises</a></li>
-<li><a href="#references">References</a></li>
+<li><a href="#references"><span class="toc-section-number">7</span> References</a></li>
 </ul>
 </div>
 
@@ -472,8 +472,8 @@ Max-Planck-Institute for Demographic Research</div></h4>
 <p>You can also assign the output straight from a function. For example:</p>
 <pre class="r"><code>nums &lt;- rnorm(n = 10, mean = 0, sd = 1)
 nums</code></pre>
-<pre><code>##  [1] -0.90241893 -0.88720099 -0.76102852 -0.02971092  1.77853359
-##  [6] -0.12965497 -1.60886284  0.63542611 -0.95405540  0.42655500</code></pre>
+<pre><code>##  [1] -0.97078243 -0.08303948  0.86055295  0.56750340 -1.29091721
+##  [6] -0.75014035  1.46999514 -0.34384949  1.03116327 -0.07260052</code></pre>
 <p>Here we have created a new object <code>nums</code> by assigning the output of the function <code>rnorm()</code> (ten random draws from a standard normal distribution). See how we use <code>rnorm()</code> there? This function has three <em>arguments</em> (i.e. parameters), in this case intuitively named if you’ve ever taken an intro statistics class. Now the object <code>nums</code> is simply available to use throughout the remainder of this <code>R</code> session, yay.</p>
 </div>
 <div id="packages-extend-r" class="section level2">
@@ -602,8 +602,8 @@ ggplot(gapminder, mapping = aes(x = gdpPercap, y = lifeExp, color = continent)) 
 <pre class="r"><code>gaps &lt;- filter(gapminder, continent != &quot;Oceania&quot;)</code></pre>
 <p>Try subsetting <code>gapminder</code> to just the first and last years (and also removing Oceania). Plot the density of log <code>gdpPercap</code> by continents (tip: <code>fill = continent</code>). They will overlap (tip: try <code>alpha = .5</code> to make them transparent). Make a 2-panel plot showing how these distributions changed between 1952 and 2007.</p>
 </div>
-<div id="references" class="section level1 unnumbered">
-<h1>References</h1>
+<div id="references" class="section level1">
+<h1><span class="header-section-number">7</span> References</h1>
 </div>
 
 
