@@ -472,8 +472,8 @@ Max-Planck-Institute for Demographic Research</div></h4>
 <p>You can also assign the output straight from a function. For example:</p>
 <pre class="r"><code>nums &lt;- rnorm(n = 10, mean = 0, sd = 1)
 nums</code></pre>
-<pre><code>##  [1] -1.18323809 -0.72989482 -0.24916878 -1.31642951  0.59243594
-##  [6] -0.78613764 -0.06133269 -2.42751851  1.31235343  0.21058670</code></pre>
+<pre><code>##  [1] -0.9428046  0.3532577  0.2496991 -0.8020724 -0.8603736 -0.6506972
+##  [7] -0.2803362  0.7766409 -0.1070681 -1.6026425</code></pre>
 <p>Here we have created a new object <code>nums</code> by assigning the output of the function <code>rnorm()</code> (ten random draws from a standard normal distribution). See how we use <code>rnorm()</code> there? This function has three <em>arguments</em> (i.e. parameters), in this case intuitively named if you’ve ever taken an intro statistics class. Now the object <code>nums</code> is simply available to use throughout the remainder of this <code>R</code> session, yay.</p>
 </div>
 <div id="packages-extend-r" class="section level2">
@@ -511,7 +511,7 @@ search_google() # by default searches this error</code></pre>
 <p><em>Tidy</em> data refers to tables of a particular layout, with one observation per row and one variable per column. Tidy datasets processed using tidyverse tools allow for fast and understandable analyses that in many cases require no programming, whereas it often takes a certain amount of head-scratching (programming) to analyze not-tidy datasets.</p>
 <div id="example-of-tidy-data" class="section level3">
 <h3><span class="header-section-number">5.1.1</span> Example of tidy data</h3>
-<p>For example, you’re probably all familiar with HMD lifetables <span class="citation">(Human Mortality Database, n.d.)</span>: This data is tidy. If you were to take all the HMD single age lifetables and stack them, adding new grouping columns for Sex and Country, then this would still be tidy. That is, a single HMD observation consists in a unique combination of Country, Sex, Year, and Age. Each lifetable column is a variable, so the tidy way to store them is the traditional way: in columns.</p>
+<p>For example, you’re probably all familiar with HMD lifetables <span class="citation">(Human Mortality Database 2019)</span>: This data is tidy. If you were to take all the HMD single age lifetables and stack them, adding new grouping columns for Sex and Country, then this would still be tidy. That is, a single HMD observation consists in a unique combination of Country, Sex, Year, and Age. Each lifetable column is a variable, so the tidy way to store them is the traditional way: in columns.</p>
 </div>
 <div id="examples-of-not-tidy-data." class="section level3">
 <h3><span class="header-section-number">5.1.2</span> Examples of not tidy data.</h3>
@@ -542,7 +542,7 @@ library(tidyverse)</code></pre>
 </div>
 <div id="basic-ggplot2-with-the-gapminder-data" class="section level2">
 <h2><span class="header-section-number">5.3</span> Basic <code>ggplot2</code> with the gapminder data</h2>
-<p>Tidy datasets such as this can also be visualized without further ado using a systematic grammar <span class="citation">(Wilkinson 2012)</span> implemented in the <code>ggplot2</code> package ( <span class="citation">Wickham (2016)</span>, this loads automatically with <code>tidyverse</code>). The <code>gapminder</code> examples I’ll give today and tomorrow are either gratuitously lifted or modified from <span class="citation">Healy (2018)</span>, which you can either purchase as the book (I’ll show it to you), or refer to the free version online: <a href="www.socviz.co">www.socviz.co</a>. It’s a fabulous book. Let’s take a first look:</p>
+<p>Tidy datasets such as this can also be visualized without further ado using a systematic grammar <span class="citation">(Wilkinson 2012)</span> implemented in the <code>ggplot2</code> package ( <span class="citation">Wickham (2016)</span>, this loads automatically with <code>tidyverse</code>). The <code>gapminder</code> examples I’ll give today and tomorrow are either gratuitously lifted or modified from <span class="citation">Healy (2019)</span>, which you can either purchase as the book (I’ll show it to you), or refer to the free version online: <a href="www.socviz.co">www.socviz.co</a>. It’s a fabulous book. Let’s take a first look:</p>
 <div id="map-to-aesthetics" class="section level3">
 <h3><span class="header-section-number">5.3.1</span> <em>Map</em> to aesthetics</h3>
 <pre class="r"><code>ggplot(gapminder, mapping = aes(x = gdpPercap, y = lifeExp, color = continent)) + 
@@ -606,10 +606,10 @@ ggplot(gapminder, mapping = aes(x = gdpPercap, y = lifeExp, color = continent)) 
 <h1>References</h1>
 <div id="refs" class="references">
 <div id="ref-healy2018data">
-<p>Healy, Kieran. 2018. <em>Data Visualization: A Practical Introduction</em>. Princeton University Press.</p>
+<p>Healy, Kieran. 2019. <em>Data Visualization: A Practical Introduction</em>. Princeton University Press.</p>
 </div>
 <div id="ref-HMD">
-<p>Human Mortality Database. n.d.</p>
+<p>Human Mortality Database. 2019. “University of California, Berkeley (USA) and Max Planck Institute for Demographic Research (Germany).”</p>
 </div>
 <div id="ref-wickham2016ggplot2">
 <p>Wickham, Hadley. 2016. <em>Ggplot2: Elegant Graphics for Data Analysis</em>. Springer.</p>
