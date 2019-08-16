@@ -123,6 +123,38 @@ nums
 ```
 Here we have created a new object `nums` by assigning the output of the function `rnorm()` (ten random draws from a standard normal distribution). See how we use `rnorm()` there? This function has three *arguments* (i.e. parameters), in this case intuitively named if you've ever taken an intro statistics class. Now the object `nums` is simply available to use throughout the remainder of this `R` session, yay. 
 
+## Packages extend R
+
+Packages are self-contained and documented collections of functions
+
+Let's get a `data.frame` to play with: Hans Rosling's famous data, which you can get as follows: First we download and install an `R` package (library) called `gapminder` using the function `install.packages()`. You only need to do this once to get the package.
+
+```{r, eval = FALSE}
+install.packages("gapminder")
+```
+This one installs quick because it doesn't depend on other packages. Here's one we'll use that has lots of dependencies, so it'll take a while to download and install all its pieces.
+
+```{r, eval = FALSE}
+install.packages("tidyverse")
+```
+
+`R` has thousands of packages, built by developers and users alike, and they are tied together into an ecosystem. Many packages get written by researchers to make research easier, and there are several demographers out there making `R` packages. `R` has a big community of users and developers: let's find it in different places online...
+
+\begin{center}
+*** Time-out to find the `R` community ***
+\end{center}
+
+Places to visit:
+1. CRAN
+2. StackOverflow
+3. github
+
+So some people created `gapminder` somewhere, uploaded it to `R`'s central repository, and then we installed it on our machines straight from an `R` session. Now you can load the package using the `library()` function. This loads the contents of the package into memory, i.e. makes them objects in your `R` session. The main object in this package is a `data.frame` called `gapminder`.
+
+```{r}
+library(gapminder)
+```
+
 ## Reading help files
 You can learn about a particular function in different ways. `R` functions are usually documented, and we can see the help file by typing `?` in front of the function name in the console:
 ```{r, eval = FALSE}
@@ -145,31 +177,31 @@ search_google() # by default searches this error
 ```
 
 # Tools for data analysis
-The above basics are incomplete, but applicable no matter what approach you take to `R` programming. Notably missing is an overview to subsetting and selecting, and this is because it depends on your approach. Now we're going to get started using some basic tools from the `tidyverse`, `ggplot` construction basics and `dplyr` data processing pipelines in particular so we'll see how a variety of operations work in the tidy approach.
+The above basics are incomplete, but applicable no matter what approach you take to `R` programming. Notably missing is an overview to subsetting and selecting, and this is because it depends on your approach. Now we're going to get started using some basic tools from the `tidyverse`, `ggplot` construction basics and `dplyr` data processing pipelines in particular so we'll see how a variety of operations work in the tidy approach. In later sessions we'll see some more traditional methods of filtering and selection.
 
 ## tidy data
-*Tidy* data refers to tables of a particular layout, with one observation per row and one variable per column.
+*Tidy* data refers to tables of a particular layout, with one observation per row and one variable per column. 
+
+### Example of tidy data
+For example, you're probably all familiar with HMD lifetables: This data is tidy. If you were to take all the HMD single age lifetables and stack them, adding new grouping columns for Sex and Country, then this would still be tidy. That is, a single HMD observation consists in a unique combination of Country, Sex, Year, and Age. Each lifetable column is a variable, so the tidy way to store them is the traditional way: in columns. 
+
+### Examples of not tidy data.
+1. The DemoData database is not tidy: it's much longer than tidy data. All variables are stacked, and the variable type (qx, lx, counts, etc) is coded in an additional grouping column. This is efficient for storage, given that not every observation has every variable. It is not efficient for interactive programming because observations are potentially scattered over rows.
+
+2. A matrix with ages in rows and years in columns can be very convenient for traditional programming, but it does not follow our definition of tidy. To make it tidy, we would need columns for age and year, and a new column containing the variable stored in the matrix.
+
+3. Often panel data is delivered with each row representing an individual, and with many many variables. If there are 100 variables, and 10 waves, we end up with 1000 or so columns. For many analyses this is not considered tidy: an observation is a unique combination of individual and wave. To make it tidy, we'd need a column to store the wave variable.
+
+Different data structures exist for various reasons, but in the end tidy data facilitates the kind of thinking and operations needed for flexible data analyses and visualization.
 
 ## the gapminder `data.frame`
-Let's work with a nicely formatted `data.frame`. These are like a rectangular spreadsheet, or like a dataset in `Stata`: `data.frame`s have rows and columns, and there can be different kinds of data between columns, but only one kind of data within a column.
-
-Let's get a `data.frame` to play with: Hans Rosling's famous data, which you can get as follows: First we download and install an `R` package (library) called `gapminder` using the function `install.packages()`. You only need to do this once to get the package.
-
-```{r, eval = FALSE}
-install.packages("gapminder")
-```
-
-`R` has thousands of packages, built by developers and users alike. Many packages are even written by researchers to make research easier. `R` has a big community of users and developers: let's find it in different places online...
-
-\begin{center}
-*** Time-out to find the `R` community ***
-\end{center}
-
-So some people created `gapminder` somewhere, uploaded it to `R`'s central repository, and then we installed it on our machines straight from an `R` session. Now you can load the package using the `library()` function. This loads the contents of the package into memory, i.e. makes them objects in your `R` session. The main object in this package is a `data.frame` called `gapminder`. There are different ways to take a look at it. 
+Let's work with a tidy `data.frame`. These are like a rectangular spreadsheet, or like a dataset in `Stata`: `data.frame`s have rows and columns, and there can be different kinds of data between columns, but only one kind of data within a column. Load it in case you didn't before:
 
 ```{r}
 library(gapminder)
 ```
+
+There are different ways to get orient yourself with a new data object.
 
 \begin{center}
 *** Clicky demonstration of viewing data ***
@@ -181,10 +213,7 @@ Or you could get metadata about the object from `str()` (structure). This tells 
 str(gapminder)
 ```
 
-We will mostly work with `data.frames` or data-frame-like objects. To do so, we'll use the *tidyverse* toolkit, which is a collection of packages, so let's make sure we get that installed and loaded.
-
-```{r, eval = FALSE}
-install.packages("tidyverse")
+In the *tidyverse*, we mostly work with `data.frames` or data-frame-like objects. 
 ```
 
 ```{r, message = FALSE}

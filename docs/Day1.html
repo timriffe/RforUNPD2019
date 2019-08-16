@@ -383,10 +383,17 @@ Max-Planck-Institute for Demographic Research</div></h4>
 <li><a href="#r-uses-objects"><span class="toc-section-number">4.3</span> <code>R</code> uses <em>objects</em></a></li>
 <li><a href="#creating-objects"><span class="toc-section-number">4.4</span> Creating objects</a></li>
 <li><a href="#more-on-functions"><span class="toc-section-number">4.5</span> More on functions</a></li>
-<li><a href="#reading-help-files"><span class="toc-section-number">4.6</span> Reading help files</a></li>
+<li><a href="#packages-extend-r"><span class="toc-section-number">4.6</span> Packages extend R</a></li>
+<li><a href="#reading-help-files"><span class="toc-section-number">4.7</span> Reading help files</a></li>
 </ul></li>
-<li><a href="#the-gapminder-data.frame"><span class="toc-section-number">5</span> the gapminder <code>data.frame</code></a></li>
-<li><a href="#tidy-data"><span class="toc-section-number">6</span> <em>tidy</em> data</a></li>
+<li><a href="#tools-for-data-analysis"><span class="toc-section-number">5</span> Tools for data analysis</a><ul>
+<li><a href="#tidy-data"><span class="toc-section-number">5.1</span> tidy data</a><ul>
+<li><a href="#example-of-tidy-data"><span class="toc-section-number">5.1.1</span> Example of tidy data</a></li>
+<li><a href="#examples-of-not-tidy-data."><span class="toc-section-number">5.1.2</span> Examples of not tidy data.</a></li>
+</ul></li>
+<li><a href="#the-gapminder-data.frame"><span class="toc-section-number">5.2</span> the gapminder <code>data.frame</code></a></li>
+</ul></li>
+<li><a href="#tidy-data-1"><span class="toc-section-number">6</span> <em>tidy</em> data</a></li>
 </ul>
 </div>
 
@@ -459,12 +466,25 @@ Max-Planck-Institute for Demographic Research</div></h4>
 <p>You can also assign the output straight from a function. For example:</p>
 <pre class="r"><code>nums &lt;- rnorm(n = 10, mean = 0, sd = 1)
 nums</code></pre>
-<pre><code>##  [1]  0.34113913 -1.19869844 -1.82194678  0.94536316 -0.33027437
-##  [6] -1.42831676  0.78036431  0.16859897 -0.14431645  0.03957556</code></pre>
+<pre><code>##  [1] -1.6554545  1.2288730 -0.6180125  1.7853530  2.0583030 -0.3371085
+##  [7]  1.0555003 -0.7232952 -0.2472845 -0.8683390</code></pre>
 <p>Here we have created a new object <code>nums</code> by assigning the output of the function <code>rnorm()</code> (ten random draws from a standard normal distribution). See how we use <code>rnorm()</code> there? This function has three <em>arguments</em> (i.e. parameters), in this case intuitively named if you’ve ever taken an intro statistics class. Now the object <code>nums</code> is simply available to use throughout the remainder of this <code>R</code> session, yay.</p>
 </div>
+<div id="packages-extend-r" class="section level2">
+<h2><span class="header-section-number">4.6</span> Packages extend R</h2>
+<p>Packages are self-contained and documented collections of functions</p>
+<p>Let’s get a <code>data.frame</code> to play with: Hans Rosling’s famous data, which you can get as follows: First we download and install an <code>R</code> package (library) called <code>gapminder</code> using the function <code>install.packages()</code>. You only need to do this once to get the package.</p>
+<pre class="r"><code>install.packages(&quot;gapminder&quot;)</code></pre>
+<p>This one installs quick because it doesn’t depend on other packages. Here’s one we’ll use that has lots of dependencies, so it’ll take a while to download and install all its pieces.</p>
+<pre class="r"><code>install.packages(&quot;tidyverse&quot;)</code></pre>
+<p><code>R</code> has thousands of packages, built by developers and users alike, and they are tied together into an ecosystem. Many packages get written by researchers to make research easier, and there are several demographers out there making <code>R</code> packages. <code>R</code> has a big community of users and developers: let’s find it in different places online…</p>
+
+<p>Places to visit: 1. CRAN 2. StackOverflow 3. github</p>
+<p>So some people created <code>gapminder</code> somewhere, uploaded it to <code>R</code>’s central repository, and then we installed it on our machines straight from an <code>R</code> session. Now you can load the package using the <code>library()</code> function. This loads the contents of the package into memory, i.e. makes them objects in your <code>R</code> session. The main object in this package is a <code>data.frame</code> called <code>gapminder</code>.</p>
+<pre class="r"><code>library(gapminder)</code></pre>
+</div>
 <div id="reading-help-files" class="section level2">
-<h2><span class="header-section-number">4.6</span> Reading help files</h2>
+<h2><span class="header-section-number">4.7</span> Reading help files</h2>
 <p>You can learn about a particular function in different ways. <code>R</code> functions are usually documented, and we can see the help file by typing <code>?</code> in front of the function name in the console:</p>
 <pre class="r"><code>?rnorm</code></pre>
 <p>Do this live and see how the help page opens by default in the lower right pane in <code>Rstudio</code>. Such help pages are structured, and it’s worth learning their basic parts so you can make good use of them. The <strong>Description</strong> section tells you the purpose, and is short and to the point. The <strong>Usage</strong> section tells you how a function <em>call</em> might look like if all arguments are used. For <code>rnorm()</code> we see <code>rnorm(n, mean = 0, sd = 1)</code>. From this we learn that <code>n</code> is a necessary argument, whereas <code>mean</code> and <code>sd</code> have default values of 0 and 1, and are therefore <em>optional</em> arguments. You can get more information about what’s expected of the arguments in the <strong>Arguments</strong> section. The <strong>Details</strong> section gives further information on methods and other things you might want to be aware of. The <strong>Value</strong> section describes function output, and it might be structured. The <strong>Examples</strong> section is probably the most immediately useful, as it gives working examples that often gives hints on how to set things up to effectively use the function.</p>
@@ -477,15 +497,31 @@ sum + mean # invoke an error
 search_google() # by default searches this error</code></pre>
 </div>
 </div>
-<div id="the-gapminder-data.frame" class="section level1">
-<h1><span class="header-section-number">5</span> the gapminder <code>data.frame</code></h1>
-<p>Let’s work with a nicely formatted <code>data.frame</code>. These are like a rectangular spreadsheet, or like a dataset in <code>Stata</code>: <code>data.frame</code>s have rows and columns, and there can be different kinds of data between columns, but only one kind of data within a column.</p>
-<p>Let’s get a <code>data.frame</code> to play with: Hans Rosling’s famous data, which you can get as follows: First we download and install an <code>R</code> package (library) called <code>gapminder</code> using the function <code>install.packages()</code>. You only need to do this once to get the package.</p>
-<pre class="r"><code>install.packages(&quot;gapminder&quot;)</code></pre>
-<p><code>R</code> has thousands of packages, built by developers and users alike. Many packages are even written by researchers to make research easier. <code>R</code> has a big community of users and developers: let’s find it in different places online…</p>
-
-<p>So some people created <code>gapminder</code> somewhere, uploaded it to <code>R</code>’s central repository, and then we installed it on our machines straight from an <code>R</code> session. Now you can load the package using the <code>library()</code> function. This loads the contents of the package into memory, i.e. makes them objects in your <code>R</code> session. The main object in this package is a <code>data.frame</code> called <code>gapminder</code>. There are different ways to take a look at it.</p>
+<div id="tools-for-data-analysis" class="section level1">
+<h1><span class="header-section-number">5</span> Tools for data analysis</h1>
+<p>The above basics are incomplete, but applicable no matter what approach you take to <code>R</code> programming. Notably missing is an overview to subsetting and selecting, and this is because it depends on your approach. Now we’re going to get started using some basic tools from the <code>tidyverse</code>, <code>ggplot</code> construction basics and <code>dplyr</code> data processing pipelines in particular so we’ll see how a variety of operations work in the tidy approach. In later sessions we’ll see some more traditional methods of filtering and selection.</p>
+<div id="tidy-data" class="section level2">
+<h2><span class="header-section-number">5.1</span> tidy data</h2>
+<p><em>Tidy</em> data refers to tables of a particular layout, with one observation per row and one variable per column.</p>
+<div id="example-of-tidy-data" class="section level3">
+<h3><span class="header-section-number">5.1.1</span> Example of tidy data</h3>
+<p>For example, you’re probably all familiar with HMD lifetables: This data is tidy. If you were to take all the HMD single age lifetables and stack them, adding new grouping columns for Sex and Country, then this would still be tidy. That is, a single HMD observation consists in a unique combination of Country, Sex, Year, and Age. Each lifetable column is a variable, so the tidy way to store them is the traditional way: in columns.</p>
+</div>
+<div id="examples-of-not-tidy-data." class="section level3">
+<h3><span class="header-section-number">5.1.2</span> Examples of not tidy data.</h3>
+<ol style="list-style-type: decimal">
+<li><p>The DemoData database is not tidy: it’s much longer than tidy data. All variables are stacked, and the variable type (qx, lx, counts, etc) is coded in an additional grouping column. This is efficient for storage, given that not every observation has every variable. It is not efficient for interactive programming because observations are potentially scattered over rows.</p></li>
+<li><p>A matrix with ages in rows and years in columns can be very convenient for traditional programming, but it does not follow our definition of tidy. To make it tidy, we would need columns for age and year, and a new column containing the variable stored in the matrix.</p></li>
+<li><p>Often panel data is delivered with each row representing an individual, and with many many variables. If there are 100 variables, and 10 waves, we end up with 1000 or so columns. For many analyses this is not considered tidy: an observation is a unique combination of individual and wave. To make it tidy, we’d need a column to store the wave variable.</p></li>
+</ol>
+<p>Different data structures exist for various reasons, but in the end tidy data facilitates the kind of thinking and operations needed for flexible data analyses and visualization.</p>
+</div>
+</div>
+<div id="the-gapminder-data.frame" class="section level2">
+<h2><span class="header-section-number">5.2</span> the gapminder <code>data.frame</code></h2>
+<p>Let’s work with a tidy <code>data.frame</code>. These are like a rectangular spreadsheet, or like a dataset in <code>Stata</code>: <code>data.frame</code>s have rows and columns, and there can be different kinds of data between columns, but only one kind of data within a column. Load it in case you didn’t before:</p>
 <pre class="r"><code>library(gapminder)</code></pre>
+<p>There are different ways to get orient yourself with a new data object.</p>
 
 <p>Or you could get metadata about the object from <code>str()</code> (structure). This tells us that we have 1704 observations (rows) of 6 variables, and then it tells us the variable (column) names, what kind of data it is (<code>Factor</code> = categorical, <code>int</code> = integer, <code>num</code> = numeric), and a sample of the first few observations in each.</p>
 <pre class="r"><code>str(gapminder)</code></pre>
@@ -496,11 +532,11 @@ search_google() # by default searches this error</code></pre>
 ##  $ lifeExp  : num  28.8 30.3 32 34 36.1 ...
 ##  $ pop      : int  8425333 9240934 10267083 11537966 13079460 14880372 12881816 13867957 16317921 22227415 ...
 ##  $ gdpPercap: num  779 821 853 836 740 ...</code></pre>
-<p>We will mostly work with <code>data.frames</code> or data-frame-like objects. To do so, we’ll use the <em>tidyverse</em> toolkit, which is a collection of packages, so let’s make sure we get that installed and loaded.</p>
-<pre class="r"><code>install.packages(&quot;tidyverse&quot;)</code></pre>
+<p>In the <em>tidyverse</em>, we mostly work with <code>data.frames</code> or data-frame-like objects. ```</p>
 <pre class="r"><code>library(tidyverse)</code></pre>
 </div>
-<div id="tidy-data" class="section level1">
+</div>
+<div id="tidy-data-1" class="section level1">
 <h1><span class="header-section-number">6</span> <em>tidy</em> data</h1>
 </div>
 
