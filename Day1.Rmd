@@ -304,7 +304,7 @@ This is all good and well if I happen to give you a dataset to play with, but I'
 ## Different data formats
 Here are a selection of functions that read in selected data formats. I've resaved the `gapminder` data in several formats in the `data` folder.
 ### csv
-`read_csv()`, `read_tsv()`, `read_delim()` will read in data delimited by commas, tabs, or any character, respectively. These have nice defaults. They work like this.
+`read_csv()`, `read_tsv()`, `read_delim()` will read in data delimited by commas, tabs, or any character, respectively. These have nice default options. They all work similarly.
 ```{r, eval = FALSE, echo = FALSE}
 write_csv(gapminder, path = here("data","gapminder.csv"))
 write_delim(gapminder, path = here("data","gapminder_tab.csv"), delim = "\t")
@@ -315,8 +315,22 @@ gapminder <- read_csv(here("data","gapminder.csv"))
 gapminder <- read_tsv(here("data","gapminder_tab.csv"))
 gapminder <- read_delim(here("data","gapminder_hash.csv"), delim = "#")
 ```
-### txt
+This would be the same if the files didn't have `.csv` ending. The file name doesn't matter as long as it just contains text. So `.txt` is OK, and other spellings.
 ### SPSS, SAS, STATA
+Proprietary software systems tend to redesign their native file formats periodically, but do not always openly publish metadata on how to interpret them. The `haven` package takes care of the *big three*. It is installed with `tidyverse`, but isn't automatically loaded with it, so you need to do `library(haven)` to use it. Labels are handled nicely, but our example doesn't use this feature.
+
+STATA is supported for versions 8-15 at present. If you use these systems, then the file extensions will look familiar to you.
+```{r, eval = FALSE, echo = FALSE}
+library(haven)
+write_dta(gapminder, path = here("data","gapminder.dta"), version = 14)
+write_sav(gapminder, path = here("data","gapminder.sav"))
+write_sas(gapminder,path = here("data","gapminder.sas7bdat"))
+```
+```{r}
+gapminder <- read_dta(here("data","gapminder.dta"))
+gapminder <- read_sav(here("data","gapminder.sav"))
+gapminder <- read_sas(here("data","gapminder.sas7bdat"))
+```
 ### spreadsheets
 Spreadheets are sort of a headache, and there are many competing methods in `R` to grab data from particular cell ranges and tabs. These are often OS dependent, so it's hard to recommend a single method for everyone.
 ### flat files
