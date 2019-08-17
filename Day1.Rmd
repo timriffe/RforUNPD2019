@@ -302,26 +302,55 @@ This probably sounds jargony, so let's hop to it:
 This is all good and well if I happen to give you a dataset to play with, but I'm sure you're itching to have a go at your own data. Problem: you probably have different datasets in different formats, probably because at times different tools are used to do the business of demography. Don't worry, you're covered. There are oodles of ways to read data into `R`. In keeping with the above approach to `R`, let's introduce two packages from the tidyverse. `readr` and `haven`. `readr` gives user friendly ways to read in datasets in generic formats, whereas `haven` helps read in several proprietary formats. If a given data format isn't already accounted for in either of these packages, there's very likely at least one other `R` package out there that does the job. Let's just plow through several examples.
 
 ## Different data formats
-Here are a selection of functions that read in selected data formats.
+Here are a selection of functions that read in selected data formats. I've resaved the `gapminder` data in several formats in the `data` folder.
 ### csv
-`read_csv()`
+`read_csv()`, `read_tsv()`, `read_delim()` will read in data delimited by commas, tabs, or any character, respectively. These have nice defaults. They work like this.
+```{r, eval = FALSE, echo = FALSE}
+write_csv(gapminder, path = here("data","gapminder.csv"))
+write_delim(gapminder, path = here("data","gapminder_tab.csv"), delim = "\t")
+write_delim(gapminder, path = here("data","gapminder_hash.csv"), delim = "#")
+```
+```{r}
+gapminder <- read_csv(here("data","gapminder.csv"))
+gapminder <- read_tsv(here("data","gapminder_tab.csv"))
+gapminder <- read_delim(here("data","gapminder_hash.csv"), delim = "#")
+```
 ### txt
 ### SPSS, SAS, STATA
 ### spreadsheets
 Spreadheets are sort of a headache, and there are many competing methods in `R` to grab data from particular cell ranges and tabs. These are often OS dependent, so it's hard to recommend a single method for everyone.
 ### flat files
-`read_fwf()` 
-`fread()` from the `data.table` is great.
-```{r}
+`read_fwf()` comes with the `readr` package, so it's loaded already with `tidyverse`. To read in a file with fixed column positions (flat files), you always need to specify column data. `readr` makes it a little bit less tedious by detecting column positions, assuming that there's at least one space between columns. Otherwise (like with US birth or death microdata) you'll still need to specify start and end positions. It also detects column classes, but to be on the safe side you can specify them yourselves using a nice string shorthand (`c` is character and `d` is double).
+```{r, results = "hide", echo = FALSE, message = FALSE}
 library(gdata)
-write.fwf(as.data.frame(gapminder), file = here("data","gapminder_flat.txt"))
-
-read_fwf(here("data","gapminder_flat.txt"),
-		 col_positions = fwf_empty(here("data","gapminder_flat.txt")),
-		 col_names = c("country","continent","year","lifeExp","pop","gdpPercap"))
-?read_fwf
+write.fwf(as.data.frame(gapminder), 
+ 		  file = here("data","gapminder_flat.txt"),
+		  colnames =FALSE)
+```
+```{r}
+# detect column properties, and declare header:
+fwf_metadata <- fwf_empty(here("data","gapminder_flat.txt"),   
+		                  col_names = c("country","continent","year",
+		 				  "lifeExp","pop","gdpPercap"))
+gapminder   <- read_fwf(here("data","gapminder_flat.txt"),
+		 col_positions = fwf_metadata,
+		 col_types = "ccdddd")
+```
+In this case we had nice white space padding, so everything could be detected, but if your data are super packed together, like with US birth and death microdata, then you'll need to build up a similar object by hand. You stick the information in a self-made list like this:
+```{r}
+fwf_metadata <- list(
+	begin = c(0,25,34,39,50,60),
+	end = c(11,33,38,47,58,NA),
+	skip = 0, # how many lines should we skip?
+	colnames = c("country", "continent", "year", 
+				 "lifeExp", "pop", "gdpPercap"))
 ```
 
+
+```{r}
+
+```
+`fread()` from the `data.table` is also great.
 ### SQL databases
 `sqldf()` from the `sqldf` package is good with SQL databases of all shapes and sizes. It also lets you do extractions using native SQL syntax, in case that's a familiar way of working for you. The `DBI` package has a nice explainer for interfacing with databases, and it's vignette is a good tutorial you can get the vignette by doing this
 ```{r, eval = FALSE}
