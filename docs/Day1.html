@@ -422,7 +422,7 @@ Max-Planck-Institute for Demographic Research</div></h4>
 <p><code>R</code> is simple and lightweight. It’s possible to work directly in its console, or even from the terminal, but we’ll instead use a very user-friendly application to interract with it:</p>
 <p><code>Rstudio</code> is an application. You should download and install the latest version from here: <a href="https://www.rstudio.com/products/rstudio/download/">https://www.rstudio.com/products/rstudio/download/</a> – again, look at the OS specs and pick the one that pairs well with your operating system.</p>
 <p><code>Rstudio</code> is many things at once. It is a file manager, a script editor, a document editor, an instance of <code>R</code>, a data viewer, even a web browser. This is where we’ll do everything. We will be working often in the form of <code>R</code><em>markdown</em> documents, which allows us to mix code, output, and text in a single file. This very document was written in <code>R</code> markdown, and it can generate nice-looking documents in Word, html, or pdf (I’m not exactly taking advantage of all its bells and whistles). We’ll get started right away with this. The other way we’ll write code is in <code>R</code> scripts, which are just text files with the <code>.R</code> or <code>.r</code> file extension.</p>
-
+<p>*** Brief intermission for Rstudio tour and demonstration ***</p>
 <p>TO-DO list for the demonstration: 1. Rstudio panes and tabs 2. arithmetic in the console 3. start a <code>.project</code> for this workshop 4. make a folder for Day 1, Monday 5. make a new <code>R</code> markdown file for this session 6. show how to use <code>R</code> from markdown 7. knit 8. yell hurrah</p>
 <p>Much of the <code>R</code> interaction we do in this first week of the workshop will be <em>from</em> Rmarkdown. This will become second nature, and you can take that with you. I’ll comment other Rstudio features as we go.</p>
 </div>
@@ -472,8 +472,8 @@ Max-Planck-Institute for Demographic Research</div></h4>
 <p>You can also assign the output straight from a function. For example:</p>
 <pre class="r"><code>nums &lt;- rnorm(n = 10, mean = 0, sd = 1)
 nums</code></pre>
-<pre><code>##  [1] -0.9428046  0.3532577  0.2496991 -0.8020724 -0.8603736 -0.6506972
-##  [7] -0.2803362  0.7766409 -0.1070681 -1.6026425</code></pre>
+<pre><code>##  [1]  0.7971327 -0.9093692  0.5709290  0.5353219 -1.6415679 -0.4635067
+##  [7]  1.1139469 -0.7506593  0.7039273  0.1641723</code></pre>
 <p>Here we have created a new object <code>nums</code> by assigning the output of the function <code>rnorm()</code> (ten random draws from a standard normal distribution). See how we use <code>rnorm()</code> there? This function has three <em>arguments</em> (i.e. parameters), in this case intuitively named if you’ve ever taken an intro statistics class. Now the object <code>nums</code> is simply available to use throughout the remainder of this <code>R</code> session, yay.</p>
 </div>
 <div id="packages-extend-r" class="section level2">
@@ -484,7 +484,7 @@ nums</code></pre>
 <p>This one installs quick because it doesn’t depend on other packages. Here’s one we’ll use that has lots of dependencies, so it’ll take a while to download and install all its pieces.</p>
 <pre class="r"><code>install.packages(&quot;tidyverse&quot;)</code></pre>
 <p><code>R</code> has thousands of packages, built by developers and users alike, and they are tied together into an ecosystem. Many packages get written by researchers to make research easier, and there are several demographers out there making <code>R</code> packages. <code>R</code> has a big community of users and developers: let’s find it in different places online…</p>
-
+<p>*** Time-out to find the <code>R</code> community ***</p>
 <p>Places to visit: 1. CRAN 2. StackOverflow 3. github</p>
 <p>So some people created <code>gapminder</code> somewhere, uploaded it to <code>R</code>’s central repository, and then we installed it on our machines straight from an <code>R</code> session. Now you can load the package using the <code>library()</code> function. This loads the contents of the package into memory, i.e. makes them objects in your <code>R</code> session. The main object in this package is a <code>data.frame</code> called <code>gapminder</code>.</p>
 <pre class="r"><code>library(gapminder)</code></pre>
@@ -529,7 +529,7 @@ search_google() # by default searches this error</code></pre>
 <pre class="r"><code>library(gapminder)
 library(tidyverse)</code></pre>
 <p>There are different ways to get orient yourself with a new data object.</p>
-
+<p>*** Clicky demonstration of viewing data ***</p>
 <p>Or you could get metadata about the object from <code>str()</code> (structure), or <code>glimpse()</code> from the tidyverse. This tells us that we have 1704 observations (rows) of 6 variables, and then it tells us the variable (column) names, what kind of data it is (<code>Factor</code> = categorical, <code>int</code> = integer, <code>num</code> = numeric), and a sample of the first few observations in each.</p>
 <pre class="r"><code>str(gapminder)</code></pre>
 <pre><code>## Classes &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;:    1704 obs. of  6 variables:

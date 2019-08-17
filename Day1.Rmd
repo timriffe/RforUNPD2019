@@ -55,9 +55,7 @@ This is an absolute intro course, I don't expect you'll have any experience with
 
 `Rstudio` is many things at once. It is a file manager, a script editor, a document editor, an instance of `R`, a data viewer, even a web browser. This is where we'll do everything. We will be working often in the form of `R`*markdown* documents, which allows us to mix code, output, and text in a single file. This very document was written in `R` markdown, and it can generate nice-looking documents in Word, html, or pdf (I'm not exactly taking advantage of all its bells and whistles). We'll get started right away with this. The other way we'll write code is in `R` scripts, which are just text files with the `.R` or `.r` file extension.
 
-\begin{center}
 *** Brief intermission for Rstudio tour and demonstration ***
-\end{center}
 
 TO-DO list for the demonstration:
 1. Rstudio panes and tabs
@@ -141,9 +139,9 @@ install.packages("tidyverse")
 
 `R` has thousands of packages, built by developers and users alike, and they are tied together into an ecosystem. Many packages get written by researchers to make research easier, and there are several demographers out there making `R` packages. `R` has a big community of users and developers: let's find it in different places online...
 
-\begin{center}
+
 *** Time-out to find the `R` community ***
-\end{center}
+
 
 Places to visit:
 1. CRAN
@@ -205,9 +203,9 @@ library(tidyverse)
 
 There are different ways to get orient yourself with a new data object.
 
-\begin{center}
+
 *** Clicky demonstration of viewing data ***
-\end{center}
+
 
 Or you could get metadata about the object from `str()` (structure), or `glimpse()` from the tidyverse. This tells us that we have 1704 observations (rows) of 6 variables, and then it tells us the variable (column) names, what kind of data it is (`Factor` = categorical, `int` = integer, `num` = numeric), and a sample of the first few observations in each.
 
@@ -264,7 +262,7 @@ ggplot(gapminder, mapping = aes(x = gdpPercap, y = lifeExp)) +
 	scale_x_log10(labels = dollar) + 
 	facet_wrap(~continent)
 ```
-We get panel plots like this by specifying a layout formula in `facet_wrap()`, where `~` separates left and right sides of the fomula, where left usually means rows in a panel layout and right means columns. Since there's nothing on the left it just orders the continents. Color is no longer needed since the groups are separated.
+We get panel plots like this by specifying a layout formula in `facet_wrap()`, where `~` separates left and right sides of the fomula, and where left means rows in a panel layout and right means columns. Since there's nothing on the left it just orders the continents. Color is no longer needed since the groups are separated.
 
 There is a time variable in this dataset that we've basically been ignoring. How about a `gdpPercap` time series?
 
@@ -281,6 +279,77 @@ ggplot(gapminder, mapping = aes(x = year, y = gdpPercap, by = country)) +
 	facet_wrap(~continent)
 ```
 
+### Summary lessons 
+More sophisticated usage of `ggplot2` builds on these basics in a rather consistent way. You can deepen your fluency by learning new `geoms`, learning what things can be *mapped* to aesthetics, and learning options to scale axes and mappings. To get an overview, refer to the `ggplot2` cheat sheet. For a very approachable introduction, try the Healy book. For the most thorough and advanced treatment, refer to the Wickham book. To learn usage, look at help examples, or R graph gallery examples (add links). In following lessons I will sometimes use `ggplot2`, and I will slip in further tips in an unstructured way.
+
+## Basic `dplyr`
+`ggplot2` is a wonderful tool if your data is already both *tidy* and *mappable*. But source data rarely is. To feed a dataset to `ggplot2` often we'll want to preprocess data, or even model it. The tools for data management, shaping, matching, sorting, joining, filtering, and so forth (stuff to prep for `ggplot2`) blend seamlessly into the tools of data analysis and modeling when one uses the `dplyr` approach. Some basic concepts will help us get started:
+
+1. `dplyr` functions are *verbal* because they *do* things to data.
+2. A bunch of `dplyr` functions executed in sequence on a dataset for a *pipeline*.
+3. Data processing pipelines read as sentences, because verbs are strung together using pipes. This is the pipe symbol: `%>%`
+4. Data processing pipelines are quick to build, easy to read, and help keep your `R` workspace less cluttered than most alternatives. Clean coding and clean workspaces means code is easier to maintain, even when not written by yourself!
+
+This probably sounds jargony, so let's hop to it:
+
+### Verbs
+
+### Pipes
+
+### Examples
+
+# Reading data into `R`
+This is all good and well if I happen to give you a dataset to play with, but I'm sure you're itching to have a go at your own data. Problem: you probably have different datasets in different formats, probably because at times different tools are used to do the business of demography. Don't worry, you're covered. There are oodles of ways to read data into `R`. In keeping with the above approach to `R`, let's introduce two packages from the tidyverse. `readr` and `haven`. `readr` gives user friendly ways to read in datasets in generic formats, whereas `haven` helps read in several proprietary formats. If a given data format isn't already accounted for in either of these packages, there's very likely at least one other `R` package out there that does the job. Let's just plow through several examples.
+
+## Different data formats
+Here are a selection of functions that read in selected data formats.
+### csv
+`read_csv()`
+### txt
+### SPSS, SAS, STATA
+### spreadsheets
+Spreadheets are sort of a headache, and there are many competing methods in `R` to grab data from particular cell ranges and tabs. These are often OS dependent, so it's hard to recommend a single method for everyone.
+### flat files
+`read_fwf()` 
+`fread()` from the `data.table` is great.
+```{r}
+library(gdata)
+write.fwf(as.data.frame(gapminder), file = here("data","gapminder_flat.txt"))
+
+read_fwf(here("data","gapminder_flat.txt"),
+		 col_positions = fwf_empty(here("data","gapminder_flat.txt")),
+		 col_names = c("country","continent","year","lifeExp","pop","gdpPercap"))
+?read_fwf
+```
+
+### SQL databases
+`sqldf()` from the `sqldf` package is good with SQL databases of all shapes and sizes. It also lets you do extractions using native SQL syntax, in case that's a familiar way of working for you. The `DBI` package has a nice explainer for interfacing with databases, and it's vignette is a good tutorial you can get the vignette by doing this
+```{r, eval = FALSE}
+install.packages("DBI")
+library(DBI)
+# this will build the vignette and open it in the right panel.
+vignette("spec", package = "DBI")
+```
+
+### Native `R` files
+`R` has more than one native compression type, I suggest you use `.rds` if you want to save an `R` object that you know will be kept in `R`. This has the advantage of fast and unambiguous loading, since no parsing is required and since loading happens via assignment (as with other read functions). Writing and reading look like this:
+```{r, eval = FALSE}
+saveRDS(gapminder,file = "gapminder.rds")
+gapminder <- readRDS("gapminder.rds")
+```
+
+
+
+
+### Requests?
+If you come across some other kind of data, take a peek at the [Data Import Cheat Sheet](https://resources.rstudio.com/rstudio-cheatsheets/data-import-cheat-sheet)  need help figuring out how to get things humming using these or other data formats let me know. It's quite possible that these situations are shared, so if I figure it out then a lesson can be made out of it. 
+
+
+
+
+
+
+
 # Exercises
 
 1. Try making the gapminder scatterplot with different smoothing methods: i) on the whole dataset and ii) by continent. You can find out the other methods by reading the help file, typing `?geom_smooth`
@@ -290,6 +359,8 @@ ggplot(gapminder, mapping = aes(x = year, y = gdpPercap, by = country)) +
 gaps <- filter(gapminder, continent != "Oceania")
 ```
 Try subsetting `gapminder` to just the first and last years (and also removing Oceania). Plot the density of log `gdpPercap` by continents (tip: `fill = continent`). They will overlap (tip: try `alpha = .5` to make them transparent). Make a 2-panel plot showing how these distributions changed between 1952 and 2007.
+
+3.
 
 # References 
 
