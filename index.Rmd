@@ -47,11 +47,11 @@ A day will consist in interactive demonstration lasting around 3 hours in the mo
 
 [Session 2](Day2) (Tuesday, 20 Aug)
 
-1. common data types and structures
-2. reshaping, sorting, and grouping
-3. writing your own functions
-4. never write the same code twice
-5. documenting functions
+1. [Functions introduction](Day2#introduction)
+2. [Reading functions](Day2#reading-functions)
+3. [Writing functions](Day2#writing-functions)
+4. [Modularity](Day2#modularity)
+5. [Documenting functions](Day2#documenting-functions)
 
 [Session 3](Day3) (Wednesday, 21 Aug)
 

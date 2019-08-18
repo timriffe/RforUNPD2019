@@ -194,7 +194,10 @@ Let's look at an example of a function doing too much: The `LT` function in my `
 [https://github.com/timriffe/LifeTable](https://github.com/timriffe/LifeTable)
 It's not broken per se, but the fact that it isn't modular makes it difficult to maintain: There is seemingly chaotic flow control of the code using `if()` statements (to be covered tomorrow).
 
-With this as our inspiration, let's write our own lifetable function. In the first instance, let's use them in a tidy pipeline. For this, use this big HMD dataset, here:
+With this as our inspiration, let's write our own lifetable function.
+
+## Lifetable utils in a tidy pipeline
+In the first instance, let's use them in a tidy pipeline. For this, use this big HMD dataset, here:
 [`HMD.rds`](https://drive.google.com/file/d/1Rc5Vb14DSglxyZ2xPaVEmEpiSCoKuC)
 Stick it in a folder called `~/data`, and you can load it into your session using (this is premised on you having faithfully set up your workspace to follow or mimick the repository for this course). 
 ```{r}
@@ -213,22 +216,34 @@ Fill in the blanks (maybe there are more steps)
 ```{r, eval = FALSE}
 HMD %>% 
   _____ %>% 
-  _____
+  ______
 ```
 
+## Build a lifetable function
+Now let's build a single lifetable function that will work in such a pipeline.
 
+```{r}
+# my_lifetable <- function(what, goes, here?){
+#    what goes here?
+#    return(what goes here?)
+# }
+```
 
+Here arguments are given in a single `data.frame` input, but it might make sense for them to be separate vectors too. Just little things to think about when designing a function destined to be used heavily.
 
-
-
-
-
-
-
-
+For your information, `DemoTools` methods have pipeline-friendly versions written in the `DDSQLtools` package, where the anticipated data chunks take the form of your `DemoData` SQL database. Pretty neat huh? `DDSQLtools` development lags a bit behind `DemoTools` development, so the collection of methods available there will grow in the coming months. In future exercises (not now), we'll use those functions.
 
 # Documenting functions
+When we toured the `DemoTools` package earlier we aw the documentation headers. These are done following some structured guidelines about what sections need to go into a function help file. These are written using a system called `roxygen2`, part of a larger movement of literate coding. The point is to keep the documentation *with* the code. This particular syntax is designed to be used in a packaging framework. I don't think we'll have time to build a package together in this visit, and it's generally a larger topic with many considerations. I suggest however that it's worth adding such headers to your self-written functions, even if they are incomplete. Doing so will help your future self, but it also makes your code more shareable. 
 
-# Using functions in pipelines
+At a minimum, you should indicate what arguments are given in the code, using a line that follows this structure.
+```{r}
+#' @param arg_name description of argument here
+```
+
+Other nice sections include `#' @description` to give an overview and `#' @return` to let us know what the output is. Any other useful tips and information should be noted somehow. There's no sense in going through all the possible sections, but these are the basic ones.
+
+***  time out to document our lifetable functions ***
+Does this seem tedious to you? Well let me tell you, don't discount your own future time: reverse engineering your own code is a much bigger waste of time! If you can't figure it out the next time then you'll end up re-writing it! A major waste of time. And when you document your code other people don't need to waste their time. Let me tell you my time as been seriously wasted trying to reverse engineer thousands of lines of undocumented and unannotated code. Let's all be better people and write nicely formatted, parsimous, annotated, and documented code.
 
 # References 

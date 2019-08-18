@@ -388,10 +388,12 @@ Max-Planck-Institute for Demographic Research</div></h4>
 </ul></li>
 <li><a href="#summary"><span class="toc-section-number">3.2</span> Summary</a></li>
 </ul></li>
-<li><a href="#modularity"><span class="toc-section-number">4</span> Modularity</a></li>
+<li><a href="#modularity"><span class="toc-section-number">4</span> Modularity</a><ul>
+<li><a href="#lifetable-utils-in-a-tidy-pipeline"><span class="toc-section-number">4.1</span> Lifetable utils in a tidy pipeline</a></li>
+<li><a href="#build-a-lifetable-function"><span class="toc-section-number">4.2</span> Build a lifetable function</a></li>
+</ul></li>
 <li><a href="#documenting-functions"><span class="toc-section-number">5</span> Documenting functions</a></li>
-<li><a href="#using-functions-in-pipelines"><span class="toc-section-number">6</span> Using functions in pipelines</a></li>
-<li><a href="#references"><span class="toc-section-number">7</span> References</a></li>
+<li><a href="#references"><span class="toc-section-number">6</span> References</a></li>
 </ul>
 </div>
 
@@ -525,7 +527,10 @@ ax    &lt;- rep(.5, length(mx))</code></pre>
 <h1><span class="header-section-number">4</span> Modularity</h1>
 <p>In the previous single-purpose lifetable functions, some of the versions were already in a sense modular: A newly written function used another function that we had just written. Using this strategy to break down code into bite sized chunks enables you to structure code. I suggest that structured code enables structured thought (on methods), and vice versa– Sometimes we start with a function that does too much and then improve it by turning functionally compact parts of it into smaller functions, a sort of whiteboard activity.</p>
 <p>Let’s look at an example of a function doing too much: The <code>LT</code> function in my <code>LifeTable</code> package, also on github: <a href="https://github.com/timriffe/LifeTable">https://github.com/timriffe/LifeTable</a> It’s not broken per se, but the fact that it isn’t modular makes it difficult to maintain: There is seemingly chaotic flow control of the code using <code>if()</code> statements (to be covered tomorrow).</p>
-<p>With this as our inspiration, let’s write our own lifetable function. In the first instance, let’s use them in a tidy pipeline. For this, use this big HMD dataset, here: <a href="https://drive.google.com/file/d/1Rc5Vb14DSglxyZ2xPaVEmEpiSCoKuC"><code>HMD.rds</code></a> Stick it in a folder called <code>~/data</code>, and you can load it into your session using (this is premised on you having faithfully set up your workspace to follow or mimick the repository for this course).</p>
+<p>With this as our inspiration, let’s write our own lifetable function.</p>
+<div id="lifetable-utils-in-a-tidy-pipeline" class="section level2">
+<h2><span class="header-section-number">4.1</span> Lifetable utils in a tidy pipeline</h2>
+<p>In the first instance, let’s use them in a tidy pipeline. For this, use this big HMD dataset, here: <a href="https://drive.google.com/file/d/1Rc5Vb14DSglxyZ2xPaVEmEpiSCoKuC"><code>HMD.rds</code></a> Stick it in a folder called <code>~/data</code>, and you can load it into your session using (this is premised on you having faithfully set up your workspace to follow or mimick the repository for this course).</p>
 <pre class="r"><code>library(here)
 HMD &lt;- readRDS(here(&quot;data&quot;,&quot;HMD.rds&quot;))
 str(HMD)</code></pre>
@@ -542,16 +547,29 @@ str(HMD)</code></pre>
 <p>Fill in the blanks (maybe there are more steps)</p>
 <pre class="r"><code>HMD %&gt;% 
   _____ %&gt;% 
-  _____</code></pre>
+  ______</code></pre>
+</div>
+<div id="build-a-lifetable-function" class="section level2">
+<h2><span class="header-section-number">4.2</span> Build a lifetable function</h2>
+<p>Now let’s build a single lifetable function that will work in such a pipeline.</p>
+<pre class="r"><code># my_lifetable &lt;- function(what, goes, here?){
+#    what goes here?
+#    return(what goes here?)
+# }</code></pre>
+<p>Here arguments are given in a single <code>data.frame</code> input, but it might make sense for them to be separate vectors too. Just little things to think about when designing a function destined to be used heavily.</p>
+<p>For your information, <code>DemoTools</code> methods have pipeline-friendly versions written in the <code>DDSQLtools</code> package, where the anticipated data chunks take the form of your <code>DemoData</code> SQL database. Pretty neat huh? <code>DDSQLtools</code> development lags a bit behind <code>DemoTools</code> development, so the collection of methods available there will grow in the coming months. In future exercises (not now), we’ll use those functions.</p>
+</div>
 </div>
 <div id="documenting-functions" class="section level1">
 <h1><span class="header-section-number">5</span> Documenting functions</h1>
-</div>
-<div id="using-functions-in-pipelines" class="section level1">
-<h1><span class="header-section-number">6</span> Using functions in pipelines</h1>
+<p>When we toured the <code>DemoTools</code> package earlier we aw the documentation headers. These are done following some structured guidelines about what sections need to go into a function help file. These are written using a system called <code>roxygen2</code>, part of a larger movement of literate coding. The point is to keep the documentation <em>with</em> the code. This particular syntax is designed to be used in a packaging framework. I don’t think we’ll have time to build a package together in this visit, and it’s generally a larger topic with many considerations. I suggest however that it’s worth adding such headers to your self-written functions, even if they are incomplete. Doing so will help your future self, but it also makes your code more shareable.</p>
+<p>At a minimum, you should indicate what arguments are given in the code, using a line that follows this structure.</p>
+<pre class="r"><code>#&#39; @param arg_name description of argument here</code></pre>
+<p>Other nice sections include <code>#&#39; @description</code> to give an overview and <code>#&#39; @return</code> to let us know what the output is. Any other useful tips and information should be noted somehow. There’s no sense in going through all the possible sections, but these are the basic ones.</p>
+<p>*** time out to document our lifetable functions *** Does this seem tedious to you? Well let me tell you, don’t discount your own future time: reverse engineering your own code is a much bigger waste of time! If you can’t figure it out the next time then you’ll end up re-writing it! A major waste of time. And when you document your code other people don’t need to waste their time. Let me tell you my time as been seriously wasted trying to reverse engineer thousands of lines of undocumented and unannotated code. Let’s all be better people and write nicely formatted, parsimous, annotated, and documented code.</p>
 </div>
 <div id="references" class="section level1">
-<h1><span class="header-section-number">7</span> References</h1>
+<h1><span class="header-section-number">6</span> References</h1>
 </div>
 
 
