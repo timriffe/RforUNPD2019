@@ -28,7 +28,24 @@ bibliography: bibliography.bib
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+# Introduction
+Today's session is about getting the most out of `R` by writing your own functions. The benefits of writing your own functions is manifold.
 
-# Content to be added
+1. You can avoid re-deriving the same code expressions over and over. 2. Scripts using the function are shorter, which makes them easier to structure, to read, and to maintain. And that makes them more robust.
+3. If you have a single copy of the function, it can get better and more robust with age: you only ever edit or fix it in one place. This avoids confusing copies of the code and needing to find them all every time you need to improve the function.
+4. It encourages you to write generalizable code.
+5. Functions are easier to share (and make use of when shared) than scripts.
+6. There are standard ways of documenting functions.
+
+# Reading functions
+It's helpful to look at some functions to observe their structure before sitting down to write our own. 
+
+# Writing functions
+
+# Modularity
+
+# Documenting functions
+
+# Using functions in pipelines
 
 # References 
