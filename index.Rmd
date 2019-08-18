@@ -38,7 +38,7 @@ A day will consist in interactive demonstration lasting around 3 hours in the mo
 ### Week 1
 [Session 1](Day1) (Monday, 19 Aug)
 
-1. Introduction to R and RStudio
+1. [About me](Day1#about-me)
 2. Using the editor: main characteristics of RStudio, packages
 3. Data handling: import/export data to/from R, including from MS-SQL databases
 4. Basic operations: assigning, subsetting

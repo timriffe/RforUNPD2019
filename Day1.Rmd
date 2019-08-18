@@ -214,6 +214,7 @@ str(gapminder)
 ```
 
 ## Basic `ggplot2` with the gapminder data
+### Overview
 Tidy datasets such as this can also be visualized without further ado using a systematic grammar [@wilkinson2012grammar] implemented in the `ggplot2` package ( @wickham2016ggplot2, this loads automatically with `tidyverse`). The `gapminder` examples I'll give today and tomorrow are either gratuitously lifted or modified from @healy2018data, which you can either purchase as the book (I'll show it to you), or refer to the free version online: [www.socviz.co](www.socviz.co). It's a fabulous book. Let's take a first look:
 
 ### *Map* to aesthetics
@@ -292,11 +293,181 @@ More sophisticated usage of `ggplot2` builds on these basics in a rather consist
 
 This probably sounds jargony, so let's hop to it:
 
-### Verbs
+### Verbs {.tabset}
+#### Overview
+Here are a selection of `dplyr` verbs. Some things to note: the first argument of each is a data object, usually something like a `data.frame`. These do things to the dataset, and they return the dataset back.
+
+1. `group_by()` allows operations on subgroups
+2. `gather()` make a wide range of columns tidy
+3. `mutate()` make new columns using other columns, no loss of rows
+4. `summarize()` aggregates over rows. Usually reduces nr of rows
+5. `select()` selects columns
+6. `filter()` selects rows (subsets)
+7. `ungroup()` removes the former
+
+We'll see other `dplyr` verbs here and there during this workshop.
+
+Flip through the tabs in order.
+
+#### `group_by()` 
+When you want to operate on groups in a dataset, then it is necessary to declare the grouping.
+```{r}
+gap_grouped    <- group_by(gapminder, country, year, continent) 
+head(gap_grouped)
+```
+Grouping does not do anything to the data directly. All values will be identical, and the dimensions are the same. It just adds a piece of metadata to the object that declares the grouping.
+
+NB: the object created here is used in the following code chunk.
+
+#### `gather()`
+Here we use `gather()` to pull all the gapminder value columns into a single key-value pair, where the key is the variable column name, and value is the contents. The resulting `data.frame` is three times longer because there are three variable columns (and three key columns), and this mimicks the setup of your own `DemoData` SQL database. 
+```{r, message = FALSE, warning = FALSE}
+gapminder_long <- gather(gap_grouped, 
+						 key="varname", 
+						 value = "value", 
+						 lifeExp:gdpPercap) 
+```
+Note: `group_by()` is a necessary prestep in order to maintain the unique key combinations. We could consider `continent` either a key or a variable. It's not strictly needed as a key because country-year uniquely identifies observations, but I left it there to not over-lengthen the dataset.
+
+You can get back to the original format with the `spread()`, which is the opposite of `gather()`.
+```{r, eval = FALSE}
+spread(gapminder_long, varname, value)
+```
+
+#### `mutate()` 
+`mutate()` adds columns to, or modifies columns in, a `data.frame`. Think of the example of lifetable construction: You might start with deaths and exposures, and all other columns are created based on these. This is a case for `mutate()`, and we'll do this sort of exercise when we get to function programming. The main thing to remember is that `mutate()` does not change the number of rows. Keeping with our gapminder example, say we want to add a column for the mean life expectancy, but repeated for each row within each group. To get these means for each country, we'll want to group by country first (our previous grouping also grouped by year).
+```{r}
+gap_grouped <- group_by(gapminder, country)
+gap_mutated <- mutate(gap_grouped,
+	   mean_lifeExp = mean(lifeExp)) 
+head(gap_mutated)
+```
+You can also just keep comma separating newly made columns, like so:
+```{r, eval = FALSE}
+mutate(gap_grouped,
+	   mean_lifeExp = mean(lifeExp),
+	   sd_lifeExp = sd(lifeExp),
+	   cov_lifeExp = sd_lifeExp / mean_lifeExp,
+	   cov_pop = sd(population) / mean(population)) 
+```
+You see how `cov_lifeExp` is created using columns being created within the same call? Pretty neat! Expressions can also be more complicated, see where `cov_pop` is created using two function calls.
+
+NB: The object `gap_grouped` created here is also used in the next code chunk.
+#### `summarize()`
+If instead we wished to collapse the dataset to have one observation per country, then we use `summarize()` (this can also by lossy with respect to columns). Here is that first `mutate` expression when executed with `summarize()`
+```{r}
+gap_summarize <- summarize(gap_grouped,
+	   mean_lifeExp = mean(lifeExp))
+head(gap_summarize)
+dim(gap_summarize) # collapsed
+```
+If you want to summarize more than one column, then this works, also with sequential dependency over columns created on the fly:
+```{r}
+gap_summarize <- summarize(gap_grouped,
+	   mean_lifeExp = mean(lifeExp),
+	   mean_gdpPercap = mean(gdpPercap),
+	   sd_gdpPercap = sd(gdpPercap),
+	   cov_gdpPercap = sd_gdpPercap / mean_gdpPercap)
+head(gap_summarize)
+```
+You can get a lot of mileage out of `group_by()`, `mutate()` and `summarize()`.
+#### `select()` 
+`select()` pikcs out columns. 
+```{r}
+head(select(gapminder, country, gdpPercap))
+```
+If data are grouped, the key columns are retained (and it tells you so in the console):
+```{r}
+gap_grouped <- group_by(gapminder, country, year)
+head(select(gap_grouped, gdpPercap))
+```
+#### `filter()` 
+More often we want to subset rows to those that satisfy certain selection criteria. Use `filter()` for this.
+```{r}
+gap_filtered <- filter(gapminder,
+					   year >= 2000,
+					   year <= 2010,
+					   continent == "Africa")
+str(gap_filtered)
+```
+There are three logical expressions here, each producing a value of TRUE or FALSE for each row. Comma separation between these is interpreted as `&`, so the full logical expression evaluated is interpreted as: 
+`year >= 2000 & year <= 2010 & continent == "Africa"`
+Note that double equals `==` is for the logical evaluation of equality! The other logical operators are pretty straightforward. A vertical bar `|` is used for *or*.
+
+#### `ungroup()` 
+It is often a good idea to remove a grouping attribute from a data object when you're done using it. Otherwise you might operate within groups when you don't mean to. Then execute `ungroup()` on the object. This is also a clean way to remove a grouping before declaring a new and different one. For example, say we want to make a column for the mean `lifeExp` within the series for each country, and also the mean over countries within each year. Then we'll need to switch groupings:
+```{r}
+gap_gr1 <- group_by(gapminder, country)
+gap_gr1 <- mutate(gap_gr1,
+				  mean_lifeExp_country = mean(lifeExp))
+# now undo to operate on a different group
+gap_gr2 <- ungroup(gap_gr1)
+gap_gr2 <- group_by(gap_gr2, year)
+gap_gr2 <- mutate(gap_gr2, mean_lifeExp_year = mean(lifeExp))
+head(gap_gr2)
+```
 
 ### Pipes
+I had to force myself not to use pipes in the previous section! Really `dplyr` functions can be executed in sequence without the need to create intermediate objects. If you executed the previous examples, look at how cluttered RStudio's environment tab has become. We can avoid all that by stringing things together using the pipe operator from the `magrittr` package that loads automatically with `tidyverse`. here are some of those example reworked. See how they read as sentences?
 
-### Examples
+Before:
+```{r, eval = FALSE}
+gap_grouped <- group_by(gapminder, country)
+gap_mutated <- mutate(gap_grouped,
+	   mean_lifeExp = mean(lifeExp)) 
+head(gap_mutated)
+```
+After:
+```{r, eval = FALSE}
+gapminder %>% 
+	group_by(country) %>% 
+	mutate(mean_lifeExp = mean(lifeExp)) %>% 
+	head()
+```
+Note: the first argument (`data`) is automatically filled with the object running through the pipeline. You should imagine `gapminder` running through a staged pipeline, getting modified at each step. When it gets to the end we just show the first several rows in the console.
+
+Before:
+```{r, eval = FALSE}
+gap_gr1 <- group_by(gapminder, country)
+gap_gr1 <- mutate(gap_gr1,
+				  mean_lifeExp_country = mean(lifeExp))
+# now undo to operate on a different group
+gap_gr2 <- ungroup(gap_gr1)
+gap_gr2 <- group_by(gap_gr2, year)
+gap_gr2 <- mutate(gap_gr2, mean_lifeExp_year = mean(lifeExp))
+head(gap_gr2)
+```
+After:
+```{r, eval = FALSE}
+gapminder %>% 
+	group_by(country) %>% 
+    mutate(mean_lifeExp_country = mean(lifeExp)) %>% 
+	ungroup() %>% 
+    group_by(year) %>% 
+    mutate(mean_lifeExp_year = mean(lifeExp)) %>% 
+	head()
+```
+Instead of ending in `head()`, we could assign the result to a new object. This is usually done at the start, like so:
+```{r, eval = FALSE}
+gap_mutated <- 
+	gapminder %>% 
+	group_by(country) %>% 
+    mutate(mean_lifeExp_country = mean(lifeExp)) %>% 
+	ungroup() %>% 
+    group_by(year) %>% 
+    mutate(mean_lifeExp_year = mean(lifeExp)) 
+```
+The object `gap_mutated` consists in the fully-executed pipeline. 
+
+Note: We usually construct pipelines like these incrementally, often checking as we to make sure things work as expected. Often that checking is done like we saw above, with ` %>% head()` or similar as the last step. As we determine next steps, this checker line gets pushed further down in the chain of execution. Just remember to remove it when you're done building the pipeline!
+
+Note also: We use indentation and alignment to make the code more legible.
+
+As mentioned, `dplyr` pipelines also read as sentences. This last one can be verbalized as "first take the gapminder dataset, then group it by country, then make a new column for the average life expectancy over time within the country, then regroup by year and make a new column for the average life expectancy over countries within the year". Such sentences don't make for good lit but they do make your code accessible to readers, which is a major advantage. You can (should) also comment as you go.
+
+Legibility of a script is acheived by reducing clutter and by using succinct pipelines. This is important because your processing/analysis code becomes all the more shareable, both with others and with future you. Who hasn't looked back at your own code written years ago and wonders wha the heck it does? It feels awful to have to reverse engineer your own logic and coding. Yes, it can be overcome with good annotations, but let's obviate the need altogether if we can.
+
+As mentioned, I'll slip in pipelines and `ggplot2` here and there in the coming days, so there will be several opportunities for practice and repetition.
 
 # Reading data into `R`
 This is all good and well if I happen to give you a dataset to play with, but I'm sure you're itching to have a go at your own data. Problem: you probably have different datasets in different formats, probably because at times different tools are used to do the business of demography. Don't worry, you're covered. There are oodles of ways to read data into `R`. In keeping with the above approach to `R`, let's introduce two packages from the tidyverse. `readr` and `haven`. `readr` gives user friendly ways to read in datasets in generic formats, whereas `haven` helps read in several proprietary formats. If a given data format isn't already accounted for in either of these packages, there's very likely at least one other `R` package out there that does the job. Let's just plow through several examples.
@@ -327,6 +498,7 @@ write_sav(gapminder, path = here("data","gapminder.sav"))
 write_sas(gapminder,path = here("data","gapminder.sas7bdat"))
 ```
 ```{r}
+library(haven)
 gapminder <- read_dta(here("data","gapminder.dta"))
 gapminder <- read_sav(here("data","gapminder.sav"))
 gapminder <- read_sas(here("data","gapminder.sas7bdat"))
