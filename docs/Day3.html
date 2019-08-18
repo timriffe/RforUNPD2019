@@ -374,18 +374,184 @@ Max-Planck-Institute for Demographic Research</div></h4>
 
 <div id="TOC">
 <ul>
-<li><a href="#content-to-be-added"><span class="toc-section-number">1</span> Content to be added</a></li>
-<li><a href="#references"><span class="toc-section-number">2</span> References</a></li>
+<li><a href="#introduction"><span class="toc-section-number">1</span> Introduction</a></li>
+<li><a href="#conditional-execution-if"><span class="toc-section-number">2</span> Conditional execution <code>if</code></a></li>
+<li><a href="#repetitive-execution-for-loops"><span class="toc-section-number">3</span> Repetitive execution: <code>for</code>-loops</a></li>
+<li><a href="#combining-if-and-for-loops"><span class="toc-section-number">4</span> Combining <code>if</code> and <code>for</code>-loops</a></li>
+<li><a href="#references"><span class="toc-section-number">5</span> References</a></li>
 </ul>
 </div>
 
 <a href="https://github.com/timriffe/RforUNPD2019" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#70B7FD; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
 <style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
-<div id="content-to-be-added" class="section level1">
-<h1><span class="header-section-number">1</span> Content to be added</h1>
+<div id="introduction" class="section level1">
+<h1><span class="header-section-number">1</span> Introduction</h1>
+<p>In this lecture we will learn some basic programming tools. This may look rather foreign if you haven’t seen code like this before. If you have, then you can know that conditional programming (<code>if</code>, <code>ifelse()</code>) works similar to anywhere else, as do <code>for</code> loops. I’ll try to pull off the feat of introducing these concepts and making them relevant to you in a single session.</p>
+</div>
+<div id="conditional-execution-if" class="section level1">
+<h1><span class="header-section-number">2</span> Conditional execution <code>if</code></h1>
+<p>Conditional execution is performed in R using the command/function <code>if</code>. It works like this:</p>
+<ol style="list-style-type: decimal">
+<li>One first <strong>tests a condition</strong>.</li>
+<li><strong>Only if</strong> this condition is <code>TRUE</code>, the following code is executed.</li>
+<li>If <code>FALSE</code>, then the following code chunk gets skipped.</li>
+</ol>
+<p>The main syntax is:</p>
+<pre class="r"><code>if ( condition == TRUE ) {
+    do.this
+    }</code></pre>
+<p>Let’s start with a very simple example</p>
+<pre class="r"><code>x &lt;- rnorm(10)
+if (mean(x) &gt; 0){
+  print(&quot;I&#39;m feeling lucky&quot;)    
+} </code></pre>
+<pre><code>## [1] &quot;I&#39;m feeling lucky&quot;</code></pre>
+<p>Only if the condition is <code>TRUE</code>, does <code>R</code> print the result. The function <code>print()</code> is used to explicitly show an R-object in the console, like a character-string. The message <code>I&#39;m feeling lucky</code> may or may not print to the console. It depends on the random numbers you got. In our case, we got</p>
+<pre class="r"><code>mean(x)</code></pre>
+<pre><code>## [1] 0.6908648</code></pre>
+<p>I’ll give more ad hoc examples of this basic idea in class.</p>
+<p>The part that goes in the parenthesis after <code>if</code> just needs to evaluate to a single value of <code>TRUE</code> in order to execute the code afterwards.</p>
+<pre class="r"><code>if (mean(x) &gt; 0) {
+  print(&quot;I&#39;m feeling lucky&quot;)
+  print(x)
+}</code></pre>
+<pre><code>## [1] &quot;I&#39;m feeling lucky&quot;
+##  [1]  0.9529157 -0.7600165  1.1613690  1.0501124  0.8367131 -0.8428397
+##  [7]  1.3241583  1.3012789  0.1099653  1.7749918</code></pre>
+<p>The curly brackets delimit the code that the <code>if</code> condition applies to, in much the same way es they demarcate the insides of a function. You can also place various lines of code inside the curly brackets.</p>
+<p>In case you want to do something different if the condition is not met, you can add a second <code>else</code> clause. This would give an alternative code chunk to execute if the condition evaluates to <code>FALSE</code>:</p>
+<pre class="r"><code>if (mean(x) &gt; 0){
+  # Note the indentation in the brackets, 
+  #  which is optional, but increases legibility
+  print(&quot;I&#39;m feeling lucky&quot;)
+} else {
+  print(&quot;Today is just not my day&quot;)
+}</code></pre>
+<pre><code>## [1] &quot;I&#39;m feeling lucky&quot;</code></pre>
+<p>You can, of course, have more than one condition using the operators <code>&amp;</code> (and) and <code>|</code> (or).</p>
+<pre class="r"><code>random1 &lt;- rnorm(1)
+random2 &lt;- rnorm(1)
+if (random1 &gt; 0 &amp; random2 &gt; 0) {
+    print(&quot;Both random numbers are positive&quot;)
+} else {
+    print(&quot;At least one number is not positive&quot;)
+}</code></pre>
+<pre><code>## [1] &quot;Both random numbers are positive&quot;</code></pre>
+<p>Effectively,</p>
+<pre class="r"><code>random1; random2</code></pre>
+<pre><code>## [1] 1.241581</code></pre>
+<pre><code>## [1] 1.177164</code></pre>
+<p>We often use <code>if</code> statements to make code able to flexibly handle different cases. If the code is simple, you can also evaluate many such conditions at once using <code>ifelse()</code>, For instance,</p>
+<pre class="r"><code>education &lt;- c(&quot;Secondary&quot;, &quot;Tertiary&quot;, &quot;Secondary&quot;,
+               &quot;Secondary&quot;, &quot;Tertiary&quot;, &quot;Primary&quot;)
+ifelse(education == &quot;Tertiary&quot;, 1, 0)</code></pre>
+<pre><code>## [1] 0 1 0 0 1 0</code></pre>
+<p>Things can also get complicated by nesting <code>if</code> or <code>ifelse()</code> statements:</p>
+<pre class="r"><code>ifelse(education == &quot;Tertiary&quot;, 2, 
+    ifelse(education == &quot;Secondary&quot;, 1, 0))</code></pre>
+<pre><code>## [1] 1 2 1 1 2 0</code></pre>
+<p>Sometimes we use <code>ifelse()</code> to recode variables if there aren’t too many unique values to recode. Otherwise, use <code>case_when()</code> from the <code>tidyverse</code>, which is a better suited to this situation. This example comes from the <code>case_when()</code> documentation. NB, I remember playing this game as a kid. The game works like this: You sit in a circle and take turns counting in sequence, if the number you’re on is evenly divisible by five, you say “fizz” instead of the number, and if it’s evenly divisible by seven you say “buzz”, and if it’s divisble by both you say “fizz buzz”. It has to be fast, but if anyone makes a mistake everyone has to start over.</p>
+<pre class="r"><code>library(tidyverse)
+x &lt;- 1:50
+case_when(
+  x %% 35 == 0 ~ &quot;fizz buzz&quot;,  # look we&#39;re using modulo again!! %%
+  x %% 5 == 0 ~ &quot;fizz&quot;,
+  x %% 7 == 0 ~ &quot;buzz&quot;,
+  TRUE ~ as.character(x)       # this is the last &#39;else&#39; instruction
+)</code></pre>
+<pre><code>##  [1] &quot;1&quot;         &quot;2&quot;         &quot;3&quot;         &quot;4&quot;         &quot;fizz&quot;     
+##  [6] &quot;6&quot;         &quot;buzz&quot;      &quot;8&quot;         &quot;9&quot;         &quot;fizz&quot;     
+## [11] &quot;11&quot;        &quot;12&quot;        &quot;13&quot;        &quot;buzz&quot;      &quot;fizz&quot;     
+## [16] &quot;16&quot;        &quot;17&quot;        &quot;18&quot;        &quot;19&quot;        &quot;fizz&quot;     
+## [21] &quot;buzz&quot;      &quot;22&quot;        &quot;23&quot;        &quot;24&quot;        &quot;fizz&quot;     
+## [26] &quot;26&quot;        &quot;27&quot;        &quot;buzz&quot;      &quot;29&quot;        &quot;fizz&quot;     
+## [31] &quot;31&quot;        &quot;32&quot;        &quot;33&quot;        &quot;34&quot;        &quot;fizz buzz&quot;
+## [36] &quot;36&quot;        &quot;37&quot;        &quot;38&quot;        &quot;39&quot;        &quot;fizz&quot;     
+## [41] &quot;41&quot;        &quot;buzz&quot;      &quot;43&quot;        &quot;44&quot;        &quot;fizz&quot;     
+## [46] &quot;46&quot;        &quot;47&quot;        &quot;48&quot;        &quot;buzz&quot;      &quot;fizz&quot;</code></pre>
+<p>Did you see what happened there? Aside from the logical testing, what kind of output did we produce? <span class="math inline">\(x\)</span> was an integer vector, and what we got back was a character vector. Inside vectors we can’t mix data types, so <code>R</code> has to coerce to the lowest (human readable!) common denominator, which is a character string.</p>
+<p>Other friends for logical testing are <code>all()</code> and <code>any()</code></p>
+<pre class="r"><code>(x &lt;- rpois(10,10))</code></pre>
+<pre><code>##  [1]  6 12 12  6  7 10  7 14  8 12</code></pre>
+<pre class="r"><code>all(x &gt; 0)</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<pre class="r"><code>all(x &gt; 5)</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<pre class="r"><code>any(x &gt;= 14) # at least one TRUE</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<p>Time out to find <code>if()</code> and friends used in the <code>DemoTools</code> package. NB: logical tests are a frequent source of bugs because sometimes we forget about how to handle certain conditions.</p>
+<table>
+<colgroup>
+<col width="100%"></col>
+</colgroup>
+<tbody>
+<tr class="odd">
+<td align="left"><strong>NOTE</strong></td>
+</tr>
+<tr class="even">
+<td align="left">Bear in mind that <code>if</code> conditions can consist in any statement that has <code>TRUE</code> or <code>FALSE</code> as a result. The code is only executed if the answer is <code>TRUE</code>, unless an <code>else</code> condition is included.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="repetitive-execution-for-loops" class="section level1">
+<h1><span class="header-section-number">3</span> Repetitive execution: <code>for</code>-loops</h1>
+<p>There are several commands available in <code>R</code> for repetitive execution, and now we will focus on <code>for</code> loops, i.e. iteration. In fact we did this without pointing it out in our tidy pipelines, for example in using <code>mutate()</code> after <code>group_by()</code>. The kind of <code>for</code>-loop construction used in <code>R</code> is common in other languages. It is often considered to be the most legible kind of iteration for this reason. The basic form looks like this:</p>
+<pre class="r"><code>for (i in values) {
+  execute.this
+}</code></pre>
+<p>The parameter <code>i</code> assumes the value of each element of <code>values</code> in succession. In the first iteration, <code>i</code> takes on the first value of <code>values</code> in the first loop and executes <code>execute.this</code>. In the second run, the second value is taken from <code>values</code> and so on until the last value is taken from <code>values</code> and <code>execute.this</code> is executed the last time. You can name <code>i</code> anything you want, and <code>values</code> can be any valid vector (not necessarily integer numbers). The code chunk in curly brackets can be big or small.</p>
+<p>Here are some examples for clarification:</p>
+<pre class="r"><code>countries &lt;- c(&quot;AUT&quot;, &quot;BEL&quot;, &quot;DEU&quot;, &quot;NLD&quot;, &quot;GBR&quot;, &quot;USA&quot;)
+for (i in countries) {
+  print(i)
+}</code></pre>
+<pre><code>## [1] &quot;AUT&quot;
+## [1] &quot;BEL&quot;
+## [1] &quot;DEU&quot;
+## [1] &quot;NLD&quot;
+## [1] &quot;GBR&quot;
+## [1] &quot;USA&quot;</code></pre>
+<pre class="r"><code>for (i in 2:4) {
+  print(countries[i+1])
+}</code></pre>
+<pre><code>## [1] &quot;DEU&quot;
+## [1] &quot;NLD&quot;
+## [1] &quot;GBR&quot;</code></pre>
+<p>Let’s say you have a vector of random numbers, and you want to compute the cumulative sum. A <code>for</code>-loop could be used to perform this task.</p>
+<pre class="r"><code>vec &lt;- sort(runif(20))
+vec</code></pre>
+<pre><code>##  [1] 0.03501968 0.04921689 0.12996321 0.24918604 0.25872322 0.37883899
+##  [7] 0.45331493 0.47800602 0.56341192 0.59277333 0.60678596 0.71495636
+## [13] 0.71903395 0.72581949 0.74837233 0.75077957 0.75836404 0.82115177
+## [19] 0.83078365 0.91200802</code></pre>
+<pre class="r"><code># Create an object with the first value of vec
+cumSum &lt;- rep(0, 20)
+# Store the cumulative sum
+for (i in 1:length(vec)) {
+  cumSum[i] &lt;- sum(vec[1:i])
+}
+cumSum</code></pre>
+<pre><code>##  [1]  0.03501968  0.08423657  0.21419979  0.46338583  0.72210904
+##  [6]  1.10094804  1.55426296  2.03226898  2.59568091  3.18845424
+## [11]  3.79524019  4.51019655  5.22923051  5.95505000  6.70342233
+## [16]  7.45420189  8.21256593  9.03371770  9.86450135 10.77650937</code></pre>
+<p>Just so you get the idea… You’ve seen the <code>cumsum()</code> function already, and it’s actually much more efficient.</p>
+<pre class="r"><code>cumsum(vec)</code></pre>
+<pre><code>##  [1]  0.03501968  0.08423657  0.21419979  0.46338583  0.72210904
+##  [6]  1.10094804  1.55426296  2.03226898  2.59568091  3.18845424
+## [11]  3.79524019  4.51019655  5.22923051  5.95505000  6.70342233
+## [16]  7.45420189  8.21256593  9.03371770  9.86450135 10.77650937</code></pre>
+</div>
+<div id="combining-if-and-for-loops" class="section level1">
+<h1><span class="header-section-number">4</span> Combining <code>if</code> and <code>for</code>-loops</h1>
+<p>The next function finds the Collatz number of a positive integer, due to the still-unproven Collatz conjecture, which (paraphrasing here) states that all positive integers can be reduced to 1 by following this iterative process: if the present iteration of the number is even, then divide by two, otherwise multiply by 3 and add 1 to it. Repeat as necessary until the number is reduced to 1. The number of steps it takes to get there is the integer’s Collatz number. These have funny patterns… that are hard to see without visualizing them… Let’s turn those words into a function together in class.</p>
+<pre class="r"><code>Collatz &lt;- function(...){
+    ...
+}</code></pre>
 </div>
 <div id="references" class="section level1">
-<h1><span class="header-section-number">2</span> References</h1>
+<h1><span class="header-section-number">5</span> References</h1>
 </div>
 
 

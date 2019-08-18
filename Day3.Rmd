@@ -29,7 +29,195 @@ bibliography: bibliography.bib
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Content to be added
+# Introduction
+
+In this lecture we will learn some basic programming tools. This may look rather foreign if you haven't seen code like this before. If you have, then you can know that conditional programming (`if`, `ifelse()`) works similar to anywhere else, as do `for` loops. I'll try to pull off the feat of introducing these concepts and making them relevant to you in a single session. 
+
+# Conditional execution `if`
+
+Conditional execution is performed in R using the command/function `if`. It works like this: 
+
+1. One first **tests a condition**. 
+2. **Only if** this condition is `TRUE`, the following code is executed.
+3. If `FALSE`, then the following code chunk gets skipped. 
+
+The main syntax is: 
+
+``` {r, eval=FALSE}
+if ( condition == TRUE ) {
+	do.this
+	}
+```
+
+Let's start with a very simple example
+``` {r}
+x <- rnorm(10)
+if (mean(x) > 0){
+  print("I'm feeling lucky")	
+} 
+```
+
+Only if the condition is `TRUE`, does `R` print the result. The function `print()` is used to explicitly show an R-object in the console, like a character-string. The message `I'm feeling lucky` may or may not print to the console. It depends on the random numbers you got. In our case, we got 
+``` {r}
+mean(x)
+```
+I'll give more ad hoc examples of this basic idea in class.
+
+The part that goes in the parenthesis after `if` just needs to evaluate to a single value of `TRUE` in order to execute the code afterwards.
+
+``` {r}
+if (mean(x) > 0) {
+  print("I'm feeling lucky")
+  print(x)
+}
+```
+The curly brackets delimit the code that the `if` condition applies to, in much the same way es they demarcate the insides of a function. You can also place various lines of code inside the curly brackets.
+
+In case you want to do something different if the condition is not met, you can add a second `else` clause. This would give an alternative code chunk to execute if the condition evaluates to `FALSE`:
+``` {r}
+if (mean(x) > 0){
+  # Note the indentation in the brackets, 
+  #  which is optional, but increases legibility
+  print("I'm feeling lucky")
+} else {
+  print("Today is just not my day")
+}
+```
+
+You can, of course, have more than one condition using the operators `&` (and) and `|` (or). 
+``` {r}
+random1 <- rnorm(1)
+random2 <- rnorm(1)
+if (random1 > 0 & random2 > 0) {
+    print("Both random numbers are positive")
+} else {
+	print("At least one number is not positive")
+}
+```
+
+Effectively,
+``` {r}
+random1; random2
+```
+
+We often use `if` statements to make code able to flexibly handle different cases. If the code is simple, you can also evaluate many such conditions at once using `ifelse()`, For instance, 
+``` {r}
+education <- c("Secondary", "Tertiary", "Secondary",
+               "Secondary", "Tertiary", "Primary")
+ifelse(education == "Tertiary", 1, 0)
+```
+
+Things can also get complicated by nesting `if` or `ifelse()` statements:
+``` {r}
+ifelse(education == "Tertiary", 2, 
+	ifelse(education == "Secondary", 1, 0))
+```
+
+Sometimes we use `ifelse()` to recode variables if there aren't too many unique values to recode. Otherwise, use `case_when()` from the `tidyverse`, which is a better suited to this situation. This example comes from the `case_when()` documentation. NB, I remember playing this game as a kid. The game works like this: You sit in a circle and take turns counting in sequence, if the number you're on is evenly divisible by five, you say "fizz" instead of the number, and if it's evenly divisible by seven you say "buzz", and if it's divisble by both you say "fizz buzz". It has to be fast, but if anyone makes a mistake everyone has to start over.
+
+```{r}
+library(tidyverse)
+x <- 1:50
+case_when(
+  x %% 35 == 0 ~ "fizz buzz",  # look we're using modulo again!! %%
+  x %% 5 == 0 ~ "fizz",
+  x %% 7 == 0 ~ "buzz",
+  TRUE ~ as.character(x)       # this is the last 'else' instruction
+)
+```
+
+Did you see what happened there? Aside from the logical testing, what kind of output did we produce? $x$ was an integer vector, and what we got back was a character vector. Inside vectors we can't mix data types, so `R` has to coerce to the lowest (human readable!) common denominator, which is a character string.
+
+Other friends for logical testing are `all()` and `any()`
+```{r}
+(x <- rpois(10,10))
+all(x > 0)
+all(x > 5)
+any(x >= 14) # at least one TRUE
+```
+
+Time out to find `if()` and friends used in the `DemoTools` package. NB: logical tests are a frequent source of bugs because sometimes we forget about how to handle certain conditions.
+
+------------------------------------------------------------------------
+**NOTE**
+
+Bear in mind that `if` conditions can consist in any statement that has `TRUE` or `FALSE` as a result. The code is only executed if the answer is `TRUE`, unless an `else` condition is included.
+------------------------------------------------------------------------
+
+# Repetitive execution: `for`-loops
+
+There are several commands available in `R` for repetitive execution, and now we will focus on `for` loops, i.e. iteration. In fact we did this without pointing it out in our tidy pipelines, for example in using `mutate()` after `group_by()`. The kind of `for`-loop construction used in `R` is common in other languages. It is often considered to be the most legible kind of iteration for this reason. The basic form looks like this:
+
+``` {r eval=FALSE, cache=TRUE}
+for (i in values) {
+  execute.this
+}
+```
+
+The parameter `i` assumes the value of each element of `values` in succession. In the first iteration, `i` takes on the first value of `values` in the first loop and executes `execute.this`. In the second run, the second value is taken from `values` and so on until the last value is taken from `values` and `execute.this` is executed the last time. You can name `i` anything you want, and `values` can be any valid vector (not necessarily integer numbers). The code chunk in curly brackets can be big or small.
+
+Here are some examples for clarification:
+``` {r}
+countries <- c("AUT", "BEL", "DEU", "NLD", "GBR", "USA")
+for (i in countries) {
+  print(i)
+}
+for (i in 2:4) {
+  print(countries[i+1])
+}
+```
+
+Let's say you have a vector of random numbers, and you want to compute the cumulative sum. A `for`-loop could be used to perform this task.
+
+``` {r}
+vec <- sort(runif(20))
+vec
+# Create an object with the first value of vec
+cumSum <- rep(0, 20)
+# Store the cumulative sum
+for (i in 1:length(vec)) {
+  cumSum[i] <- sum(vec[1:i])
+}
+cumSum
+```
+
+Just so you get the idea... You've seen the `cumsum()` function already, and it's actually much more efficient.
+``` {r}
+cumsum(vec)
+```
+# Combining `if` and `for`-loops
+
+The next function finds the Collatz number of a positive integer, due to the still-unproven Collatz conjecture, which (paraphrasing here) states that all positive integers can be reduced to 1 by following this iterative process: if the present iteration of the number is even, then divide by two, otherwise multiply by 3 and add 1 to it. Repeat as necessary until the number is reduced to 1. The number of steps it takes to get there is the integer's Collatz number. These have funny patterns... that are hard to see without visualizing them... Let's turn those words into a function together in class.
+```{r, eval = FALSE}
+Collatz <- function(...){
+	...
+}
+```
+
+```{r, eval = FALSE, echo = FALSE}
+# due to Collatz Conjecture. 
+Collatz <- function(number, maxit = 1e5){
+	number  <- as.integer(number)
+	Cnumber <- 0 
+	for (fake.iterator in 1:maxit){ 
+		if (number != 1){ 
+			# first increment our counter
+			Cnumber <- Cnumber + 1    
+			if (number %% 2 == 0){
+				number <- number / 2
+			} else {
+				number <- number * 3 + 1
+			}
+		} else {
+			# otherwise it must equal 1!
+			break
+		}
+	}
+	Cnumber
+}
+```
+
+
 
 # References 
 

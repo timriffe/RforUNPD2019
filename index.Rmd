@@ -55,10 +55,9 @@ A day will consist in interactive demonstration lasting around 3 hours in the mo
 
 [Session 3](Day3) (Wednesday, 21 Aug)
 
-1. descriptive statistics
-2. base plotting concepts and ggplot2
-3. overview of DemoTools function and how to use them
-4. learn coding from DemoTools functions
+1. [Conditional execution](Day3#conditional-execution-if)
+2. [Repetetive execution](Day3#repetetive-execution-for-loops)
+3. [Combining `if` and `for`-loops](Day3#combining-if-and-for-loops)
 
 [Session 4](Day4) (Thursday, 22 Aug)
 
