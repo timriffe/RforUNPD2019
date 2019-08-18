@@ -188,7 +188,39 @@ That was a workout! I hope that given the above repetition you'll now be able to
 *** Time out to collect the functions we just wrote ***
 
 # Modularity
-In the previous single-purpose lifetable functions, some of the versions were already in a sense modular: A newly written function used another function that we had just written. Using this strategy to break down code into bite sized chunks enables you to structure code. I suggest that structured code enables structured thought (on methods), and vice versa-- Sometimes we start with a function that does too much and then improve it by turning functionally compact parts of it into smaller functions. It's a sort of whiteboard activity.
+In the previous single-purpose lifetable functions, some of the versions were already in a sense modular: A newly written function used another function that we had just written. Using this strategy to break down code into bite sized chunks enables you to structure code. I suggest that structured code enables structured thought (on methods), and vice versa-- Sometimes we start with a function that does too much and then improve it by turning functionally compact parts of it into smaller functions, a sort of whiteboard activity.
+
+Let's look at an example of a function doing too much: The `LT` function in my `LifeTable` package, also on github:
+[https://github.com/timriffe/LifeTable](https://github.com/timriffe/LifeTable)
+It's not broken per se, but the fact that it isn't modular makes it difficult to maintain: There is seemingly chaotic flow control of the code using `if()` statements (to be covered tomorrow).
+
+With this as our inspiration, let's write our own lifetable function. In the first instance, let's use them in a tidy pipeline. For this, use this big HMD dataset, here:
+[`HMD.rds`](https://drive.google.com/file/d/1Rc5Vb14DSglxyZ2xPaVEmEpiSCoKuC)
+Stick it in a folder called `~/data`, and you can load it into your session using (this is premised on you having faithfully set up your workspace to follow or mimick the repository for this course). 
+```{r}
+library(here)
+HMD <- readRDS(here("data","HMD.rds"))
+str(HMD)
+```
+Take a peek at the data using `str()` or `head()` or `glimpse()` or by opening it in a data viewer. It consists in all HMD lifetable $m(x)$ and $a(x)$ values stacked, where `Country`, `Sex`, `Year`, and are key columns, and `Age`, `mx`, and `ax` are variable columns. At least for purposes of making lifetables, a practical subset consists in a chunk of data with all ages. That's why age isn't a key variable here.
+
+As an exercise, let's fill out the lifetable columns for all unique key combinations in a tidy pipeline. To do so, we'll want to ensure all of our lifetable utility functions are loaded and available. Here's a nice trick to load them, assuming they're sitting in a script called `~/R/Functions.R` 
+```{r, eval = FALSE}
+source(here("R","Functions.R"))
+```
+
+Fill in the blanks (maybe there are more steps)
+```{r, eval = FALSE}
+HMD %>% 
+  _____ %>% 
+  _____
+```
+
+
+
+
+
+
 
 
 
