@@ -575,7 +575,7 @@ gaps <- filter(gapminder, continent != "Oceania")
 ```
 Try subsetting `gapminder` to just the first and last years (and also removing Oceania). Plot the density of log `gdpPercap` by continents (tip: `fill = continent`). They will overlap (tip: try `alpha = .5` to make them transparent). Make a 2-panel plot showing how these distributions changed between 1952 and 2007.
 
-3.
+3. TBD I'll make stuff up for exercises as we go
 
 # References 
 
