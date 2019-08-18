@@ -38,11 +38,162 @@ Today's session is about getting the most out of `R` by writing your own functio
 6. There are standard ways of documenting functions.
 
 # Reading functions
-It's helpful to look at some functions to observe their structure before sitting down to write our own. 
+It's helpful to look at some functions to observe their structure before sitting down to write our own. Let's look at a few cases from the `DemoTools` package. For now, let's just browse functions in it on github. Here's the repository url [https://github.com/timriffe/DemoTools](https://github.com/timriffe/DemoTools)
+
+List of some things to point out:
+
+1. There are small helper functions
+2. Functions build on each other. Some are generic pieces used in various places.
+3. Optional arguments
+4. Anatomy: assignment to name, arguments, body, return
+5. Documentation headers
+6. Beers or Sprague before / after (script to function evolution)
+7. Spreadsheet to function evolution (`agesmth` examples)
+8. Indentation and alignment, commenting.
+
+This tour includes various levels of sophistication, of good and probably also bad form. Our learning today will grow from humble modularity to ambitious analysis, by combining simple utility functions in a data analysis pipeline.
 
 # Writing functions
+In this section we'll write some simple functions.
+## The anatomy of a function
+
+Here's an oldy but goody:
+```{r}
+hello <- function(your_name){
+	paste0("Hello ", your_name, ". Have a nice day!")
+}
+hello("Tim")
+```
+
+1. `hello` is the name of the new function, which we know because
+2. `<- function(){}` is being assigned to it, which creates functions
+3. The thing in the parentheses `(your_name)` is the name of an argument to be used 
+4. The part inside `{ }` is the body of the function, presumably making use of `your_name`.
+5. In this particular case we're using the function `paste0()`, which concatenates text, including our argument `your_name`.
+
+Those are the parts of a function. The function can have more arguments, which could be any kind of data of any size and shape, and the stuff that happens inside the function (inside `{ }`) should know what to do with the arguments. It should produce a result, and return it. For our little function above, it returns a character string (the last thing evaluated). In our case it printed to console because we didn't assign it to anything. We can be more explicit about that by telling it what to return:
+
+```{r}
+# Identical in this case
+hello <- function(your_name){
+	out <- paste0("Hello ", your_name, ". Have a nice day!")
+	return(out)
+}
+hello("Tim")
+```
+
+So here's an outline:
+```{r, eval = FALSE}
+function_name <- function(argument1, argument2, ...){
+	# do stuff with arguments
+	return(result)
+}
+```
+
+## Simplified lifetable functions
+As you can see in our cheap example, functions can use other functions, as long they can be found. I think we should start straight away with an exercise. Below I give a bunch of equations for lifetables. Start with a variable `mx`, a.k.a. $m(x)$, or $\mu(x)$ if you can pretend it's continuous. We'll also need a helper-variable `ax` that tells us something about mortality within age intervals- This is one we usually assume something for, and we can be lazy and just say it's always $0.5$ for single age data.
+
+If the mortality rate is constant in the interval, then we have some relationships that I think we can program as little functions. I think it's always a good idea to write functions with test data, so how about you use this as your test `mx` and `ax`:
+
+```{r}
+omega <- 110 # last age 
+x     <- 0:omega
+a     <- 0.00022
+b     <- .07
+mx    <- a * exp(x*b)
+ax    <- rep(.5, length(mx))
+```
+
+### $q(x)$
+The conditional probability of death in an age interval, $q(x)$: 
+$$q(x) = \frac{m(x)}{1 + (1 - a(x)) \cdot m(x)}$$
+Write a function called `mxax_to_qx()`, taking arguments `mx` and `ax` and returning a variable `qx`. Let's assume single ages for now. Note, `mx` and `ax` should be the same length (one element per age class).  Note, it's common to declare that the very last value of $q(x)$ is 1, i.e. that no one survives beyond that age.
+
+```{r}
+# mxax_to_qx <- 
+```
+
+An aside: if there's time, let's modify the function to accept an optional argument `AgeInt` that assumes intervals are equal to 1 unless otherwise told so.
+
+### $p(x)$
+The conditional survival probaility, $p(x)$
+$$ p(x) = 1 - q(x) $$
+Fill in the blank:
+```{r}
+# qx_to_px <-
+```
+
+### $l(x)$
+Lifetable survivorship from birth, $l(x)$. 
+$$ l(x) = \prod _{i=0}^{x-1} p(i) $$
+Make the function have an optional `radix` argument, with default value equal to 1 (or something else if you prefer). Tip: there is a function called `cumprod()`.
+```{r}
+# px_to_lx <-
+```
+
+### $d(x)$
+The lifetable death distribution, $d(x)$ is the probability at birth of dying in a given age (if the radix is equal to 1).
+
+$$ d(x) = l(x) \cdot q(x) $$
+Or you could also think of it as minus the first difference in $l(x)$
+$$ d(x) = l(x) - l(x+1) $$
+Can you make a function `lxqx_to_dx()`? What about `mxax_to_dx()` (make it use the previous functions!), or just `lx_to_dx()`? For this last one, note it's common if $\omega$ is nice and big to just assume that no one survives beyond that age. Remember to include a `radix` argument where appropriate. Remember also that the resulting $d(x)$ should be the same length as both inputs!
+```{r}
+# this one doesn't need a radix argument
+# lxqx_to_dx <-
+
+# maybe inclued AgeInt as an argument?
+# mxax_to_dx <-
+
+# this one doesn't need a radix argument
+# lx_to_dx <-
+```
+
+### Lifetable exposure, $L(x)$
+The total lifetable person-years lived between age $x$ and $x+1$.
+
+$$L(x) = l(x) - (1 - a(x)) \cdot d(x)$$
+write `lxax_to_dx()`
+```{r}
+# lxax_to_dx <-
+```
+Can you modify the function to include an `AgeInt` argument?
+
+### $T(x)$
+Total remaining survivorship, $T(x)$:
+$$ T(x) = \sum_{i=x}^\omega L(i)$$
+Try to write `Lx_to_Tx()`. This is tricky since we haven't talked about loops, but you can do it by creatively combining `rev()` (flip a vector backwards) and `cumsum()`. 
+
+### $e(x)$
+The average length of life left at each age in the lifetable, $e(x)$.
+$$ e(x) = \frac{T(x)}{l(x)}$$
+
+Can you write function `lxTx_to_ex()`? What about `mxax_to_ex()`? If you do the second one, try to make it modular, i.e. use the little functions written earlier.
+```{r}
+# lxTx_to_ex <-
+
+# mxax_to_ex <-
+```
+What about $e(x)$ as the weighted average of $x$, where $d(x)$ are the weights? How about we write a tiny weighted mean function, `wmean()` to hold this formula?
+$$ wmean = \frac{\sum x * w}{\sum w} $$
+Here, $x$ is the thing we weight together and $w$ are the weights.
+```{r}
+# wmean <-
+```
+NB: insert tiny lesson on `na.rm` option.
+
+## Summary
+That was a workout! I hope that given the above repetition you'll now be able to make little utility functions. Have other favorite lifetable quantities? Have at it! Now, I suggest you take the lot of functions we just wrote and stick them in a single `R` script with an intuitive name. Put it in a new subfolder called `R` in the project folder for this workshop.
+
+*** Time out to collect the functions we just wrote ***
 
 # Modularity
+In the previous single-purpose lifetable functions, some of the versions were already in a sense modular: A newly written function used another function that we had just written. Using this strategy to break down code into bite sized chunks enables you to structure code. I suggest that structured code enables structured thought (on methods), and vice versa-- Sometimes we start with a function that does too much and then improve it by turning functionally compact parts of it into smaller functions. It's a sort of whiteboard activity.
+
+
+
+
+
 
 # Documenting functions
 

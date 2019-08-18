@@ -376,7 +376,18 @@ Max-Planck-Institute for Demographic Research</div></h4>
 <ul>
 <li><a href="#introduction"><span class="toc-section-number">1</span> Introduction</a></li>
 <li><a href="#reading-functions"><span class="toc-section-number">2</span> Reading functions</a></li>
-<li><a href="#writing-functions"><span class="toc-section-number">3</span> Writing functions</a></li>
+<li><a href="#writing-functions"><span class="toc-section-number">3</span> Writing functions</a><ul>
+<li><a href="#simplified-lifetable-functions"><span class="toc-section-number">3.1</span> Simplified lifetable functions</a><ul>
+<li><a href="#qx"><span class="toc-section-number">3.1.1</span> <span class="math inline">\(q(x)\)</span></a></li>
+<li><a href="#px"><span class="toc-section-number">3.1.2</span> <span class="math inline">\(p(x)\)</span></a></li>
+<li><a href="#lx"><span class="toc-section-number">3.1.3</span> <span class="math inline">\(l(x)\)</span></a></li>
+<li><a href="#dx"><span class="toc-section-number">3.1.4</span> <span class="math inline">\(d(x)\)</span></a></li>
+<li><a href="#lifetable-exposure-lx"><span class="toc-section-number">3.1.5</span> Lifetable exposure, <span class="math inline">\(L(x)\)</span></a></li>
+<li><a href="#tx"><span class="toc-section-number">3.1.6</span> <span class="math inline">\(T(x)\)</span></a></li>
+<li><a href="#ex"><span class="toc-section-number">3.1.7</span> <span class="math inline">\(e(x)\)</span></a></li>
+</ul></li>
+<li><a href="#summary"><span class="toc-section-number">3.2</span> Summary</a></li>
+</ul></li>
 <li><a href="#modularity"><span class="toc-section-number">4</span> Modularity</a></li>
 <li><a href="#documenting-functions"><span class="toc-section-number">5</span> Documenting functions</a></li>
 <li><a href="#using-functions-in-pipelines"><span class="toc-section-number">6</span> Using functions in pipelines</a></li>
@@ -399,13 +410,120 @@ Max-Planck-Institute for Demographic Research</div></h4>
 </div>
 <div id="reading-functions" class="section level1">
 <h1><span class="header-section-number">2</span> Reading functions</h1>
-<p>It’s helpful to look at some functions to observe their structure before sitting down to write our own.</p>
+<p>It’s helpful to look at some functions to observe their structure before sitting down to write our own. Let’s look at a few cases from the <code>DemoTools</code> package. For now, let’s just browse functions in it on github. Here’s the repository url <a href="https://github.com/timriffe/DemoTools">https://github.com/timriffe/DemoTools</a></p>
+<p>List of some things to point out:</p>
+<ol style="list-style-type: decimal">
+<li>There are small helper functions</li>
+<li>Functions build on each other. Some are generic pieces used in various places.</li>
+<li>Optional arguments</li>
+<li>Anatomy: assignment to name, arguments, body, return</li>
+<li>Documentation headers</li>
+<li>Beers or Sprague before / after (script to function evolution)</li>
+<li>Spreadsheet to function evolution (<code>agesmth</code> examples)</li>
+<li>Indentation and alignment, commenting.</li>
+</ol>
+<p>This tour includes various levels of sophistication, of good and probably also bad form. Our learning today will grow from humble modularity to ambitious analysis, by combining simple utility functions in a data analysis pipeline.</p>
 </div>
 <div id="writing-functions" class="section level1">
 <h1><span class="header-section-number">3</span> Writing functions</h1>
+<p>In this section we’ll write some simple functions. ## The anatomy of a function</p>
+<p>Here’s an oldy but goody:</p>
+<pre class="r"><code>hello &lt;- function(your_name){
+    paste0(&quot;Hello &quot;, your_name, &quot;. Have a nice day!&quot;)
+}
+hello(&quot;Tim&quot;)</code></pre>
+<pre><code>## [1] &quot;Hello Tim. Have a nice day!&quot;</code></pre>
+<ol style="list-style-type: decimal">
+<li><code>hello</code> is the name of the new function, which we know because</li>
+<li><code>&lt;- function(){}</code> is being assigned to it, which creates functions</li>
+<li>The thing in the parentheses <code>(your_name)</code> is the name of an argument to be used</li>
+<li>The part inside <code>{ }</code> is the body of the function, presumably making use of <code>your_name</code>.</li>
+<li>In this particular case we’re using the function <code>paste0()</code>, which concatenates text, including our argument <code>your_name</code>.</li>
+</ol>
+<p>Those are the parts of a function. The function can have more arguments, which could be any kind of data of any size and shape, and the stuff that happens inside the function (inside <code>{ }</code>) should know what to do with the arguments. It should produce a result, and return it. For our little function above, it returns a character string (the last thing evaluated). In our case it printed to console because we didn’t assign it to anything. We can be more explicit about that by telling it what to return:</p>
+<pre class="r"><code># Identical in this case
+hello &lt;- function(your_name){
+    out &lt;- paste0(&quot;Hello &quot;, your_name, &quot;. Have a nice day!&quot;)
+    return(out)
+}
+hello(&quot;Tim&quot;)</code></pre>
+<pre><code>## [1] &quot;Hello Tim. Have a nice day!&quot;</code></pre>
+<p>So here’s an outline:</p>
+<pre class="r"><code>function_name &lt;- function(argument1, argument2, ...){
+    # do stuff with arguments
+    return(result)
+}</code></pre>
+<div id="simplified-lifetable-functions" class="section level2">
+<h2><span class="header-section-number">3.1</span> Simplified lifetable functions</h2>
+<p>As you can see in our cheap example, functions can use other functions, as long they can be found. I think we should start straight away with an exercise. Below I give a bunch of equations for lifetables. Start with a variable <code>mx</code>, a.k.a. <span class="math inline">\(m(x)\)</span>, or <span class="math inline">\(\mu(x)\)</span> if you can pretend it’s continuous. We’ll also need a helper-variable <code>ax</code> that tells us something about mortality within age intervals- This is one we usually assume something for, and we can be lazy and just say it’s always <span class="math inline">\(0.5\)</span> for single age data.</p>
+<p>If the mortality rate is constant in the interval, then we have some relationships that I think we can program as little functions. I think it’s always a good idea to write functions with test data, so how about you use this as your test <code>mx</code> and <code>ax</code>:</p>
+<pre class="r"><code>omega &lt;- 110 # last age 
+x     &lt;- 0:omega
+a     &lt;- 0.00022
+b     &lt;- .07
+mx    &lt;- a * exp(x*b)
+ax    &lt;- rep(.5, length(mx))</code></pre>
+<div id="qx" class="section level3">
+<h3><span class="header-section-number">3.1.1</span> <span class="math inline">\(q(x)\)</span></h3>
+<p>The conditional probability of death in an age interval, <span class="math inline">\(q(x)\)</span>: <span class="math display">\[q(x) = \frac{m(x)}{1 + (1 - a(x)) \cdot m(x)}\]</span> Write a function called <code>mxax_to_qx()</code>, taking arguments <code>mx</code> and <code>ax</code> and returning a variable <code>qx</code>. Let’s assume single ages for now. Note, <code>mx</code> and <code>ax</code> should be the same length (one element per age class). Note, it’s common to declare that the very last value of <span class="math inline">\(q(x)\)</span> is 1, i.e. that no one survives beyond that age.</p>
+<pre class="r"><code># mxax_to_qx &lt;- </code></pre>
+<p>An aside: if there’s time, let’s modify the function to accept an optional argument <code>AgeInt</code> that assumes intervals are equal to 1 unless otherwise told so.</p>
+</div>
+<div id="px" class="section level3">
+<h3><span class="header-section-number">3.1.2</span> <span class="math inline">\(p(x)\)</span></h3>
+<p>The conditional survival probaility, <span class="math inline">\(p(x)\)</span> <span class="math display">\[ p(x) = 1 - q(x) \]</span> Fill in the blank:</p>
+<pre class="r"><code># qx_to_px &lt;-</code></pre>
+</div>
+<div id="lx" class="section level3">
+<h3><span class="header-section-number">3.1.3</span> <span class="math inline">\(l(x)\)</span></h3>
+<p>Lifetable survivorship from birth, <span class="math inline">\(l(x)\)</span>. <span class="math display">\[ l(x) = \prod _{i=0}^{x-1} p(i) \]</span> Make the function have an optional <code>radix</code> argument, with default value equal to 1 (or something else if you prefer). Tip: there is a function called <code>cumprod()</code>.</p>
+<pre class="r"><code># px_to_lx &lt;-</code></pre>
+</div>
+<div id="dx" class="section level3">
+<h3><span class="header-section-number">3.1.4</span> <span class="math inline">\(d(x)\)</span></h3>
+<p>The lifetable death distribution, <span class="math inline">\(d(x)\)</span> is the probability at birth of dying in a given age (if the radix is equal to 1).</p>
+<p><span class="math display">\[ d(x) = l(x) \cdot q(x) \]</span> Or you could also think of it as minus the first difference in <span class="math inline">\(l(x)\)</span> <span class="math display">\[ d(x) = l(x) - l(x+1) \]</span> Can you make a function <code>lxqx_to_dx()</code>? What about <code>mxax_to_dx()</code> (make it use the previous functions!), or just <code>lx_to_dx()</code>? For this last one, note it’s common if <span class="math inline">\(\omega\)</span> is nice and big to just assume that no one survives beyond that age. Remember to include a <code>radix</code> argument where appropriate. Remember also that the resulting <span class="math inline">\(d(x)\)</span> should be the same length as both inputs!</p>
+<pre class="r"><code># this one doesn&#39;t need a radix argument
+# lxqx_to_dx &lt;-
+
+# maybe inclued AgeInt as an argument?
+# mxax_to_dx &lt;-
+
+# this one doesn&#39;t need a radix argument
+# lx_to_dx &lt;-</code></pre>
+</div>
+<div id="lifetable-exposure-lx" class="section level3">
+<h3><span class="header-section-number">3.1.5</span> Lifetable exposure, <span class="math inline">\(L(x)\)</span></h3>
+<p>The total lifetable person-years lived between age <span class="math inline">\(x\)</span> and <span class="math inline">\(x+1\)</span>.</p>
+<p><span class="math display">\[L(x) = l(x) - (1 - a(x)) \cdot d(x)\]</span> write <code>lxax_to_dx()</code></p>
+<pre class="r"><code># lxax_to_dx &lt;-</code></pre>
+<p>Can you modify the function to include an <code>AgeInt</code> argument?</p>
+</div>
+<div id="tx" class="section level3">
+<h3><span class="header-section-number">3.1.6</span> <span class="math inline">\(T(x)\)</span></h3>
+<p>Total remaining survivorship, <span class="math inline">\(T(x)\)</span>: <span class="math display">\[ T(x) = \sum_{i=x}^\omega L(i)\]</span> Try to write <code>Lx_to_Tx()</code>. This is tricky since we haven’t talked about loops, but you can do it by creatively combining <code>rev()</code> (flip a vector backwards) and <code>cumsum()</code>.</p>
+</div>
+<div id="ex" class="section level3">
+<h3><span class="header-section-number">3.1.7</span> <span class="math inline">\(e(x)\)</span></h3>
+<p>The average length of life left at each age in the lifetable, <span class="math inline">\(e(x)\)</span>. <span class="math display">\[ e(x) = \frac{T(x)}{l(x)}\]</span></p>
+<p>Can you write function <code>lxTx_to_ex()</code>? What about <code>mxax_to_ex()</code>? If you do the second one, try to make it modular, i.e. use the little functions written earlier.</p>
+<pre class="r"><code># lxTx_to_ex &lt;-
+
+# mxax_to_ex &lt;-</code></pre>
+<p>What about <span class="math inline">\(e(x)\)</span> as the weighted average of <span class="math inline">\(x\)</span>, where <span class="math inline">\(d(x)\)</span> are the weights? How about we write a tiny weighted mean function, <code>wmean()</code> to hold this formula? <span class="math display">\[ wmean = \frac{\sum x * w}{\sum w} \]</span> Here, <span class="math inline">\(x\)</span> is the thing we weight together and <span class="math inline">\(w\)</span> are the weights.</p>
+<pre class="r"><code># wmean &lt;-</code></pre>
+<p>NB: insert tiny lesson on <code>na.rm</code> option.</p>
+</div>
+</div>
+<div id="summary" class="section level2">
+<h2><span class="header-section-number">3.2</span> Summary</h2>
+<p>That was a workout! I hope that given the above repetition you’ll now be able to make little utility functions. Have other favorite lifetable quantities? Have at it! Now, I suggest you take the lot of functions we just wrote and stick them in a single <code>R</code> script with an intuitive name. Put it in a new subfolder called <code>R</code> in the project folder for this workshop.</p>
+<p>*** Time out to collect the functions we just wrote ***</p>
+</div>
 </div>
 <div id="modularity" class="section level1">
 <h1><span class="header-section-number">4</span> Modularity</h1>
+<p>In the previous single-purpose lifetable functions, some of the versions were already in a sense modular: A newly written function used another function that we had just written. Using this strategy to break down code into bite sized chunks enables you to structure code. I suggest that structured code enables structured thought (on methods), and vice versa– Sometimes we start with a function that does too much and then improve it by turning functionally compact parts of it into smaller functions. It’s a sort of whiteboard activity.</p>
 </div>
 <div id="documenting-functions" class="section level1">
 <h1><span class="header-section-number">5</span> Documenting functions</h1>
