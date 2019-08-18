@@ -39,10 +39,11 @@ A day will consist in interactive demonstration lasting around 3 hours in the mo
 [Session 1](Day1) (Monday, 19 Aug)
 
 1. [About me](Day1#about-me)
-2. Using the editor: main characteristics of RStudio, packages
-3. Data handling: import/export data to/from R, including from MS-SQL databases
-4. Basic operations: assigning, subsetting
-5. Using functions, getting help
+2. [About this workshop](Day1#about-this-workshop)
+3. [R and the RStudio environment](Day1#r-and-the-rstudio-environment)
+4. [R basics](Day1#r-basics)
+5. [Tidyverse basics](Day1#tidyverse-basics)
+6. [Reading data into r](Day1#reading-data-into-r)
 
 [Session 2](Day2) (Tuesday, 20 Aug)
 
