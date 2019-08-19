@@ -265,7 +265,7 @@ ggplot(gapminder, mapping = aes(x = gdpPercap, y = lifeExp)) +
 	scale_x_log10(labels = dollar) + 
 	facet_wrap(~continent)
 ```
-We get panel plots like this by specifying a layout formula in `facet_wrap()`, where `~` separates left and right sides of the fomula, and where left means rows in a panel layout and right means columns. Since there's nothing on the left it just orders the continents. Color is no longer needed since the groups are separated.
+We get panel plots like this by specifying a layout formula in `facet_wrap()`, where `~` separates left and right sides of the formula, and where left means rows in a panel layout and right means columns. Since there's nothing on the left it just orders the continents. Color is no longer needed since the groups are separated.
 
 There is a time variable in this dataset that we've basically been ignoring. How about a `gdpPercap` time series?
 
@@ -275,7 +275,7 @@ ggplot(gapminder, mapping = aes(x = year, y = gdpPercap, by = country)) +
 	geom_line() 
 ```
 
-Use facetting to seprate the continents
+Use faceting to separate the continents
 ```{r}
 ggplot(gapminder, mapping = aes(x = year, y = gdpPercap, by = country)) +
 	geom_line() +
@@ -286,7 +286,7 @@ ggplot(gapminder, mapping = aes(x = year, y = gdpPercap, by = country)) +
 More sophisticated usage of `ggplot2` builds on these basics in a rather consistent way. You can deepen your fluency by learning new `geoms`, learning what things can be *mapped* to aesthetics, and learning options to scale axes and mappings. To get an overview, refer to the `ggplot2` cheat sheet. For a very approachable introduction, try the Healy book. For the most thorough and advanced treatment, refer to the Wickham book. To learn usage, look at help examples, or R graph gallery examples (add links). In following lessons I will sometimes use `ggplot2`, and I will slip in further tips in an unstructured way.
 
 ## Basic `dplyr`
-`ggplot2` is a wonderful tool if your data is already both *tidy* and *mappable*. But source data rarely is. To feed a dataset to `ggplot2` often we'll want to preprocess data, or even model it. The tools for data management, shaping, matching, sorting, joining, filtering, and so forth (stuff to prep for `ggplot2`) blend seamlessly into the tools of data analysis and modeling when one uses the `dplyr` approach. Some basic concepts will help us get started:
+`ggplot2` is a wonderful tool if your data is already both *tidy* and *mappable*. But source data rarely is. To feed a dataset to `ggplot2` often we'll want to pre-process data, or even model it. The tools for data management, shaping, matching, sorting, joining, filtering, and so forth (stuff to prep for `ggplot2`) blend seamlessly into the tools of data analysis and modeling when one uses the `dplyr` approach. Some basic concepts will help us get started:
 
 1. `dplyr` functions are *verbal* because they *do* things to data.
 2. A bunch of `dplyr` functions executed in sequence on a dataset for a *pipeline*.
@@ -322,14 +322,14 @@ Grouping does not do anything to the data directly. All values will be identical
 NB: the object created here is used in the following code chunk.
 
 #### `gather()`
-Here we use `gather()` to pull all the gapminder value columns into a single key-value pair, where the key is the variable column name, and value is the contents. The resulting `data.frame` is three times longer because there are three variable columns (and three key columns), and this mimicks the setup of your own `DemoData` SQL database. 
+Here we use `gather()` to pull all the gapminder value columns into a single key-value pair, where the key is the variable column name, and value is the contents. The resulting `data.frame` is three times longer because there are three variable columns (and three key columns), and this mimics the setup of your own `DemoData` SQL database. 
 ```{r, message = FALSE, warning = FALSE}
 gapminder_long <- gather(gap_grouped, 
 						 key="varname", 
 						 value = "value", 
 						 lifeExp:gdpPercap) 
 ```
-Note: `group_by()` is a necessary prestep in order to maintain the unique key combinations. We could consider `continent` either a key or a variable. It's not strictly needed as a key because country-year uniquely identifies observations, but I left it there to not over-lengthen the dataset.
+Note: `group_by()` is a necessary pre-step in order to maintain the unique key combinations. We could consider `continent` either a key or a variable. It's not strictly needed as a key because country-year uniquely identifies observations, but I left it there to not over-lengthen the dataset.
 
 You can get back to the original format with the `spread()`, which is the opposite of `gather()`.
 ```{r, eval = FALSE}
@@ -374,7 +374,7 @@ head(gap_summarize)
 ```
 You can get a lot of mileage out of `group_by()`, `mutate()` and `summarize()`.
 #### `select()` 
-`select()` pikcs out columns. 
+`select()` picks out columns. 
 ```{r}
 head(select(gapminder, country, gdpPercap))
 ```
@@ -467,7 +467,7 @@ Note also: We use indentation and alignment to make the code more legible.
 
 As mentioned, `dplyr` pipelines also read as sentences. This last one can be verbalized as "first take the gapminder dataset, then group it by country, then make a new column for the average life expectancy over time within the country, then regroup by year and make a new column for the average life expectancy over countries within the year". Such sentences don't make for good lit but they do make your code accessible to readers, which is a major advantage. You can (should) also comment as you go.
 
-Legibility of a script is acheived by reducing clutter and by using succinct pipelines. This is important because your processing/analysis code becomes all the more shareable, both with others and with future you. Who hasn't looked back at your own code written years ago and wonders wha the heck it does? It feels awful to have to reverse engineer your own logic and coding. Yes, it can be overcome with good annotations, but let's obviate the need altogether if we can.
+Legibility of a script is achieved by reducing clutter and by using succinct pipelines. This is important because your processing/analysis code becomes all the more shareable, both with others and with future you. Who hasn't looked back at your own code written years ago and wonders what the heck it does? It feels awful to have to reverse engineer your own logic and coding. Yes, it can be overcome with good annotations, but let's obviate the need altogether if we can.
 
 As mentioned, I'll slip in pipelines and `ggplot2` here and there in the coming days, so there will be several opportunities for practice and repetition.
 
@@ -508,7 +508,7 @@ gapminder <- read_sav(here("data","gapminder.sav"))
 gapminder <- read_sas(here("data","gapminder.sas7bdat"))
 ```
 ### spreadsheets
-Spreadheets are sort of a headache, and there are many competing methods in `R` to grab data from particular cell ranges and tabs. These are often OS dependent, so it's hard to recommend a single method for everyone.
+Spreadsheets are sort of a headache, and there are many competing methods in `R` to grab data from particular cell ranges and tabs. These are often OS dependent, so it's hard to recommend a single method for everyone.
 ### flat files
 `read_fwf()` comes with the `readr` package, so it's loaded already with `tidyverse`. To read in a file with fixed column positions (flat files), you always need to specify column data. `readr` makes it a little bit less tedious by detecting column positions, assuming that there's at least one space between columns. Otherwise (like with US birth or death microdata) you'll still need to specify start and end positions. It also detects column classes, but to be on the safe side you can specify them yourselves using a nice string shorthand (`c` is character and `d` is double).
 ```{r, results = "hide", echo = FALSE, message = FALSE}
