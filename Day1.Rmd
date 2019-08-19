@@ -645,7 +645,7 @@ saveRDS(gapminder,file = "gapminder.rds")
 gapminder <- readRDS("gapminder.rds")
 ```
 
-### Requests?
+## Requests?
 
 If you come across some other kind of data, take a peek at the [Data Import Cheat Sheet](https://resources.rstudio.com/rstudio-cheatsheets/data-import-cheat-sheet)  need help figuring out how to get things humming using these or other data formats let me know. It's quite possible that these situations are shared, so if I figure it out then a lesson can be made out of it. 
 
