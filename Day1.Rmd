@@ -75,15 +75,19 @@ Much of the `R` interaction we do in this first week of the workshop will be *fr
 We often speak of `R` sessions, a given interactive instance of `R`. For the most part `R` sessions are in-memory. If you have a dataset (or many) loaded into a session, then these are stored as *objects* in your workspace or *environment*. You can have a clean or a cluttery environment. You can take a look at what's in your environment in the `environment` tab of Rstudio (upper right corner by default). When you close an instance of `R` you can save your environment as-is, or you can lose it. I recommend *not* saving it. Otherwise you'll end up with lots of file baggage. It's more efficient and less bug-prone to save code and data in files than to save a bunch of saved `R` sessions. You can wipe your session free in Rstudio by selecting `Restart R` under `session` tab, or `Ctrl + Shift + F10`, or by executing `rstudioapi::restartSession()` in the console.
 
 ## `R` is functional
+
 `R` is a *functional* programming language. You can think of functions in different ways-- they're like the way functions are used in mathematics, $f()$, or you could think of them as little programs. You give the function input (data, instructions), and then it does something with that and returns output.
 
 Here's a cheap example:
+
 ```{r}
 sum(1,2,3,4)
 ```
+
 *sum* is just the name of the function instead of $f()$, and just the same, we enclose its inputs in round parentheses. `R` has many many such functions available to you. They can be combined in many many ways, and you can write your own functions too. If you get the hang of it, you'll find that functions can help you structure thought and analyses. We'll learn a lot about them later this week, but we'll start using them today without thinking about it much. We call `R` a functional language because everything gets done in `R` using functions, and because functions always behave consistently: a given set of inputs (arguments) always returns the same output.
 
 ## `R` uses *objects*
+
 In an interactive `R` session, you can have different pieces of data, *objects*, and `R` has different kinds of these, most of which are data structures. 
 
 1. `vector`s store a single data type.
@@ -97,29 +101,39 @@ And many more...
 Today we'll use `vector`s and `data.frame`s, and some nuanced cousins of the `data.frame`.
 
 ## Creating objects
+
 You can make an object by *assigning* (`<-`) to its name, like this:
+
 ```{r}
 a <- 2
 ```
+
 Now we have a scalar, a vector with one element. This element consists in the integer value 2. The new object is called `a`. Not `A`! **`R` is case sensitive**. You can see `a` pop up in the environment tab, with some extra meta information. `a` can be used like so:
+
 ```{r}
 a+1
 a^2
 ```
+
 You can also remove `a` like so:
+
 ```{r}
 rm(a)
 ```
+
 Assignment also works using `=`, so whether to use `<-` or not is mostly an aesthetic choice. `=` is used to specify arguments, so perhaps to avoid confusion you'd prefer `=` for everything, but I personally like to keep concepts separate where possible.
 
 This way of object creation is general, for all types and sizes of objects. You will see it used everywhere you look in `R`.
 
 ## More on functions
+
 You can also assign the output straight from a function. For example:
+
 ```{r}
 nums <- rnorm(n = 10, mean = 0, sd = 1)
 nums
 ```
+
 Here we have created a new object `nums` by assigning the output of the function `rnorm()` (ten random draws from a standard normal distribution). See how we use `rnorm()` there? This function has three *arguments* (i.e. parameters), in this case intuitively named if you've ever taken an intro statistics class. Now the object `nums` is simply available to use throughout the remainder of this `R` session, yay. 
 
 ## Packages extend R
@@ -131,6 +145,7 @@ Let's get a `data.frame` to play with: Hans Rosling's famous data, which you can
 ```{r, eval = FALSE}
 install.packages("gapminder")
 ```
+
 This one installs quick because it doesn't depend on other packages. Here's one we'll use that has lots of dependencies, so it'll take a while to download and install all its pieces.
 
 ```{r, eval = FALSE}
@@ -156,19 +171,23 @@ library(gapminder)
 
 ## Reading help files
 You can learn about a particular function in different ways. `R` functions are usually documented, and we can see the help file by typing `?` in front of the function name in the console:
+
 ```{r, eval = FALSE}
 ?rnorm
 ```
+
 Do this live and see how the help page opens by default in the lower right pane in `Rstudio`. Such help pages are structured, and it's worth learning their basic parts so you can make good use of them. The **Description** section tells you the purpose, and is short and to the point. The **Usage** section tells you how a function *call* might look like if all arguments are used. For `rnorm()` we see `rnorm(n, mean = 0, sd = 1)`. From this we learn that `n` is a necessary argument, whereas `mean` and `sd` have default values of 0 and 1, and are therefore *optional* arguments. You can get more information about what's expected of the arguments in the **Arguments** section. The **Details** section gives further information on methods and other things you might want to be aware of. The **Value** section describes function output, and it might be structured. The **Examples** section is probably the most immediately useful, as it gives working examples that often gives hints on how to set things up to effectively use the function.
 
 Even so, sometimes help files are terse. If the reason you're reading them is an error or warning, then you can often find answers in [Stack Overflow](https://stackoverflow.com/questions/tagged/r). You can also save yourself the trouble of copying and pasting error messages into a search engine by using the `searcher` package.
 
 You only need to install it once.
+
 ```{r, eval = FALSE}
 install.packages("searcher")
 ```
 
 The following works in live `R` sessions, but not from an `Rmarkdown` chunk in my experience, FYI.
+
 ```{r, eval = FALSE}
 library(searcher)
 sum + mean # invoke an error
@@ -176,15 +195,19 @@ search_google() # by default searches this error
 ```
 
 # Tidyverse basics
+
 The above basics are incomplete, but applicable no matter what approach you take to `R` programming. Notably missing is an overview to subsetting and selecting, and this is because it depends on your approach. Now we're going to get started using some basic tools from the `tidyverse`, `ggplot` construction basics and `dplyr` data processing pipelines in particular so we'll see how a variety of operations work in the tidy approach. In later sessions we'll see some more traditional methods of filtering and selection.
 
 ## tidy data
+
 *Tidy* data refers to tables of a particular layout, with one observation per row and one variable per column. Tidy datasets processed using tidyverse tools allow for fast and understandable analyses that in many cases require no programming, whereas it often takes a certain amount of head-scratching (programming) to analyze not-tidy datasets. 
 
 ### Example of tidy data
+
 For example, you're probably all familiar with HMD lifetables [@HMD]: This data is tidy. If you were to take all the HMD single age lifetables and stack them, adding new grouping columns for Sex and Country, then this would still be tidy. That is, a single HMD observation consists in a unique combination of Country, Sex, Year, and Age. Each lifetable column is a variable, so the tidy way to store them is the traditional way: in columns. 
 
 ### Examples of not tidy data.
+
 1. The DemoData database is not tidy: it's much longer than tidy data. All variables are stacked, and the variable type (qx, lx, counts, etc) is coded in an additional grouping column. This is efficient for storage, given that not every observation has every variable. It is not efficient for interactive programming because observations are potentially scattered over rows.
 
 2. A matrix with ages in rows and years in columns can be very convenient for traditional programming, but it does not follow our definition of tidy. To make it tidy, we would need columns for age and year, and a new column containing the variable stored in the matrix.
@@ -194,6 +217,7 @@ For example, you're probably all familiar with HMD lifetables [@HMD]: This data 
 Different data structures exist for various reasons, but in the end tidy data facilitates the kind of thinking and operations needed for a particular system of flexible data analysis and visualization.
 
 ## the gapminder `data.frame`
+
 Let's work with a tidy `data.frame`. These are like a rectangular spreadsheet, or like a dataset in `Stata`: `data.frame`s have rows and columns, and there can be different kinds of data between columns, but only one kind of data within a column. Load it along with `tidyverse` in case you didn't before:
 
 ```{r}
@@ -215,9 +239,15 @@ str(gapminder)
 
 ## Basic `ggplot2` with the gapminder data
 ### Overview
-Tidy datasets such as this can also be visualized without further ado using a systematic grammar [@wilkinson2012grammar] implemented in the `ggplot2` package ( @wickham2016ggplot2, this loads automatically with `tidyverse`). The `gapminder` examples I'll give today and tomorrow are either gratuitously lifted or modified from @healy2018data, which you can either purchase as the book (I'll show it to you), or refer to the free version online: [www.socviz.co](www.socviz.co). It's a fabulous book. Let's take a first look:
+
+Tidy datasets such as this can also be visualized without further ado using a systematic grammar [@wilkinson2012grammar] implemented in the `ggplot2` package ( @wickham2016ggplot2, this loads automatically with `tidyverse`). The `gapminder` examples I'll give today and tomorrow are either gratuitously lifted or modified from @healy2018data, which you can either purchase as the book (I'll show it to you), or refer to the free version online: [www.socviz.co](www.socviz.co). It's a fabulous book. 
+
+NOTE: when following along in these examples, you should **type along**, and not copy-paste the code.
+
+Let's take a first look:
 
 ### *Map* to aesthetics
+
 ```{r}
 ggplot(gapminder, mapping = aes(x = gdpPercap, y = lifeExp, color = continent)) + 
 	geom_point() 
@@ -228,6 +258,7 @@ The `ggplot()` function *maps* variables in the `gapminder` dataset to either co
 Notes: The first argument specifies the dataset. The `mapping` argument is specified always as `mapping = aes()`, where *aes* stands for aesthetics. At a minimum you'll want to map to `x`, but in this case also `y` and `color`. The things that you can map are variables in the tidy dataset. And where necessary `ggplot2` guesses whether they are quantitative or categorical in nature. You need to give a mapping to `ggplot()`, but you can also give different mappings for different geoms specified directly in the `geom` functions. That only makes sense if you'll have more than one `geom` going into the plot (we'll see this). Further modifications to the coordinate base created by `ggplot()` are *added* in to the expression with `+`.
 
 ### Adjust axis scales
+
 ```{r}
 library(scales)
 ggplot(gapminder, mapping = aes(x = gdpPercap, y = lifeExp, color = continent)) + 
@@ -238,9 +269,11 @@ ggplot(gapminder, mapping = aes(x = gdpPercap, y = lifeExp, color = continent)) 
 It turns out that by specifying a nice large set of possible mappings, coordinate systems, geoms, and discrete and continous options for scaling mappings, that you can create just about any plot. For other tricky ones, there are usually packages available. Here's a nice overview of `ggplot2` functionality: [https://www.rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf](https://www.rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf)
 
 ### `geom`s and `facet`s
+
 My objective now is to show you a few different geoms and ways of doing panels in `ggplot2`. 
 
 For example, we can also add in a smoother to see the global trend:
+
 ```{r}
 ggplot(gapminder, mapping = aes(x = gdpPercap, y = lifeExp)) + 
 	geom_point(mapping = aes(color = continent)) +
@@ -256,6 +289,7 @@ ggplot(gapminder, mapping = aes(x = gdpPercap, y = lifeExp, color = continent)) 
 	geom_smooth(method = "loess") +
 	scale_x_log10(labels = dollar)
 ```
+
 Wow, that's a noisy plot! What if instead of color we just split it into subplots by continent?
 
 ```{r}
@@ -265,17 +299,20 @@ ggplot(gapminder, mapping = aes(x = gdpPercap, y = lifeExp)) +
 	scale_x_log10(labels = dollar) + 
 	facet_wrap(~continent)
 ```
+
 We get panel plots like this by specifying a layout formula in `facet_wrap()`, where `~` separates left and right sides of the formula, and where left means rows in a panel layout and right means columns. Since there's nothing on the left it just orders the continents. Color is no longer needed since the groups are separated.
 
 There is a time variable in this dataset that we've basically been ignoring. How about a `gdpPercap` time series?
 
 Too busy?
+
 ```{r}
 ggplot(gapminder, mapping = aes(x = year, y = gdpPercap, by = country)) +
 	geom_line() 
 ```
 
 Use faceting to separate the continents
+
 ```{r}
 ggplot(gapminder, mapping = aes(x = year, y = gdpPercap, by = country)) +
 	geom_line() +
@@ -313,38 +350,46 @@ Flip through the tabs in order.
 
 #### `group_by()` 
 When you want to operate on groups in a dataset, then it is necessary to declare the grouping.
+
 ```{r}
 gap_grouped    <- group_by(gapminder, country, year, continent) 
 head(gap_grouped)
 ```
+
 Grouping does not do anything to the data directly. All values will be identical, and the dimensions are the same. It just adds a piece of metadata to the object that declares the grouping.
 
 NB: the object created here is used in the following code chunk.
 
 #### `gather()`
-Here we use `gather()` to pull all the gapminder value columns into a single key-value pair, where the key is the variable column name, and value is the contents. The resulting `data.frame` is three times longer because there are three variable columns (and three key columns), and this mimics the setup of your own `DemoData` SQL database. 
+Here we use `gather()` to pull all the gapminder value columns into a single key-value pair, where the key is the variable column name, and value is the contents. The resulting `data.frame` is three times longer because there are three variable columns (and three key columns), and this mimics the setup of your own `DemoData` SQL database.
+
 ```{r, message = FALSE, warning = FALSE}
 gapminder_long <- gather(gap_grouped, 
 						 key="varname", 
 						 value = "value", 
 						 lifeExp:gdpPercap) 
 ```
+
 Note: `group_by()` is a necessary pre-step in order to maintain the unique key combinations. We could consider `continent` either a key or a variable. It's not strictly needed as a key because country-year uniquely identifies observations, but I left it there to not over-lengthen the dataset.
 
 You can get back to the original format with the `spread()`, which is the opposite of `gather()`.
+
 ```{r, eval = FALSE}
 spread(gapminder_long, varname, value)
 ```
 
 #### `mutate()` 
 `mutate()` adds columns to, or modifies columns in, a `data.frame`. Think of the example of lifetable construction: You might start with deaths and exposures, and all other columns are created based on these. This is a case for `mutate()`, and we'll do this sort of exercise when we get to function programming. The main thing to remember is that `mutate()` does not change the number of rows. Keeping with our gapminder example, say we want to add a column for the mean life expectancy, but repeated for each row within each group. To get these means for each country, we'll want to group by country first (our previous grouping also grouped by year).
+
 ```{r}
 gap_grouped <- group_by(gapminder, country)
 gap_mutated <- mutate(gap_grouped,
 	   mean_lifeExp = mean(lifeExp)) 
 head(gap_mutated)
 ```
+
 You can also just keep comma separating newly made columns, like so:
+
 ```{r, eval = FALSE}
 mutate(gap_grouped,
 	   mean_lifeExp = mean(lifeExp),
@@ -352,18 +397,24 @@ mutate(gap_grouped,
 	   cov_lifeExp = sd_lifeExp / mean_lifeExp,
 	   cov_pop = sd(population) / mean(population)) 
 ```
+
 You see how `cov_lifeExp` is created using columns being created within the same call? Pretty neat! Expressions can also be more complicated, see where `cov_pop` is created using two function calls.
 
 NB: The object `gap_grouped` created here is also used in the next code chunk.
+
 #### `summarize()`
-If instead we wished to collapse the dataset to have one observation per country, then we use `summarize()` (this can also by lossy with respect to columns). Here is that first `mutate` expression when executed with `summarize()`
+
+If instead we wished to collapse the dataset to have one observation per country, then we use `summarize()` (this can also by lossy with respect to columns). Here is that first `mutate` expression when executed with `summarize()`:
+
 ```{r}
 gap_summarize <- summarize(gap_grouped,
 	   mean_lifeExp = mean(lifeExp))
 head(gap_summarize)
 dim(gap_summarize) # collapsed
 ```
+
 If you want to summarize more than one column, then this works, also with sequential dependency over columns created on the fly:
+
 ```{r}
 gap_summarize <- summarize(gap_grouped,
 	   mean_lifeExp = mean(lifeExp),
@@ -372,19 +423,27 @@ gap_summarize <- summarize(gap_grouped,
 	   cov_gdpPercap = sd_gdpPercap / mean_gdpPercap)
 head(gap_summarize)
 ```
+
 You can get a lot of mileage out of `group_by()`, `mutate()` and `summarize()`.
+
 #### `select()` 
-`select()` picks out columns. 
+`select()` picks out columns:
+
 ```{r}
 head(select(gapminder, country, gdpPercap))
 ```
+
 If data are grouped, the key columns are retained (and it tells you so in the console):
+
 ```{r}
 gap_grouped <- group_by(gapminder, country, year)
 head(select(gap_grouped, gdpPercap))
 ```
+
 #### `filter()` 
-More often we want to subset rows to those that satisfy certain selection criteria. Use `filter()` for this.
+
+More often we want to subset rows to those that satisfy certain selection criteria. Use `filter()` for this:
+
 ```{r}
 gap_filtered <- filter(gapminder,
 					   year >= 2000,
@@ -392,12 +451,15 @@ gap_filtered <- filter(gapminder,
 					   continent == "Africa")
 str(gap_filtered)
 ```
+
 There are three logical expressions here, each producing a value of TRUE or FALSE for each row. Comma separation between these is interpreted as `&`, so the full logical expression evaluated is interpreted as: 
 `year >= 2000 & year <= 2010 & continent == "Africa"`
 Note that double equals `==` is for the logical evaluation of equality! The other logical operators are pretty straightforward. A vertical bar `|` is used for *or*.
 
 #### `ungroup()` 
+
 It is often a good idea to remove a grouping attribute from a data object when you're done using it. Otherwise you might operate within groups when you don't mean to. Then execute `ungroup()` on the object. This is also a clean way to remove a grouping before declaring a new and different one. For example, say we want to make a column for the mean `lifeExp` within the series for each country, and also the mean over countries within each year. Then we'll need to switch groupings:
+
 ```{r}
 gap_gr1 <- group_by(gapminder, country)
 gap_gr1 <- mutate(gap_gr1,
@@ -410,25 +472,31 @@ head(gap_gr2)
 ```
 
 ### Pipes
+
 I had to force myself not to use pipes in the previous section! Really `dplyr` functions can be executed in sequence without the need to create intermediate objects. If you executed the previous examples, look at how cluttered RStudio's environment tab has become. We can avoid all that by stringing things together using the pipe operator from the `magrittr` package that loads automatically with `tidyverse`. here are some of those example reworked. See how they read as sentences?
 
 Before:
+
 ```{r, eval = FALSE}
 gap_grouped <- group_by(gapminder, country)
 gap_mutated <- mutate(gap_grouped,
 	   mean_lifeExp = mean(lifeExp)) 
 head(gap_mutated)
 ```
+
 After:
+
 ```{r, eval = FALSE}
 gapminder %>% 
 	group_by(country) %>% 
 	mutate(mean_lifeExp = mean(lifeExp)) %>% 
 	head()
 ```
+
 Note: the first argument (`data`) is automatically filled with the object running through the pipeline. You should imagine `gapminder` running through a staged pipeline, getting modified at each step. When it gets to the end we just show the first several rows in the console.
 
 Before:
+
 ```{r, eval = FALSE}
 gap_gr1 <- group_by(gapminder, country)
 gap_gr1 <- mutate(gap_gr1,
@@ -439,7 +507,9 @@ gap_gr2 <- group_by(gap_gr2, year)
 gap_gr2 <- mutate(gap_gr2, mean_lifeExp_year = mean(lifeExp))
 head(gap_gr2)
 ```
+
 After:
+
 ```{r, eval = FALSE}
 gapminder %>% 
 	group_by(country) %>% 
@@ -449,7 +519,9 @@ gapminder %>%
     mutate(mean_lifeExp_year = mean(lifeExp)) %>% 
 	head()
 ```
+
 Instead of ending in `head()`, we could assign the result to a new object. This is usually done at the start, like so:
+
 ```{r, eval = FALSE}
 gap_mutated <- 
 	gapminder %>% 
@@ -459,6 +531,7 @@ gap_mutated <-
     group_by(year) %>% 
     mutate(mean_lifeExp_year = mean(lifeExp)) 
 ```
+
 The object `gap_mutated` consists in the fully-executed pipeline. 
 
 Note: We usually construct pipelines like these incrementally, often checking as we to make sure things work as expected. Often that checking is done like we saw above, with ` %>% head()` or similar as the last step. As we determine next steps, this checker line gets pushed further down in the chain of execution. Just remember to remove it when you're done building the pipeline!
@@ -472,11 +545,15 @@ Legibility of a script is achieved by reducing clutter and by using succinct pip
 As mentioned, I'll slip in pipelines and `ggplot2` here and there in the coming days, so there will be several opportunities for practice and repetition.
 
 # Reading data into `R`
+
 This is all good and well if I happen to give you a dataset to play with, but I'm sure you're itching to have a go at your own data. Problem: you probably have different datasets in different formats, probably because at times different tools are used to do the business of demography. Don't worry, you're covered. There are oodles of ways to read data into `R`. In keeping with the above approach to `R`, let's introduce two packages from the tidyverse. `readr` and `haven`. `readr` gives user friendly ways to read in datasets in generic formats, whereas `haven` helps read in several proprietary formats. If a given data format isn't already accounted for in either of these packages, there's very likely at least one other `R` package out there that does the job. Let's just plow through several examples.
 
 ## Different data formats
+
 Here are a selection of functions that read in selected data formats. I've resaved the `gapminder` data in several formats in the `data` folder.
+
 ### csv
+
 `read_csv()`, `read_tsv()`, `read_delim()` will read in data delimited by commas, tabs, or any character, respectively. These have nice default options. They all work similarly.
 ```{r, eval = FALSE, echo = FALSE}
 library(here)
@@ -491,10 +568,13 @@ gapminder <- read_tsv(here("data","gapminder_tab.csv"))
 gapminder <- read_delim(here("data","gapminder_hash.csv"), delim = "#")
 ```
 This would be the same if the files didn't have `.csv` ending. The file name doesn't matter as long as it just contains text. So `.txt` is OK, and other spellings.
+
 ### SPSS, SAS, STATA
+
 Proprietary software systems tend to redesign their native file formats periodically, but do not always openly publish metadata on how to interpret them. The `haven` package takes care of the *big three*. It is installed with `tidyverse`, but isn't automatically loaded with it, so you need to do `library(haven)` to use it. Labels are handled nicely, but our example doesn't use this feature.
 
 STATA is supported for versions 8-15 at present. If you use these systems, then the file extensions will look familiar to you.
+
 ```{r, eval = FALSE, echo = FALSE}
 library(haven)
 write_dta(gapminder, path = here("data","gapminder.dta"), version = 14)
@@ -507,10 +587,15 @@ gapminder <- read_dta(here("data","gapminder.dta"))
 gapminder <- read_sav(here("data","gapminder.sav"))
 gapminder <- read_sas(here("data","gapminder.sas7bdat"))
 ```
+
 ### spreadsheets
+
 Spreadsheets are sort of a headache, and there are many competing methods in `R` to grab data from particular cell ranges and tabs. These are often OS dependent, so it's hard to recommend a single method for everyone.
+
 ### flat files
+
 `read_fwf()` comes with the `readr` package, so it's loaded already with `tidyverse`. To read in a file with fixed column positions (flat files), you always need to specify column data. `readr` makes it a little bit less tedious by detecting column positions, assuming that there's at least one space between columns. Otherwise (like with US birth or death microdata) you'll still need to specify start and end positions. It also detects column classes, but to be on the safe side you can specify them yourselves using a nice string shorthand (`c` is character and `d` is double).
+
 ```{r, results = "hide", echo = FALSE, message = FALSE}
 library(gdata)
 write.fwf(as.data.frame(gapminder), 
@@ -526,7 +611,9 @@ gapminder   <- read_fwf(here("data","gapminder_flat.txt"),
 		 col_positions = fwf_metadata,
 		 col_types = "ccdddd")
 ```
+
 In this case we had nice white space padding, so everything could be detected, but if your data are super packed together, like with US birth and death microdata, then you'll need to build up a similar object by hand. You stick the information in a self-made list like this:
+
 ```{r}
 fwf_metadata <- list(
 	begin = c(0,25,34,39,50,60),
@@ -536,13 +623,12 @@ fwf_metadata <- list(
 				 "lifeExp", "pop", "gdpPercap"))
 ```
 
+Also, `fread()` from the `data.table` is also great.
 
-```{r}
-
-```
-`fread()` from the `data.table` is also great.
 ### SQL databases
-`sqldf()` from the `sqldf` package is good with SQL databases of all shapes and sizes. It also lets you do extractions using native SQL syntax, in case that's a familiar way of working for you. The `DBI` package has a nice explainer for interfacing with databases, and it's vignette is a good tutorial you can get the vignette by doing this
+
+`sqldf()` from the `sqldf` package is good with SQL databases of all shapes and sizes. It also lets you do extractions using native SQL syntax, in case that's a familiar way of working for you. The `DBI` package has a nice explainer for interfacing with databases, and it's vignette is a good tutorial you can get the vignette by doing this:
+
 ```{r, eval = FALSE}
 install.packages("DBI")
 library(DBI)
@@ -551,32 +637,28 @@ vignette("spec", package = "DBI")
 ```
 
 ### Native `R` files
+
 `R` has more than one native compression type, I suggest you use `.rds` if you want to save an `R` object that you know will be kept in `R`. This has the advantage of fast and unambiguous loading, since no parsing is required and since loading happens via assignment (as with other read functions). Writing and reading look like this:
+
 ```{r, eval = FALSE}
 saveRDS(gapminder,file = "gapminder.rds")
 gapminder <- readRDS("gapminder.rds")
 ```
 
-
-
-
 ### Requests?
+
 If you come across some other kind of data, take a peek at the [Data Import Cheat Sheet](https://resources.rstudio.com/rstudio-cheatsheets/data-import-cheat-sheet)  need help figuring out how to get things humming using these or other data formats let me know. It's quite possible that these situations are shared, so if I figure it out then a lesson can be made out of it. 
-
-
-
-
-
-
 
 # Exercises
 
 1. Try making the gapminder scatterplot with different smoothing methods: i) on the whole dataset and ii) by continent. You can find out the other methods by reading the help file, typing `?geom_smooth`
 
 2. Here's a way to remove some rows from a dataset:
+
 ```{r}
 gaps <- filter(gapminder, continent != "Oceania")
 ```
+
 Try subsetting `gapminder` to just the first and last years (and also removing Oceania). Plot the density of log `gdpPercap` by continents (tip: `fill = continent`). They will overlap (tip: try `alpha = .5` to make them transparent). Make a 2-panel plot showing how these distributions changed between 1952 and 2007.
 
 3. TBD I'll make stuff up for exercises as we go
