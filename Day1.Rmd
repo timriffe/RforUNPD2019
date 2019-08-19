@@ -191,7 +191,7 @@ For example, you're probably all familiar with HMD lifetables [@HMD]: This data 
 
 3. Often panel data is delivered with each row representing an individual, and with many many variables. If there are 100 variables, and 10 waves, we end up with 1000 or so columns. For many analyses this is not considered tidy: an observation is a unique combination of individual and wave. To make it tidy, we'd need a column to store the wave variable.
 
-Different data structures exist for various reasons, but in the end tidy data facilitates the kind of thinking and operations needed for flexible data analyses and visualization.
+Different data structures exist for various reasons, but in the end tidy data facilitates the kind of thinking and operations needed for a particular system of flexible data analysis and visualization.
 
 ## the gapminder `data.frame`
 Let's work with a tidy `data.frame`. These are like a rectangular spreadsheet, or like a dataset in `Stata`: `data.frame`s have rows and columns, and there can be different kinds of data between columns, but only one kind of data within a column. Load it along with `tidyverse` in case you didn't before:
@@ -223,7 +223,9 @@ ggplot(gapminder, mapping = aes(x = gdpPercap, y = lifeExp, color = continent)) 
 	geom_point() 
 ```
 
-The `ggplot()` function *maps* variables in the `gapminder` dataset to either coordinates (x,y) or aesthetics (for example color). This sets up the plot metadata, but it does not plot the data because we didn't tell it how to do so: this final step is done by adding a point geometry `geom_point()` 
+The `ggplot()` function *maps* variables in the `gapminder` dataset to either coordinates (x,y) or aesthetics (for example color). This sets up the plot metadata, but it does not plot the data because we didn't tell it how to do so: this final step is done by adding a point geometry `geom_point()`. 
+
+Notes: The first argument specifies the dataset. The `mapping` argument is specified always as `mapping = aes()`, where *aes* stands for aesthetics. At a minimum you'll want to map to `x`, but in this case also `y` and `color`. The things that you can map are variables in the tidy dataset. And where necessary `ggplot2` guesses whether they are quantitative or categorical in nature. You need to give a mapping to `ggplot()`, but you can also give different mappings for different geoms specified directly in the `geom` functions. That only makes sense if you'll have more than one `geom` going into the plot (we'll see this). Further modifications to the coordinate base created by `ggplot()` are *added* in to the expression with `+`.
 
 ### Adjust axis scales
 ```{r}
@@ -477,11 +479,13 @@ Here are a selection of functions that read in selected data formats. I've resav
 ### csv
 `read_csv()`, `read_tsv()`, `read_delim()` will read in data delimited by commas, tabs, or any character, respectively. These have nice default options. They all work similarly.
 ```{r, eval = FALSE, echo = FALSE}
+library(here)
 write_csv(gapminder, path = here("data","gapminder.csv"))
 write_delim(gapminder, path = here("data","gapminder_tab.csv"), delim = "\t")
 write_delim(gapminder, path = here("data","gapminder_hash.csv"), delim = "#")
 ```
 ```{r}
+library(here)
 gapminder <- read_csv(here("data","gapminder.csv"))
 gapminder <- read_tsv(here("data","gapminder_tab.csv"))
 gapminder <- read_delim(here("data","gapminder_hash.csv"), delim = "#")
