@@ -58,22 +58,22 @@ A day will consist in interactive demonstration lasting around 3 hours in the mo
 1. [Conditional execution](Day3#conditional-execution-if)
 2. [Repetetive execution](Day3#repetetive-execution-for-loops)
 3. [Combining `if` and `for`-loops](Day3#combining-if-and-for-loops)
+4. Exercises
 
 [Session 4](Day4) (Thursday, 22 Aug)
 
-1. Conditional execution (if, ifelse, etc)
-2. for-loops
-3. alternatives to for-loops
-4. More on writing functions & debugging
-5. operating on groups
+1. Little programming things
+2. Using `DemoTools`
+3. Using `DDSQLtools`
+4. How to file requests, bug reports
+5. Exercise: Code review 
 
 [Session 5](Day5) (Friday, 23 Aug)
 
-1. R markdown for legible reproducibility
-2. tidyverse concepts 
-3. DDSQLtools workflow with tidyverse
-4. errors, bugs, and feature requests for DemoTools or DDSQLtools
-5. review 
+1. Intro to statistics in `R`
+2. Tidy statistics
+3. Modeling pipeline examples
+4. Reproducible reports
 
 ### Week 2
 The second week is dedicated for advanced users/programmers.
