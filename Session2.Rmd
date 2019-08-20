@@ -1,0 +1,359 @@
+---
+title: "Session 2"
+author: "Tim Riffe"
+date: "8/20/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#
+```{r}
+calcAgeN <- function(Age, N = 5, shiftdown = 0){
+	shift <- abs(shiftdown)
+	stopifnot(shift < N)
+	(Age + shift) - (Age + shift) %% N 
+}
+Age <- 0:100
+calcAgeN(Age)
+```
+
+## an example
+
+```{r}
+hello <- function(your_name){
+  paste0("Hello ", 
+         your_name,
+         "! Have a nice day :-)")
+}
+hello(c("Tim","Francois"))
+
+# your_name
+```
+
+## Lifetable utility functions
+
+```{r}
+omega <- 110
+x     <- 0:omega # sequence trick
+a     <- 0.00022
+b     <- 0.07
+mx    <- a * exp(x * b)
+ax    <- rep(.5, length(mx))
+```
+
+$$ q(x) = \frac{m(x)}{1 + (1 - a(x)) \cdot m(x)}$$
+
+```{r}
+mxax_to_qx <- function(mx, ax){
+  qx            <- mx / (1 + (1 - ax) * mx)
+  qx[length(qx)] <- 1
+  return(qx)
+}
+qx <- mxax_to_qx(mx = mx, ax = ax)
+```
+
+$$ p(x) = 1 - q(x) $$
+
+```{r}
+qx_to_px <- function(qx){
+  px <- 1 - qx
+  return(px)
+}
+px <- qx_to_px(qx)
+```
+
+$$ l(x) = \prod _{i=0}^{x-1} p(i) $$
+
+Tips: 
+1. `cumprod()`
+2. shift up `lx` to start with 1
+3. multiply in a radix
+```{r}
+px_to_lx <- function(px, radix = 1){
+  lx <- cumprod(px)
+  lx <- radix * c(1, lx)
+  lx <- lx[1:length(px)]
+  # lx[-(length(px) + 1)]
+  lx
+}
+
+lx <- px_to_lx(px)
+
+```
+
+$$ d(x) = l(x) \cdot q(x) $$
+$$ d(x) = l(x) - l(x+1)$$
+
+```{r}
+lxqx_to_dx <- function(lx, qx){
+  dx <- lx * qx
+  return(dx)
+}
+
+lx_to_dx <- function(lx){
+  dx <- -diff(c(lx,0))
+  return(dx)
+}
+```
+
+Or we could make a modular version, which takes things from the top, using our self-made functions and containing no explicit formula. Why on Earth would we do this? It's so that you only need to fix/improve things in one spot. e.g., if we want the qx formula to know about age intervals.
+```{r}
+mxax_to_dx <- function(mx, ax){
+  qx <- mxax_to_qx(mx = mx, ax = ax)
+  lx <- px_to_lx(1 - qx)
+  dx <- lxqx_to_dx(qx = qx, lx = lx)
+  return(dx)
+}
+dx <- mxax_to_dx(mx, ax)
+```
+
+$$ L(x) = l(x) - (1-a(x))\cdot d(x) $$
+
+Note: if we decide to incorporate age intervals above then we also need to do so here.
+```{r}
+lxax_to_Lx <- function(lx, ax){
+  dx <- lx_to_dx(lx)
+  Lx <- lx - (1 - ax) * dx
+  return(Lx)
+}
+# this is the greedier alternative.
+# they are identical in what they do,
+# but the first one
+lxaxdx_to_Lx <- function(lx, ax, dx){
+  Lx <- lx - (1 - ax) * dx
+  return(Lx)
+}
+
+Lx <- lxax_to_Lx(lx, ax)
+```
+
+$$ T(x) = \sum _{i = x}^{\omega} L(i) $$
+
+Tip: `rev()`, `cumsum()`
+
+```{r}
+library(tidyverse)
+Lx_to_Tx <- function(Lx){
+  Tx <- 
+    Lx %>% 
+    rev() %>% 
+    cumsum() %>% 
+    rev()
+  return(Tx)
+}
+Tx <- Lx_to_Tx(Lx)
+```
+
+Last column (for today)!
+
+$$ e(x) = \frac{T(x)}{ l(x)}$$ 
+
+```{r}
+Txlx_to_ex <- function(Tx, lx){
+  ex <- Tx / lx
+  return(ex)
+}
+ex <- Txlx_to_ex(Tx, lx)
+
+```
+
+
+## combine all the functions
+
+```{r}
+library(here)
+source(here("R","Functions.R"))
+```
+
+## Step 1, make a lifetable function.
+
+```{r}
+LT_simple <- function(mx, ax, age, radix = 1){
+   qx <- mxax_to_qx(mx = mx, ax = ax)
+   lx <- px_to_lx(px = 1 - qx, radix = radix)
+   dx <- lx_to_dx(lx = lx)
+   Lx <- lxax_to_Lx(lx = lx, ax = ax)
+   Tx <- Lx_to_Tx(Lx = Lx)
+   ex <- Txlx_to_ex(Tx = Tx, lx = lx)
+   
+   LT_out <- data.frame(age = age,
+              mx = mx, ax = ax,
+              qx = qx, lx = lx,
+              dx = dx, Lx = Lx,
+              Tx = Tx, ex = ex
+              )
+   return(LT_out)
+}
+lt_test <- LT_simple(mx = mx, 
+                     ax = ax, 
+                     age = x, 
+                     radix = 100000)
+tail(lt_test)
+```
+
+Now the next version uses a single call to `mutate()`,
+AND we're going to make it take a data.frame as it's argument.
+
+```{r}
+library(tidyverse)
+LT_chunk <- function(chunk, radix){
+  LT_out <-
+    chunk %>% mutate(
+      qx = mxax_to_qx(mx = mx, ax = ax),
+      lx = px_to_lx(px = 1 - qx, radix = radix),
+      dx = lx_to_dx(lx = lx),
+      Lx = lxax_to_Lx(lx = lx, ax = ax),
+      Tx = Lx_to_Tx(Lx = Lx),
+      ex = Txlx_to_ex(Tx = Tx, lx = lx)
+  )
+  return(LT_out)
+}
+test_chunk <- data.frame(
+  age = x, 
+  mx = mx, 
+  ax = ax)
+LT_chunk(chunk = test_chunk, 
+         radix = 100000) %>% head()
+
+```
+
+```{r}
+library(here)
+HMD <- readRDS(here("data","HMD.rds"))
+glimpse(HMD)
+```
+
+```{r}
+HMD %>% 
+  group_by(Country, Year, Sex) %>% 
+  mutate(
+      qx = mxax_to_qx(mx = mx, ax = ax),
+      lx = px_to_lx(px = 1 - qx, radix = 100000),
+      dx = lx_to_dx(lx = lx),
+      Lx = lxax_to_Lx(lx = lx, ax = ax),
+      Tx = Lx_to_Tx(Lx = Lx),
+      ex = Txlx_to_ex(Tx = Tx, lx = lx)
+  ) %>% glimpse()
+```
+
+Let's re-write this using the chunk lifetable function we wrote:
+
+```{r}
+HMD %>% 
+  group_by(Country, Year, Sex) %>% 
+  LT_chunk(radix = 100000) %>% glimpse()
+```
+
+## Exercise:
+
+Make an HMD point cloud figure, where x and y are mapped to two variables that we might expect to be structurally related. Examples include infant mortality versus adult survival. But there are many.
+
+1. Make the point cloud. It should be the last stop in your pipeline.
+
+```{r}
+HMDLT <- HMD %>% 
+  group_by(Country, Year, Sex) %>% 
+  LT_chunk(radix = 100000) %>% 
+  ungroup() %>% 
+  filter(Age == 0) 
+  
+  HMDLT %>% 
+    filter(Year >= 1950) %>% 
+  ggplot(mapping = aes(x = mx, y = ex)) +
+    geom_point(color = gray(.2),
+               alpha = .2) + 
+    scale_x_log10() +
+    geom_point(filter(HMDLT, Country == "TWN"),
+               mapping = aes(
+                 x = mx, y = ex,
+                 color = Year)
+               ) +
+    annotate(geom = "text",
+             x = 0.03, y = 80,
+             label = "Taiwan compared\nwith the rest of HMD")
+```
+
+```{r}
+library(colorspace)
+library(tidyverse)
+library(here)
+HMDLT %>% 
+  filter(Age == 0) %>% 
+  ggplot(mapping = aes(x = mx,
+                       y = ex)) +
+  stat_density_2d(
+    aes(fill = stat(level)), geom = "polygon") +
+  scale_x_log10() +
+  scale_fill_continuous_sequential(palette = "Blues")
+
+```
+
+
+2. Then we'll modify the cloud to turn it into a background reference
+3. Then we'll highlight one country on top.
+
+The purpose of this is to simulate a diagnostic exercise. And practice `ggplot2` and making a nice pipeline.
+
+```{r}
+HMDLT <- HMD %>% 
+  group_by(Country, Year, Sex) %>% 
+  # radix doesn't matter, won't affect our
+  # results because we're taking ratios of
+  # lx
+  LT_chunk(radix = 100000) %>% 
+  mutate(
+    adult = 1 - lx[Age == 60] / lx[Age == 15],
+    child = 1 - lx[Age == 5] / lx[Age == 0]) %>%   filter(Year >= 1950, Age == 0) 
+  # could select any age, because the values
+  # plotted are repeated.
+
+HMDLT %>% 
+  ggplot(mapping = aes(x = child,
+                       y = adult)) +
+  geom_point(alpha = .1, size = 1.5) + 
+  scale_x_log10() +
+  scale_y_log10() + 
+  geom_point(filter(HMDLT, 
+                    Country == "CAN"),
+             mapping = aes(x = child,
+                       y = adult),
+             color = "red",
+             size = 2
+             ) +
+  facet_wrap(~Sex)
+```
+
+Now, second try, with a time series plot.
+
+```{r}
+# when we want to highlight the max per year
+# we'll need to feed in another dataset, and
+# since that processing takes a couple steps,
+# we'll do it in advance.
+HMDmax <- HMDLT %>% 
+  ungroup() %>% 
+  group_by(Year, Sex) %>% 
+  filter(ex == max(ex)) %>% 
+  ungroup()
+
+
+HMDLT %>% 
+  ggplot(mapping = aes(x = Year,
+                       y = ex,
+                       by = Country)) +
+  geom_line(color = gray(.5)) + 
+  facet_wrap(~Sex) + 
+  geom_point(HMDmax,
+            mapping = aes(x = Year,
+                          y = ex,
+                          color = Country),
+            size = 2)
+  
+```
+
+
+
+
