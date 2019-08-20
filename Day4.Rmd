@@ -29,6 +29,33 @@ bibliography: bibliography.bib
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Content to be added
+# reading in data from Excel
+The `readxl` package installs automatically with `tidyverse`, but you need to load it directly to use it (we'll also load a couple other helpful packages):
+
+```{r, message = FALSE}
+library(tidyverse)
+library(here)
+library(readxl)
+```
+
+This packge offers read functionality, and it's also platform independent, and you don't actually need Excel installed to use it. I downloaded an example dataset from Eurostat. You can download it from the repository. Open the spreadsheet so you can see you it's formatted: this one has some common formatting aspects that make it tricky to machine read, so hopefully it simulates what you might actually find.
+
+Let's grab the table from `Sheet 1`
+```{r, message = FALSE}
+read_xlsx(here("data","eurostat.xlsx"), 
+                  sheet = "Sheet 1",
+                  range = "A8:X63",
+          na = ":") %>% 
+  # select cols using names (character, to be sure)
+  select(c("TIME",as.character(2007:2018))) %>% 
+  # TIME refered to the column headers,
+  # whereas GEO refers to the row names,
+  # which for us are a key variable.
+  rename(GEO = TIME) %>% 
+  # remove the empty first row
+  slice(-1) %>% 
+  # finally let's get it tidy:
+  gather(key = "Year", value = "Deaths", -GEO)
+```
 
 # References 
