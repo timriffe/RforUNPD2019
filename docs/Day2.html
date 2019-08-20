@@ -393,7 +393,9 @@ Max-Planck-Institute for Demographic Research</div></h4>
 <li><a href="#build-a-lifetable-function"><span class="toc-section-number">4.2</span> Build a lifetable function</a></li>
 </ul></li>
 <li><a href="#documenting-functions"><span class="toc-section-number">5</span> Documenting functions</a></li>
-<li><a href="#references"><span class="toc-section-number">6</span> References</a></li>
+<li><a href="#exercise"><span class="toc-section-number">6</span> Exercise</a></li>
+<li><a href="#solutions"><span class="toc-section-number">7</span> Solutions</a></li>
+<li><a href="#references"><span class="toc-section-number">8</span> References</a></li>
 </ul>
 </div>
 
@@ -403,7 +405,8 @@ Max-Planck-Institute for Demographic Research</div></h4>
 <h1><span class="header-section-number">1</span> Introduction</h1>
 <p>Today’s session is about getting the most out of <code>R</code> by writing your own functions. The benefits of writing your own functions is manifold.</p>
 <ol style="list-style-type: decimal">
-<li>You can avoid re-deriving the same code expressions over and over. 2. Scripts using the function are shorter, which makes them easier to structure, to read, and to maintain. And that makes them more robust.</li>
+<li>You can avoid re-deriving the same code expressions over and over.</li>
+<li>Scripts using the function are shorter, which makes them easier to structure, to read, and to maintain. And that makes them more robust.</li>
 <li>If you have a single copy of the function, it can get better and more robust with age: you only ever edit or fix it in one place. This avoids confusing copies of the code and needing to find them all every time you need to improve the function.</li>
 <li>It encourages you to write generalizable code.</li>
 <li>Functions are easier to share (and make use of when shared) than scripts.</li>
@@ -457,14 +460,14 @@ hello(&quot;Tim&quot;)</code></pre>
 }</code></pre>
 <div id="simplified-lifetable-functions" class="section level2">
 <h2><span class="header-section-number">3.1</span> Simplified lifetable functions</h2>
-<p>As you can see in our cheap example, functions can use other functions, as long they can be found. I think we should start straight away with an exercise. Below I give a bunch of equations for lifetables. Start with a variable <code>mx</code>, a.k.a. <span class="math inline">\(m(x)\)</span>, or <span class="math inline">\(\mu(x)\)</span> if you can pretend it’s continuous. We’ll also need a helper-variable <code>ax</code> that tells us something about mortality within age intervals- This is one we usually assume something for, and we can be lazy and just say it’s always <span class="math inline">\(0.5\)</span> for single age data.</p>
-<p>If the mortality rate is constant in the interval, then we have some relationships that I think we can program as little functions. I think it’s always a good idea to write functions with test data, so how about you use this as your test <code>mx</code> and <code>ax</code>:</p>
-<pre class="r"><code>omega &lt;- 110 # last age 
-x     &lt;- 0:omega
+<p>As you can see in our cheap example, functions can use other functions, as long they can be found. I think we should start straight away with an exercise. Below I give a bunch of equations for lifetables. Start with a variable <code>mx</code>, a.k.a. <span class="math inline">\(m(x)\)</span>, or <span class="math inline">\(\mu(x)\)</span> if you can pretend it’s continuous. We’ll also need a helper-variable <code>ax</code> that tells us something about mortality within age intervals- This is one we usually assume something for, and we can be lazy and just say it’s always <span class="math inline">\(0.5\)</span> for single age data, and we won’t worry too much about infants or closeout for the time being.</p>
+<p>I think it’s always a good idea to write functions with test data, so how about you use this as your test <code>mx</code> and <code>ax</code>:</p>
+<pre class="r"><code>omega &lt;- 110       # last age 
+x     &lt;- 0:omega   # from:to, neat trick!
 a     &lt;- 0.00022
 b     &lt;- .07
-mx    &lt;- a * exp(x*b)
-ax    &lt;- rep(.5, length(mx))</code></pre>
+mx    &lt;- a * exp(x * b)
+ax    &lt;- rep(.5, length(mx))  # rep = repeat; length() = super handy!</code></pre>
 <div id="qx" class="section level3">
 <h3><span class="header-section-number">3.1.1</span> <span class="math inline">\(q(x)\)</span></h3>
 <p>The conditional probability of death in an age interval, <span class="math inline">\(q(x)\)</span>: <span class="math display">\[q(x) = \frac{m(x)}{1 + (1 - a(x)) \cdot m(x)}\]</span> Write a function called <code>mxax_to_qx()</code>, taking arguments <code>mx</code> and <code>ax</code> and returning a variable <code>qx</code>. Let’s assume single ages for now. Note, <code>mx</code> and <code>ax</code> should be the same length (one element per age class). Note, it’s common to declare that the very last value of <span class="math inline">\(q(x)\)</span> is 1, i.e. that no one survives beyond that age.</p>
@@ -525,12 +528,12 @@ ax    &lt;- rep(.5, length(mx))</code></pre>
 </div>
 <div id="modularity" class="section level1">
 <h1><span class="header-section-number">4</span> Modularity</h1>
-<p>In the previous single-purpose lifetable functions, some of the versions were already in a sense modular: A newly written function used another function that we had just written. Using this strategy to break down code into bite sized chunks enables you to structure code. I suggest that structured code enables structured thought (on methods), and vice versa– Sometimes we start with a function that does too much and then improve it by turning functionally compact parts of it into smaller functions, a sort of whiteboard activity.</p>
-<p>Let’s look at an example of a function doing too much: The <code>LT</code> function in my <code>LifeTable</code> package, also on github: <a href="https://github.com/timriffe/LifeTable">https://github.com/timriffe/LifeTable</a> It’s not broken per se, but the fact that it isn’t modular makes it difficult to maintain: There is seemingly chaotic flow control of the code using <code>if()</code> statements (to be covered tomorrow).</p>
-<p>With this as our inspiration, let’s write our own lifetable function.</p>
+<p>In the previous single-purpose lifetable functions, some of the versions were already modular: A newly written function used another function that we had just written. Using this strategy to break down code into bite sized chunks enables you to structure code. I suggest that structured code enables structured thought (on methods), and vice versa– Sometimes we start with a function that does too much and then improve it by turning functionally compact parts of it into smaller functions, a sort of whiteboard activity.</p>
+<p>Let’s look at an example of a function doing too much: The <code>LT</code> function in my <code>LifeTable</code> package, also on github: <a href="https://github.com/timriffe/LifeTable">https://github.com/timriffe/LifeTable</a> It’s not broken per se, but the fact that it isn’t modular makes it difficult to maintain: There is seemingly chaotic flow control of the code using <code>if()</code> statements (to be covered tomorrow). Also, certain features, like smoothing, probably ought to be separate and not in this function.</p>
+<p>With this as an example of what we <em>don’t</em> want to do, let’s write our own lifetable function.</p>
 <div id="lifetable-utils-in-a-tidy-pipeline" class="section level2">
 <h2><span class="header-section-number">4.1</span> Lifetable utils in a tidy pipeline</h2>
-<p>In the first instance, let’s use them in a tidy pipeline. For this, use this big HMD dataset, here: <a href="https://drive.google.com/file/d/1Rc5Vb14DSglxyZ2xPaVEmEpiSCoKuC"><code>HMD.rds</code></a> Stick it in a folder called <code>~/data</code>, and you can load it into your session using (this is premised on you having faithfully set up your workspace to follow or mimick the repository for this course).</p>
+<p>In the first instance, let’s use them in a tidy pipeline. For this, use this big HMD dataset, here: (You got it Monday already) <a href="https://drive.google.com/file/d/1Rc5Vb14DSglxyZ2xPaVEmEpiSCoKuC"><code>HMD.rds</code></a> Stick it in a folder called <code>~/data</code>, and you can load it into your session using (this is premised on you having faithfully set up your workspace to follow or mimick the repository for this course).</p>
 <pre class="r"><code>library(here)
 HMD &lt;- readRDS(here(&quot;data&quot;,&quot;HMD.rds&quot;))
 str(HMD)</code></pre>
@@ -541,7 +544,7 @@ str(HMD)</code></pre>
 ##  $ Age    : int  0 1 2 3 4 5 6 7 8 9 ...
 ##  $ mx     : num  0.05999 0.01206 0.00578 0.00289 0.00325 ...
 ##  $ ax     : num  0.28 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 ...</code></pre>
-<p>Take a peek at the data using <code>str()</code> or <code>head()</code> or <code>glimpse()</code> or by opening it in a data viewer. It consists in all HMD lifetable <span class="math inline">\(m(x)\)</span> and <span class="math inline">\(a(x)\)</span> values stacked, where <code>Country</code>, <code>Sex</code>, <code>Year</code>, and are key columns, and <code>Age</code>, <code>mx</code>, and <code>ax</code> are variable columns. At least for purposes of making lifetables, a practical subset consists in a chunk of data with all ages. That’s why age isn’t a key variable here.</p>
+<p>Take a peek at the data using <code>str()</code> or <code>head()</code> or <code>glimpse()</code> or by opening it in a data viewer. It consists in all HMD lifetable <span class="math inline">\(m(x)\)</span> and <span class="math inline">\(a(x)\)</span> values stacked, where <code>Country</code>, <code>Sex</code>, <code>Year</code>, and are key columns, and <code>Age</code>, <code>mx</code>, and <code>ax</code> are variable columns. At least for purposes of making lifetables, a practical subset consists in a chunk of data with all ages. That’s why age isn’t a key variable here. For other things, <code>Age</code> might well act as a key.</p>
 <p>As an exercise, let’s fill out the lifetable columns for all unique key combinations in a tidy pipeline. To do so, we’ll want to ensure all of our lifetable utility functions are loaded and available. Here’s a nice trick to load them, assuming they’re sitting in a script called <code>~/R/Functions.R</code></p>
 <pre class="r"><code>source(here(&quot;R&quot;,&quot;Functions.R&quot;))</code></pre>
 <p>Fill in the blanks (maybe there are more steps)</p>
@@ -551,12 +554,12 @@ str(HMD)</code></pre>
 </div>
 <div id="build-a-lifetable-function" class="section level2">
 <h2><span class="header-section-number">4.2</span> Build a lifetable function</h2>
-<p>Now let’s build a single lifetable function that will work in such a pipeline.</p>
+<p>Now, instead of a scripted lifetable, let’s build a single lifetable function that will work in such a pipeline.</p>
 <pre class="r"><code># my_lifetable &lt;- function(what, goes, here?){
 #    what goes here?
 #    return(what goes here?)
 # }</code></pre>
-<p>Here arguments are given in a single <code>data.frame</code> input, but it might make sense for them to be separate vectors too. Just little things to think about when designing a function destined to be used heavily.</p>
+<p>Here arguments are given in a single <code>data.frame</code> input (as received in the pipeline), but it might make sense in other contexts for them to be separate vectors too. Just little things to think about when designing a function destined to be used heavily.</p>
 <p>For your information, <code>DemoTools</code> methods have pipeline-friendly versions written in the <code>DDSQLtools</code> package, where the anticipated data chunks take the form of your <code>DemoData</code> SQL database. Pretty neat huh? <code>DDSQLtools</code> development lags a bit behind <code>DemoTools</code> development, so the collection of methods available there will grow in the coming months. In future exercises (not now), we’ll use those functions.</p>
 </div>
 </div>
@@ -568,8 +571,25 @@ str(HMD)</code></pre>
 <p>Other nice sections include <code>#&#39; @description</code> to give an overview and <code>#&#39; @return</code> to let us know what the output is. Any other useful tips and information should be noted somehow. There’s no sense in going through all the possible sections, but these are the basic ones.</p>
 <p>*** time out to document our lifetable functions *** Does this seem tedious to you? Well let me tell you, don’t discount your own future time: reverse engineering your own code is a much bigger waste of time! If you can’t figure it out the next time then you’ll end up re-writing it! A major waste of time. And when you document your code other people don’t need to waste their time. Let me tell you my time as been seriously wasted trying to reverse engineer thousands of lines of undocumented and unannotated code. Let’s all be better people and write nicely formatted, parsimous, annotated, and documented code.</p>
 </div>
+<div id="exercise" class="section level1">
+<h1><span class="header-section-number">6</span> Exercise</h1>
+<p>This exercises as subchallenges.</p>
+<ol style="list-style-type: decimal">
+<li>Make some scatterplots that might serve as meaningful diagnostics: Infant mortality versus adult survival, bivarate things like that.</li>
+<li>Use these as the <em>background</em> HMD cloud (i.e. mute the color somehow)</li>
+<li>Highlight a single country on top of it. Tip: you can re-specify the same dataset, but <code>filter()</code> it down to just the country you want, and you can just specify the the points (or line) should be thicker (<code>size = 2</code>?) and in a different color (<code>color = &quot;red&quot;</code>?).</li>
+<li>Add a direct annotation telling us which country is highlighted. Tip: see <code>annotate()</code>, look at the help file to see how.</li>
+</ol>
+<ol start="5" style="list-style-type: decimal">
+<li>Make the <code>dplyr + ggplot2</code> pipeline for this start with reading the data in and end with the plot. Tip: remember that the pipeline part in glued together with <code>%&gt;%</code>, wereas <code>ggplot()</code> construction is glued together with <code>+</code>.</li>
+</ol>
+</div>
+<div id="solutions" class="section level1">
+<h1><span class="header-section-number">7</span> Solutions</h1>
+<p>Solutions will go here after the session is over.</p>
+</div>
 <div id="references" class="section level1">
-<h1><span class="header-section-number">6</span> References</h1>
+<h1><span class="header-section-number">8</span> References</h1>
 </div>
 
 

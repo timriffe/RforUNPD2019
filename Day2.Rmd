@@ -31,7 +31,8 @@ knitr::opts_chunk$set(echo = TRUE)
 # Introduction
 Today's session is about getting the most out of `R` by writing your own functions. The benefits of writing your own functions is manifold.
 
-1. You can avoid re-deriving the same code expressions over and over. 2. Scripts using the function are shorter, which makes them easier to structure, to read, and to maintain. And that makes them more robust.
+1. You can avoid re-deriving the same code expressions over and over.
+2. Scripts using the function are shorter, which makes them easier to structure, to read, and to maintain. And that makes them more robust.
 3. If you have a single copy of the function, it can get better and more robust with age: you only ever edit or fix it in one place. This avoids confusing copies of the code and needing to find them all every time you need to improve the function.
 4. It encourages you to write generalizable code.
 5. Functions are easier to share (and make use of when shared) than scripts.
@@ -91,17 +92,17 @@ function_name <- function(argument1, argument2, ...){
 ```
 
 ## Simplified lifetable functions
-As you can see in our cheap example, functions can use other functions, as long they can be found. I think we should start straight away with an exercise. Below I give a bunch of equations for lifetables. Start with a variable `mx`, a.k.a. $m(x)$, or $\mu(x)$ if you can pretend it's continuous. We'll also need a helper-variable `ax` that tells us something about mortality within age intervals- This is one we usually assume something for, and we can be lazy and just say it's always $0.5$ for single age data.
+As you can see in our cheap example, functions can use other functions, as long they can be found. I think we should start straight away with an exercise. Below I give a bunch of equations for lifetables. Start with a variable `mx`, a.k.a. $m(x)$, or $\mu(x)$ if you can pretend it's continuous. We'll also need a helper-variable `ax` that tells us something about mortality within age intervals- This is one we usually assume something for, and we can be lazy and just say it's always $0.5$ for single age data, and we won't worry too much about infants or closeout for the time being.
 
-If the mortality rate is constant in the interval, then we have some relationships that I think we can program as little functions. I think it's always a good idea to write functions with test data, so how about you use this as your test `mx` and `ax`:
+I think it's always a good idea to write functions with test data, so how about you use this as your test `mx` and `ax`:
 
 ```{r}
-omega <- 110 # last age 
-x     <- 0:omega
+omega <- 110       # last age 
+x     <- 0:omega   # from:to, neat trick!
 a     <- 0.00022
 b     <- .07
-mx    <- a * exp(x*b)
-ax    <- rep(.5, length(mx))
+mx    <- a * exp(x * b)
+ax    <- rep(.5, length(mx))  # rep = repeat; length() = super handy!
 ```
 
 ### $q(x)$
@@ -188,16 +189,16 @@ That was a workout! I hope that given the above repetition you'll now be able to
 *** Time out to collect the functions we just wrote ***
 
 # Modularity
-In the previous single-purpose lifetable functions, some of the versions were already in a sense modular: A newly written function used another function that we had just written. Using this strategy to break down code into bite sized chunks enables you to structure code. I suggest that structured code enables structured thought (on methods), and vice versa-- Sometimes we start with a function that does too much and then improve it by turning functionally compact parts of it into smaller functions, a sort of whiteboard activity.
+In the previous single-purpose lifetable functions, some of the versions were already modular: A newly written function used another function that we had just written. Using this strategy to break down code into bite sized chunks enables you to structure code. I suggest that structured code enables structured thought (on methods), and vice versa-- Sometimes we start with a function that does too much and then improve it by turning functionally compact parts of it into smaller functions, a sort of whiteboard activity.
 
 Let's look at an example of a function doing too much: The `LT` function in my `LifeTable` package, also on github:
 [https://github.com/timriffe/LifeTable](https://github.com/timriffe/LifeTable)
-It's not broken per se, but the fact that it isn't modular makes it difficult to maintain: There is seemingly chaotic flow control of the code using `if()` statements (to be covered tomorrow).
+It's not broken per se, but the fact that it isn't modular makes it difficult to maintain: There is seemingly chaotic flow control of the code using `if()` statements (to be covered tomorrow). Also, certain features, like smoothing, probably ought to be separate and not in this function.
 
-With this as our inspiration, let's write our own lifetable function.
+With this as an example of what we *don't* want to do, let's write our own lifetable function.
 
 ## Lifetable utils in a tidy pipeline
-In the first instance, let's use them in a tidy pipeline. For this, use this big HMD dataset, here:
+In the first instance, let's use them in a tidy pipeline. For this, use this big HMD dataset, here: (You got it Monday already)
 [`HMD.rds`](https://drive.google.com/file/d/1Rc5Vb14DSglxyZ2xPaVEmEpiSCoKuC)
 Stick it in a folder called `~/data`, and you can load it into your session using (this is premised on you having faithfully set up your workspace to follow or mimick the repository for this course). 
 ```{r}
@@ -205,7 +206,7 @@ library(here)
 HMD <- readRDS(here("data","HMD.rds"))
 str(HMD)
 ```
-Take a peek at the data using `str()` or `head()` or `glimpse()` or by opening it in a data viewer. It consists in all HMD lifetable $m(x)$ and $a(x)$ values stacked, where `Country`, `Sex`, `Year`, and are key columns, and `Age`, `mx`, and `ax` are variable columns. At least for purposes of making lifetables, a practical subset consists in a chunk of data with all ages. That's why age isn't a key variable here.
+Take a peek at the data using `str()` or `head()` or `glimpse()` or by opening it in a data viewer. It consists in all HMD lifetable $m(x)$ and $a(x)$ values stacked, where `Country`, `Sex`, `Year`, and are key columns, and `Age`, `mx`, and `ax` are variable columns. At least for purposes of making lifetables, a practical subset consists in a chunk of data with all ages. That's why age isn't a key variable here. For other things, `Age` might well act as a key.
 
 As an exercise, let's fill out the lifetable columns for all unique key combinations in a tidy pipeline. To do so, we'll want to ensure all of our lifetable utility functions are loaded and available. Here's a nice trick to load them, assuming they're sitting in a script called `~/R/Functions.R` 
 ```{r, eval = FALSE}
@@ -220,7 +221,7 @@ HMD %>%
 ```
 
 ## Build a lifetable function
-Now let's build a single lifetable function that will work in such a pipeline.
+Now, instead of a scripted lifetable, let's build a single lifetable function that will work in such a pipeline.
 
 ```{r}
 # my_lifetable <- function(what, goes, here?){
@@ -229,7 +230,7 @@ Now let's build a single lifetable function that will work in such a pipeline.
 # }
 ```
 
-Here arguments are given in a single `data.frame` input, but it might make sense for them to be separate vectors too. Just little things to think about when designing a function destined to be used heavily.
+Here arguments are given in a single `data.frame` input (as received in the pipeline), but it might make sense in other contexts for them to be separate vectors too. Just little things to think about when designing a function destined to be used heavily.
 
 For your information, `DemoTools` methods have pipeline-friendly versions written in the `DDSQLtools` package, where the anticipated data chunks take the form of your `DemoData` SQL database. Pretty neat huh? `DDSQLtools` development lags a bit behind `DemoTools` development, so the collection of methods available there will grow in the coming months. In future exercises (not now), we'll use those functions.
 
@@ -245,5 +246,18 @@ Other nice sections include `#' @description` to give an overview and `#' @retur
 
 ***  time out to document our lifetable functions ***
 Does this seem tedious to you? Well let me tell you, don't discount your own future time: reverse engineering your own code is a much bigger waste of time! If you can't figure it out the next time then you'll end up re-writing it! A major waste of time. And when you document your code other people don't need to waste their time. Let me tell you my time as been seriously wasted trying to reverse engineer thousands of lines of undocumented and unannotated code. Let's all be better people and write nicely formatted, parsimous, annotated, and documented code.
+
+# Exercise
+This exercises as subchallenges.
+
+1. Make some scatterplots that might serve as meaningful diagnostics: Infant mortality versus adult survival, bivarate things like that. 
+2. Use these as the *background* HMD cloud (i.e. mute the color somehow)
+3. Highlight a single country on top of it. Tip: you can re-specify the same dataset, but `filter()` it down to just the country you want, and you can just specify the the points (or line) should be thicker  (`size = 2`?) and in a different color (`color = "red"`?).
+4. Add a direct annotation telling us which country is highlighted. Tip: see `annotate()`, look at the help file to see how.
+5) Make the `dplyr + ggplot2` pipeline for this start with reading the data in and end with the plot. Tip: remember that the pipeline part in glued together with `%>%`, wereas `ggplot()` construction is glued together with `+`.
+
+
+# Solutions
+Solutions will go here after the session is over.
 
 # References 

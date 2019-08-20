@@ -1,0 +1,431 @@
+---
+title: "Session 1"
+author: "Tim Riffe"
+date: "8/19/2019"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction
+
+The repository for this workshop is here
+[https://github.com/timriffe/RforUNPD2019](https://github.com/timriffe/RforUNPD2019)
+
+This is a code chunk. They are offset by three back-ticks.
+
+```{r}
+
+# This is a comment, use # to indicate that.
+# and this line is R happening:
+1+1
+```
+Note `#`
+
+## R sessions
+R sessions refer to a temporary instance of R. 
+
+## R is functional
+
+Using a function, and assigning
+```{r}
+a <- rnorm(n = 10)
+a
+```
+
+`a` is a little object. Specifically it is a vector, a numeric vector of length 10.
+
+`rnorm()` is a function available to you immediately when you open R. You use a function by writing its name. `rnorm` is the name, and we feed it inputs (parameters) called arguments. These go into the round parentheses, and if there is more than one argument they are comma separated.
+
+## Help files
+
+```{r}
+#?rnorm
+```
+
+Copy-paste the examples from the help file:
+
+```{r}
+# copy-paste examples, they'll always run,
+# it's a good way to learn
+dnorm(0) == 1/sqrt(2*pi)
+dnorm(1) == exp(-1/2)/sqrt(2*pi)
+dnorm(1) == 1/sqrt(2*pi*exp(1))
+```
+NB: multiple lines can be executed in sequence, but new expressions need to start on new lines. So the above three lines works just fine, because each it literally on a new line. Also note, there is no assignment happening, so the code executes, but we don't get to keep anything.
+
+## Packages
+Packages extend R by making new functions available. We can install them straight from out R session. Lets install a couple right now.
+
+```{r, eval = FALSE}
+install.packages("searcher")
+```
+Note: `eval = FALSE` means that when we knit, it won't execute this code. GOOD! Because we install stuff.
+
+
+
+```{r}
+library(searcher)
+#search_google("Rtools not available for version")
+
+```
+
+# tidyverse basics
+
+## what is tidy?
+Tidy data is defined as a dataset that has observations in rows and variables in columns.
+
+```{r, eval = FALSE}
+install.packages("gapminder")
+install.packages("tidyverse")
+```
+
+Let's look at the gapminder data.
+
+```{r}
+library(gapminder)
+library(tidyverse)
+# verbose metadata
+str(gapminder)
+# look at the first rows
+head(gapminder)
+# look at the last rows
+tail(gapminder)
+# compact metadata
+glimpse(gapminder)
+# open the whole thing (dont edit!)
+#View(gapminder)
+# unique
+unique(gapminder$continent)
+```
+
+The structure of this data:
+
+Country and year identify an observation
+Continent is a fixed characteristic of an observation so technically it's a variable.
+
+The variables are `lifeExp`, `pop`, and `gdpPercap`.
+
+```{r}
+ggplot(data = gapminder, 
+       mapping = aes(x = gdpPercap,
+                     y = lifeExp,
+                     color = continent)) +
+  geom_point()
+```
+
+This is a modifiable construct, if we save that first mapping in an object.
+
+```{r}
+p <- ggplot(data = gapminder, 
+            mapping = aes(x = gdpPercap,
+                          y = lifeExp,
+                          color = continent))
+p + geom_point()
+p + 
+  geom_point() + 
+  scale_x_log10() 
+
+```
+
+We add in details to the plot to keep them logically separate, and well, it also increases the legibiltiy of the plot call itself, because we tend to align new lines.
+
+```{r}
+p + 
+  geom_point() +
+  scale_x_log10() +
+  geom_smooth(mapping = aes(x = gdpPercap,
+                            y = lifeExp),
+              method = "lm",
+              inherit.aes = FALSE)
+```
+
+What happened here?: We gave a different mapping to the points and the smoother line. We need to override the mapping inside the `geom_smooth()` using the argument `inherit.aes = FALSE` BUT we could simplify a little bit by swapping the mappings. What?
+
+```{r}
+p <- ggplot( gapminder, 
+             mapping = aes(x = gdpPercap,
+                           y = lifeExp))
+p + 
+  geom_point(mapping = aes(color = continent)) +
+  scale_x_log10() + 
+  geom_smooth(method = "lm")
+```
+In this redux, we swapped the mapping to be one where the top `ggplot()` call is the most general mapping that everything downstream can inherit with no problems. Then modify in situ where needed. Probably good practice.
+
+## more `geom`s
+
+```{r}
+library(scales)
+p +
+  geom_point(mapping = aes(color = continent)) +
+  scale_x_log10(labels = dollar) + 
+  geom_smooth(method = "loess") 
+```
+
+I opened the cheat sheet, got inspired to put a quantile geom on this point cloud, so let's try it:
+
+```{r}
+p + 
+  geom_point(mapping = aes(color = continent)) +
+  scale_x_log10() + 
+  geom_quantile(method = "rqss")
+```
+
+NB: I got the method tip by doing `?geom_quantile`, I guessed the `rq` was the defauly linear quantiles, and I hoped at `rqss` was something more flexible, and lo, I was.
+
+## faceting
+faceting is the ggplot way of making small multiples.
+
+```{r}
+p <- ggplot(gapminder,
+            mapping = aes(x = gdpPercap,
+                          y = lifeExp)) 
+p + 
+  geom_point(alpha = .2) +
+  facet_wrap(~continent) +
+  scale_x_log10() + 
+  geom_smooth(method = "loess")
+```
+
+We made those overplotted regions a bit more informative by overplotting semitransparent points, using the `alpha` argument to `geom_point()`. But maybe we can enhance the plot still more by switching to a different geom altogether.
+
+```{r}
+p +
+  geom_density_2d() + 
+  scale_x_log10() + 
+  geom_smooth(method = "loess") +
+  facet_wrap(~continent)
+```
+
+Note: `geom_density_2d()` was found by using autocomplete suggestions in Rstudio. Brave new future, love it.
+
+But what about the time series nature of these data?
+
+```{r}
+p <- ggplot(gapminder,
+            mapping = aes(x = year,
+                          y = gdpPercap,
+                          by = country))
+p + geom_line()
+```
+
+Aside, who is that unblievable outlier?
+```{r}
+filter(gapminder,
+       gdpPercap > 50000,
+       year < 1980)
+```
+
+Let's log the y axis and separate the continents.
+```{r}
+p + geom_line() +
+  scale_y_log10() + 
+  facet_wrap(~continent)
+```
+
+# tidy pipelines with dplyr
+
+`group_by()`
+`gather()`
+`mutate()`
+`summarize()`
+`filter()` and `select()`
+`ungroup()`
+
+```{r}
+gap_grouped <- group_by(gapminder,
+                        country,
+                        year)
+glimpse(gap_grouped)
+gapminder <- ungroup(gap_grouped)
+```
+
+Note: when we declare groups, the data isn't actually split into separate pieces, but rather the groups are declared as a kind of metainfo on the dataset. You can see a new subtle line appear when you `glimpse()` at the data.
+
+
+`gather()` stacks ranges of columns. Ergo it makes your data longer.
+```{r}
+gapminder_long <- 
+  gather(gap_grouped,
+       key = "varname",
+       value = "value",
+       lifeExp:gdpPercap)
+glimpse(gapminder_long)
+```
+To move in the opposite direction, we `spread()`
+```{r}
+spread(gapminder_long, 
+       key = varname,
+       value = value)
+```
+
+`mutate()` is super important. We make new columns as transformations of ones we already have.
+```{r}
+gap_grouped <- group_by(gapminder, country)
+gap_mutated <- mutate(gap_grouped,
+            mean_lifeExp = mean(lifeExp))
+head(gap_mutated)
+```
+
+Notes: mutate doesn't change the number of rows: in this case we end up with an average lifeExp (over time) repeated for each year observation within each country.
+
+Note: we can make lots of columns, the formulas might be complicated, and they can also be sequentially dependent (that's pure gold)
+```{r}
+
+gap_super_mutated <- mutate(gap_grouped,
+       mean_lifeExp = mean(lifeExp),
+       sd_lifeExp = sd(lifeExp),
+       cov_lifeExp = sd_lifeExp / mean_lifeExp,
+       cov = sd(pop) / mean(pop))
+glimpse(gap_super_mutated)
+```
+
+`summarize()` is for aggregation that somehow shrinks down your data in the classic sense of aggregation.
+
+```{r}
+gap_summarized <- summarize(gap_grouped,
+          mean_lifeExp = mean(lifeExp))
+```
+
+Note: if you do this, the only columns retained are those created in your summarize statement, AND whatever was used to declare the groups.
+
+What if literally all you wanted were the count. Like in tabulating microdata. Use `n()` to count cases, or you could sum up the person weights, or whatever.
+```{r}
+gap_summarized <- summarize(gap_grouped,
+          mean_lifeExp = mean(lifeExp),
+          n = n()
+        )
+```
+
+`filter()` is for rows which are idenified by you making a logical expression. Check it out:
+
+selecting is for picking out columns.
+```{r}
+filter(gapminder, 
+       year < 1990,
+       gdpPercap > 50000)
+
+filter(gapminder, 
+       year < 1990 &
+       gdpPercap > 50000)
+
+1 <= 2 # TRUE
+1 < 2  # TRUE
+1 >= 2 # FALSE
+(1 <= 2)| (3 > 4) # TRUE
+```
+```{r}
+head(select(gapminder, country:year))
+head(select(gap_grouped, lifeExp))
+```
+
+Note: if you declared a grouping, we keep those columns too, like it or not.
+
+
+Note, ungroup() can be handy if you want to change your groupings midway in a your chain of processing.
+```{r}
+gap_gr1 <- group_by(gapminder, country)
+gap_gr1 <- mutate(gap_gr1,
+              mean_lifeExp_country = mean(lifeExp))
+gap_gr2 <- ungroup(gap_gr1)
+gap_gr2 <- group_by(gap_gr2, year)
+gap_gr2 <- mutate(gap_gr2,
+              mean_lifeExp_year = mean(lifeExp))
+head(gap_gr2)
+```
+
+Pipes are super nice. This is the pipe symbol: `%>%` . Whatever is on the left gets eaten by the function on the right.
+
+Things to note: This reads as a sentence. It is a pipeline, because the dateset passes through it, is modified along the way at each step, and comes out the end and no objects are created in our workspace until that point. i.e. whatever happens in the pipelines stays in the pipeline.
+```{r}
+gap_mutated <- gapminder %>% 
+  group_by(country) %>% 
+  mutate(mean_lifeExp_country = mean(lifeExp)) %>% 
+  ungroup() %>% 
+  group_by(year) %>% 
+  mutate(mean_lifeExp_year = mean(lifeExp)) %>% 
+  ungroup()
+```
+
+Let's build one of these organically, checking as we go:
+```{r}
+gapminder %>% 
+  group_by(country) %>% 
+  mutate(mean_e0 = mean(lifeExp))%>% 
+  glimpse()
+```
+
+So, there's a shortcut for making these code chunks:
+`Ctrl + Alt + i`
+```{r, echo = FALSE, results = "hide"}
+
+```
+
+# getting data into R
+
+## csv
+```{r}
+library(here)
+read_csv(here("data","gapminder.csv")) %>% 
+  head()
+read_tsv(here("data","gapminder_tab.csv")) %>% 
+  head()
+read_delim(here("data","gapminder_hash.csv"),
+           delim = "#") %>% 
+  head()
+```
+
+## proprietary file types
+```{r}
+library(haven)
+read_spss(here("data","gapminder.sav")) %>% 
+  head()
+
+read_sas(here("data","gapminder.sas7bdat")) %>% 
+  head()
+
+read_dta(here("data","gapminder.dta")) %>% 
+  head()
+```
+
+## spreadsheets
+
+Tip1: save from the spreadsheet as csv or similar.
+
+Tip2: copy read from clipboard
+
+```{r, eval = FALSE}
+read_delim(file = clipboard(), delim = c("\t ")) %>% 
+  head()
+```
+
+## flat files
+
+```{r}
+path <- here("data", "gapminder_flat.txt")
+fwf_metadata <- fwf_empty(path, 
+     col_names = c("country", "continent",
+                   "year", "lifeExp",
+                   "pop", "gdpPercap"))
+
+read_fwf(path, 
+         col_positions = fwf_metadata,
+         col_types = "ccdddd") %>% 
+  glimpse()
+```
+
+## Native R files
+`.Rdata`, `.rds`
+```{r}
+library(gapminder)
+saveRDS(gapminder, file = here("data","gapminder.rds"))
+
+gapminder <- readRDS(
+  here("data","gapminder.rds"))
+```
+
