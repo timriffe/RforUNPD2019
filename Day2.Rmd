@@ -245,6 +245,7 @@ At a minimum, you should indicate what arguments are given in the code, using a 
 Other nice sections include `#' @description` to give an overview and `#' @return` to let us know what the output is. Any other useful tips and information should be noted somehow. There's no sense in going through all the possible sections, but these are the basic ones.
 
 ***  time out to document our lifetable functions ***
+
 Does this seem tedious to you? Well let me tell you, don't discount your own future time: reverse engineering your own code is a much bigger waste of time! If you can't figure it out the next time then you'll end up re-writing it! A major waste of time. And when you document your code other people don't need to waste their time. Let me tell you my time as been seriously wasted trying to reverse engineer thousands of lines of undocumented and unannotated code. Let's all be better people and write nicely formatted, parsimous, annotated, and documented code.
 
 # Exercise
