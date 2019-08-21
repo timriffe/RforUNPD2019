@@ -22,6 +22,7 @@ calcAgeN(Age)
 
 ## an example
 
+Here we see how to specify an argument. Also we can use other available functions inside our function. Anything else needs to come from the arguments. In this case there is just one.
 ```{r}
 hello <- function(your_name){
   paste0("Hello ", 
@@ -35,6 +36,7 @@ hello(c("Tim","Francois"))
 
 ## Lifetable utility functions
 
+Now we'll practice function writing by walking through each of the lifetable formulas (a bit simplified here and there). This was repetetive practice. To start, for the sake of live coding, i.e. having some toy objects to use, we simulate `mx` and `ax` using the simplest parametric formula (Gompertz). Details not important. Here was just want objects that will up us program along the way and make sure everything is working as expected. For this reason, we'd like for our test objects (`mx` and `ax`) to have the **same names** as the arguments we'll make. So let's not get confused about what is an argument and what is an actual object. For us they'll always have the same names. 
 ```{r}
 omega <- 110
 x     <- 0:omega # sequence trick
@@ -44,8 +46,9 @@ mx    <- a * exp(x * b)
 ax    <- rep(.5, length(mx))
 ```
 
+This one we did together. Given the below formula (we don't care what it does or how it works), make a function that does this. The pattern is this: variables on the right need to be arguments, and the thing on the left will be the output.
 $$ q(x) = \frac{m(x)}{1 + (1 - a(x)) \cdot m(x)}$$
-
+And here's how one might do that:
 ```{r}
 mxax_to_qx <- function(mx, ax){
   qx            <- mx / (1 + (1 - ax) * mx)
@@ -54,7 +57,9 @@ mxax_to_qx <- function(mx, ax){
 }
 qx <- mxax_to_qx(mx = mx, ax = ax)
 ```
+$q(x)$ is the conditional probability of dying in the interval, whereas $m(x)$ is a rate (what we start with), and $a(x)$ is instrumental. Here we use a cheap assumption, but the topic of deciding what is a good $a(x)$ is one people have spent a lot of time on. The literal interpretation of $a(x)$ is "the average time lived in the interval by those that die in the interval".
 
+The complement of $q(x)$ is the probability of surviving to the end of the interval conditional on entering it.
 $$ p(x) = 1 - q(x) $$
 
 ```{r}
@@ -65,6 +70,7 @@ qx_to_px <- function(qx){
 px <- qx_to_px(qx)
 ```
 
+$l(x)$ is lifetable survivorship at exact age $x$. It's not an interval value, it's a point value.
 $$ l(x) = \prod _{i=0}^{x-1} p(i) $$
 
 Tips: 
@@ -79,12 +85,12 @@ px_to_lx <- function(px, radix = 1){
   # lx[-(length(px) + 1)]
   lx
 }
-
 lx <- px_to_lx(px)
-
 ```
 
+$d(x)$ is the lifetable deaths distribution. It sums to whatever the lifetable radix is, because everyone must die. If the lifetable radix is 1, then it is the probability at birth of dying aged $x$. We might want to implement it in one or another way: This first formula preserves lengths, but will require two arguments:
 $$ d(x) = l(x) \cdot q(x) $$
+This second formula will do with one argument, but we need to take care to preserve the proper length of output:
 $$ d(x) = l(x) - l(x+1)$$
 
 ```{r}
@@ -110,6 +116,7 @@ mxax_to_dx <- function(mx, ax){
 dx <- mxax_to_dx(mx, ax)
 ```
 
+$L(x)$ is the lifetable exposure, the integral under the survival curve from $x$ until $x+1$. Here's one way to approximate it.
 $$ L(x) = l(x) - (1-a(x))\cdot d(x) $$
 
 Note: if we decide to incorporate age intervals above then we also need to do so here.
@@ -130,10 +137,13 @@ lxaxdx_to_Lx <- function(lx, ax, dx){
 Lx <- lxax_to_Lx(lx, ax)
 ```
 
+$T(x)$ is the total lifetable person years lived from $x$ until $\omega$. Easy to say, but tricky to compute. Because cumulative sums always go from the bottom up, but we need to go from the top down. Tricky.
+
 $$ T(x) = \sum _{i = x}^{\omega} L(i) $$
 
 Tip: `rev()`, `cumsum()`
-
+Note: we used pipes here, but really it's not necessary. This
+example was just a prop to show how nested parentheses can be confusing to read.
 ```{r}
 library(tidyverse)
 Lx_to_Tx <- function(Lx){
@@ -147,7 +157,7 @@ Lx_to_Tx <- function(Lx){
 Tx <- Lx_to_Tx(Lx)
 ```
 
-Last column (for today)!
+Last column (for today)! $e(x)$ is the average remaining length of life by those having survived until age $x$. We calculate it as the total person years lived after age divided by how many people made it to age $x$. Makes sense.
 
 $$ e(x) = \frac{T(x)}{ l(x)}$$ 
 
@@ -157,12 +167,12 @@ Txlx_to_ex <- function(Tx, lx){
   return(ex)
 }
 ex <- Txlx_to_ex(Tx, lx)
-
 ```
 
 
 ## combine all the functions
 
+Here we copied and pasted each of the above functions into an `R` script. This was to show how to `source()` them. Questions were asked about dependencies and so forth, and I suggested that unless you're building a package, that you can just include `require(package)` or `library(package)` in the file where the functions are defined that use the given package. It's cheap and available. There are more elegant and robust ways to do this if making a package instead. Already we have enough functions to justify one IMO.
 ```{r}
 library(here)
 source(here("R","Functions.R"))
@@ -170,6 +180,7 @@ source(here("R","Functions.R"))
 
 ## Step 1, make a lifetable function.
 
+First exercise: make a lifetable function. We include as may vector arguments as needed, make all the columns using our new functions, and then include them all in a manually constructed `data.frame`.
 ```{r}
 LT_simple <- function(mx, ax, age, radix = 1){
    qx <- mxax_to_qx(mx = mx, ax = ax)
@@ -195,7 +206,7 @@ tail(lt_test)
 ```
 
 Now the next version uses a single call to `mutate()`,
-AND we're going to make it take a data.frame as it's argument.
+AND we're going to make it take a `data.frame` as it's argument.
 
 ```{r}
 library(tidyverse)
@@ -217,15 +228,16 @@ test_chunk <- data.frame(
   ax = ax)
 LT_chunk(chunk = test_chunk, 
          radix = 100000) %>% head()
-
 ```
-
+These seem to run OK on our test data, so let's give it a whirl on a large `HMD` data set.
 ```{r}
 library(here)
 HMD <- readRDS(here("data","HMD.rds"))
 glimpse(HMD)
 ```
+See? This only contains `mx` and `ax`, the two things we started with.
 
+We could have course just derived this whole thing in a tidy pipeline:
 ```{r}
 HMD %>% 
   group_by(Country, Year, Sex) %>% 
@@ -240,13 +252,12 @@ HMD %>%
 ```
 
 Let's re-write this using the chunk lifetable function we wrote:
-
 ```{r}
 HMD %>% 
   group_by(Country, Year, Sex) %>% 
   LT_chunk(radix = 100000) %>% glimpse()
 ```
-
+This is nice because we can basically swap out `HMD` with some other single age dataset. As long as it has columns called `mx` and `ax` it'll hum along, and you'll need to take care to specify the full key in the `group_by()` statement.
 ## Exercise:
 
 Make an HMD point cloud figure, where x and y are mapped to two variables that we might expect to be structurally related. Examples include infant mortality versus adult survival. But there are many.
@@ -266,16 +277,18 @@ HMDLT <- HMD %>%
     geom_point(color = gray(.2),
                alpha = .2) + 
     scale_x_log10() +
-    geom_point(filter(HMDLT, Country == "TWN"),
+    geom_point(filter(HMDLT, Country == "CAN"),
                mapping = aes(
                  x = mx, y = ex,
                  color = Year)
                ) +
     annotate(geom = "text",
              x = 0.03, y = 80,
-             label = "Taiwan compared\nwith the rest of HMD")
+             label = "Canada compared\nwith the rest of HMD")
 ```
+This was take 1. We built this up iteratively, seeing how things modified as we went along. The decisions to log this or that axis was made up as we go: it often makes sense to do so when data is squished to an axis: there may be a pattern hidden there. Here we tried to make the HMD a background cloud, and to accentuate a particular series on top of it.
 
+Let's try again, changing the HMD geom.
 ```{r}
 library(colorspace)
 library(tidyverse)
@@ -288,14 +301,10 @@ HMDLT %>%
     aes(fill = stat(level)), geom = "polygon") +
   scale_x_log10() +
   scale_fill_continuous_sequential(palette = "Blues")
-
 ```
+Some internet searching was done of the fly to find the functions `stat_density_2d()` and `scale_fill_continuous_sequential()`, satisfied though.
 
-
-2. Then we'll modify the cloud to turn it into a background reference
-3. Then we'll highlight one country on top.
-
-The purpose of this is to simulate a diagnostic exercise. And practice `ggplot2` and making a nice pipeline.
+The purpose of this is to simulate a diagnostic exercise. And practice `ggplot2` and making a nice pipeline. So let's derive some common indicators that ought to have some structural relationship. Maybe not these exact ones, but something like this:
 
 ```{r}
 HMDLT <- HMD %>% 
@@ -326,7 +335,7 @@ HMDLT %>%
   facet_wrap(~Sex)
 ```
 
-Now, second try, with a time series plot.
+Now, second try, with a time series plot. How about the Oeppen-Vaupel exercise?
 
 ```{r}
 # when we want to highlight the max per year
@@ -345,15 +354,14 @@ HMDLT %>%
                        y = ex,
                        by = Country)) +
   geom_line(color = gray(.5)) + 
+	# noticed to facet this when the plot looked like two series
   facet_wrap(~Sex) + 
+	# second dataset requires another mapping
   geom_point(HMDmax,
             mapping = aes(x = Year,
                           y = ex,
+            			  # this differentiates the countries
                           color = Country),
             size = 2)
-  
 ```
-
-
-
-
+What would I change? Maybe choose different qualitative color palette, also direct-label the top countries where their dots happen to be in the plot.
