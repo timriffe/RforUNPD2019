@@ -1,0 +1,479 @@
+---
+title: "Session 3"
+author: "Tim Riffe"
+date: "8/21/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# `if` statements
+
+the command `if` starts it off, then put a condition that evaluates to `TRUE` or `FALSE` in round parentheses, the contain the body of the offset code in curly braces. Either that code gets executed or not, depending on the condition in the round parentheses. Here's a hypothetical use: Do we use method A or method B? This is predicated on there having been a `method` argument that can have one value or the other.
+```{r, eval = FALSE}
+
+# la la code entering in here
+if (method == "beers"){
+  # then execute code that does that
+}
+
+if (method == "sprague"){
+  # code that does a sprague method
+} else {
+  print("Sorry I don't have that method")
+}
+```
+
+Use it to toggle whether to execute code or not. Say you have code that takes a long time to execute and you don't want to do it repeatedly, but rather only when necessary, and in that case
+you'll manually turn it on.
+```{r}
+# change this to TRUE if
+# we want to run this code
+do.this <- FALSE
+if (do.this){
+HMDLT <- HMD %>% 
+  group_by(Country, Year, Sex) %>% 
+  LT_chunk(radix = 100000)
+saveRDS(HMDLT, file = here("data","HMDLT.rds"))
+}
+```
+
+Here's another example.
+```{r}
+x <- rnorm(10)
+if (mean(x) > 0){
+  print("I'm feeling lucky")
+} else {
+  print("Today is just not my day")
+}
+```
+
+What happens if ou have more than one `TRUE` / `FALSE`? Then it takes the first one and warns you:
+```{r}
+if (x > 0){
+  print("I'm feeling lucky")
+}
+```
+
+Here are some ways to do logical checking on vectors.
+```{r}
+any(x > 0)
+all(x > 0)
+all(! (x > 0))
+```
+
+## what about lots of little conditions?
+The case of recoding `ifelse()` is vectorized, meaning it'll do a lot at once without you telling it so explicitly. This works well when the number of cases to deal with is smallish.
+
+```{r}
+edu <- c("sec","pri","ter","ter","sec","pri","pri")
+ifelse(edu == "pri", "pri" , ">pri" )
+# double-nested
+ifelse(edu == "pri", 1,
+       ifelse(edu == "sec", 2, 3))
+
+# mini example of vectorization
+a <- rnorm(10)
+b <- rnorm(10)
+a+b
+```
+
+But what if there are lots of cases? Do we really need to nest that deep? That's ugly. Here's a way around it with `case_when()` from the tidyverse.
+
+```{r, message = FALSE}
+library(tidyverse)
+x <- 1:50
+x -  x %% 5
+
+case_when(
+  (x %% 5 == 0) & (x %% 7 == 0) ~ "fizzbuzz",
+  x %% 5 == 0 ~ "fizz",
+  x %% 7 == 0 ~ "buzz",
+  TRUE ~ as.character(x)
+)
+```
+
+Final case, for when the number of things you need to recode gets really big. Imagine something like reducing 1000 occupational codes to 10, or adding a Continent variable to dataset if you have country codes plus a lookup table. This trick uses named indexing to do its work. It makes sense if there are no `NA`s.
+
+This will also show named indexing.
+```{r}
+x <- 1:26
+names(x) <- letters
+
+# the values of this vector should be the destination codes.
+recode_vector <- sample(1:4, 26, replace = TRUE)
+
+# the names of the vector are the origin codes. Be thorough!
+names(recode_vector) <- letters
+
+# you can use the recode_vector like this:
+FakeData <- data.frame(ID = sample(letters, 
+                       100, 
+                       replace = TRUE))
+
+# Use the column containing the origin codes to
+# 'select' from the recode_vector. It expands, 
+# repeats, and rearranges as required, neat!
+FakeData$ID2 <- recode_vector[FakeData$ID]
+head(FakeData)
+```
+
+Another alternative still would be to just get the two data objects, the main one and the lookup table, and merge them as a data operation. For tips on this (and more `dplyr` functions), look at the `dplyr` cheat sheet.
+
+Logical operators that I can think of right now.
+```{r}
+"a" %in% letters
+c("a","Z") %in% letters
+
+"a" == letters
+c("a","Z") == letters
+
+x <- rnorm(10)
+x >= 0
+# ==
+# !=
+  
+```
+
+# iteration
+Well, not iterartion in general, just for-loops for now. Looping is the most general solution to repetetive code execution. It's done almost the same way in many languages.
+
+```{r, eval = FALSE}
+for (yr in years){
+  # repeat this code
+}
+```
+
+```{r}
+countries <- c("AUT", "BEL", "DEU", "NLD", "GBR", "USA")
+for (cntry in countries){
+  print(cntry)
+}
+
+```
+
+1. Rule 1, you may or may not actually use the iterator. Here's a funny example. We increment a counter (for no reason at the moment) to illustrate that the loop repeats once for each element in set that is iterated over.
+
+```{r}
+i <- 0
+for (cntry in countries){
+  i <- i + 1
+  print(i)
+}
+```
+
+2. The body knows about objects that were created before the loop. It's kind of a trivial property, and we point this out because the body of the loop is offset but it is still in your environment at the same level.
+
+```{r}
+A <- 5
+B <- 6
+for (i in 1:10){
+  print(A / i + B * i)
+}
+```
+
+You can use loops for trivial things.
+
+```{r}
+x <- rnorm(100)
+y <- rnorm(100)
+xi <- x * 0
+yi <- y * 0
+for (i in 1:length(x)){
+  xi[i] <- sum(x[1:i])
+  yi[i] <- sum(y[1:i])
+}
+```
+
+In the above we pre-allocated the container for the results, which is best practice. But we don't need to. We could also grow an object as the loop progresses:
+```{r}
+
+xi <- 0
+yi <- 0
+for (i in 1:length(x)){
+  xi[i] <- sum(x[1:i])
+  yi[i] <- sum(y[1:i])
+}
+# R grows your vector to the required
+# size without complaining, dangerously polite
+xi[1000] <- 1
+```
+
+Many times there is a simple function that already does what we need.
+```{r, eval = FALSE}
+cumsum(x) == xi
+```
+
+## Example using the HMD data:
+
+```{r}
+library(here)
+library(tidyverse)
+source(here("R","Functions.R"))
+HMD <- readRDS(here("data","HMD.rds"))
+
+HMDLT <- HMD %>% 
+  group_by(Country, Year, Sex) %>% 
+  LT_chunk(radix = 100000)
+```
+
+What would this look like in a loop?
+
+```{r, eval = FALSE}
+countries <- unique(HMD$Country)
+sexes     <- unique(HMD$Sex)
+
+HMDLT     <- list()
+i         <- 0
+for (ctry in countries){
+  for (sex in sexes){
+    # calculate unique years for
+    # this subset without needing
+    # to allocate the entire subset
+    years <- 
+      filter(HMD,
+             Country == ctry,
+             Sex == sex) %>% 
+      # this is the new function.
+      # it extracts a column, kind of
+      # like $
+      pull(Year) %>% 
+      unique()
+    # This is what we can avoid:
+    # chunktoobig <- filter(HMD,
+    #          Country == ctry,
+    #          Sex == sex)
+    # years <- unique(chunktoobig$Year)
+    for (yr in years){
+      i <- i + 1
+      chunk <- filter(HMD,
+                      Country == ctry,
+                      Sex == sex,
+                      Year == yr)
+      HMDLT[[i]] <- LT_chunk(chunk, 
+                             radix = 100000)
+    } # end year loop
+  } # end sex loop
+} # end country loop
+HMDLT <- bind_rows(HMDLT)
+```
+
+Lesson: don't grow objects in loops. It's the memory reallocation stuff under the hood that will slow you down. But there are alternatives.
+
+```{r}
+
+# make a list, where each element is
+# a subset
+HMDLT <- split(HMD, list(HMD$Country, 
+                         HMD$Sex,
+                         HMD$Year
+                ),
+               drop = TRUE)
+HMDLT <- lapply(HMDLT, 
+                LT_chunk, 
+                radix = 100000)
+
+HMDLT <- bind_rows(HMDLT)
+```
+
+But we can borrow a tip from this strategy and not abandon loops altogether:
+
+```{r, eval = FALSE}
+HMDLT <- split(HMD, list(HMD$Country, 
+                         HMD$Sex,
+                         HMD$Year
+                ),
+               drop = TRUE)
+# for-loop goes here:
+# here we iterate down the elements
+# of this largish list
+for (i in 1:length(HMDLT)){
+  HMDLT[[i]] <- LT_chunk(HMDLT[[i]], 
+                         radix = 100000)
+}
+HMDLT <- bind_rows(HMDLT)
+```
+
+Defensive coding inside this last loop technique:
+
+```{r, eval = FALSE}
+HMDLT <- split(HMD, list(HMD$Country, 
+                         HMD$Sex,
+                         HMD$Year
+                ),
+               drop = TRUE)
+# for-loop goes here:
+# here we iterate down the elements
+# of this largish list
+for (i in 1:length(HMDLT)){
+  if (i == 100){
+    HMDLT[[i]]$ax <- as.character(HMDLT[[i]]$ax)
+  }
+  HMDLT[[i]] <- 
+    try(LT_chunk(HMDLT[[i]], 
+                         radix = 100000))
+}
+HMDLT[[100]] # here's the error message. 
+# One could also, instead of keeping the message,
+# capture some more info and assign that instead.
+HMDLT[[101]] %>% head()
+# would need to remove the error list elements first.
+HMDLT <- bind_rows(HMDLT)
+```
+
+# Exercises
+
+1. Start with an integer.
+2. i) if it is even, divide by 2
+  ii) if it is odd, multiply by 3 and add 1
+3. wash-wrinse-repeat, count how many steps it takes. That's the Collatz number.
+
+Step 1, write some lines of code that finds the number. Some correct answers: 1 has a Collatz number of 0. 2 is 1. 3 is 7 (did it on board).
+```{r}
+number <- 3
+Cnumber <- 0
+
+for (i in 1:1000){
+  if (number == 1){
+    break
+  }
+  Cnumber <- Cnumber + 1
+  if (number %% 2 == 0){
+    number <- number / 2
+  } else {
+    number <- number * 3 + 1
+  }
+  number <- as.integer(number)
+}
+```
+
+Step 2, turn it into a function
+
+```{r}
+Collatz <- function(number, maxit = 1e4){
+  Cnumber <- 0
+  for (i in 1:maxit){
+    number <- as.integer(number)
+    if (number == 1){
+      return(Cnumber)
+    }
+    Cnumber <- Cnumber + 1
+    if (number %% 2 == 0){
+      number <- number / 2
+    } else {
+      number <- number * 3 + 1
+    }
+  }
+  warning("you better increase maxit!\nNo Cmnumber for you!")
+}
+```
+
+
+Step 3, let's look at the neat pattern-not-pattern
+
+```{r}
+
+numbers <- 1:10000
+Cnumbers <- numbers * 0
+for (n in numbers){
+  Cnumbers[n] <- Collatz(n)
+}
+data.frame(n = numbers, 
+           Coll = Cnumbers) %>% 
+  ggplot(mapping = aes(x = n, 
+                       y = Coll)) +
+  geom_point() +
+  scale_x_log10()
+
+```
+
+## Coale's iterative method for finding intrinsic $r$
+
+First let's get a an $L(x)$ vector and an $F(x)$ (ASFR) vector to play with.
+```{r}
+HFD <- readRDS(here("data","HFD.rds"))
+HMD <- readRDS(here("data","HMD.rds"))
+Lx <- HMD %>% 
+  group_by(Country, Sex, Year) %>% 
+  LT_chunk(radix = 100000) %>% 
+  filter(Country == "SWE",Year == 1800,
+         Sex == "f") %>% 
+  pull(Lx)
+Lx <- Lx / 100000
+
+Fx <- HFD %>% 
+  filter(Country == "SWE",Year == 1900) %>% 
+  pull(ASFR)
+Fx <- c(rep(0,11), Fx, rep(0,56)) * .4886 # discount for female births
+```
+
+
+Steps:
+1. Calculate $R(0)$ (aka NRR) as:
+ $$ R(0) = \sum L(x) F(x)$$
+2. Assume $T$ (mean length of generation in the stable population) is something like 29.
+3. calcualte a first guess at $r$
+$$ r^i = \frac{log(R(0))}{T}$$
+4. now in a loop, update `r` in using two steps
+   (i) get a residual
+   $$ \delta = \left(\sum e^{-r^i * x}F(x)*.4886*L(x)\right) - 1 $$
+   (ii) now use $\delta$ to update $r^i$:
+   $$ r^{i+1} = r^i + \frac{\delta}{T - \frac{\delta}{r^i}}$$
+5. When $\delta = 0$ you're done!
+
+And here's that code!
+```{r}
+x     <- .5:110.5
+maxit <- 100
+tol   <- 1e-10
+
+Coale_r <- function(Fxf, Lx, 
+                    maxit = 100, tol = 1e-12){
+  R0    <- sum(Lx * Fxf) # fixed quantity
+  G     <- 29            # assumed
+  ri    <- log(R0) / G   # first guess
+  for (i in 1:maxit){
+    # get residual
+    delta <- sum(exp(-ri * x) * Fxf * Lx) - 1
+    # use it to adjust r estimate
+    ri    <- ri + delta / (G - delta / ri)
+    # check for convergence
+    if (delta^2 < tol){
+      break
+    }
+  }
+  return(ri)
+}
+# messing around to look for how fert would need to change
+# to achieve stationarity.
+Coale_r(Fx*1.0252, Lx)
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
