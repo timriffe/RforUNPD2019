@@ -386,7 +386,7 @@ Max-Planck-Institute for Demographic Research</div></h4>
 <style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
 <div id="introduction" class="section level1">
 <h1><span class="header-section-number">1</span> Introduction</h1>
-<p>In this lecture we will learn some basic programming tools. This may look rather foreign if you haven’t seen code like this before. If you have, then you can know that conditional programming (<code>if</code>, <code>ifelse()</code>) works similar to anywhere else, as do <code>for</code> loops. I’ll try to pull off the feat of introducing these concepts and making them relevant to you in a single session.</p>
+<p>In this lecture we will learn some basic programming tools. This may look rather foreign if you haven’t seen code like this before. If you have, then you can know that conditional programming (<code>if</code>, <code>ifelse()</code>) works similar to anywhere else, as do <code>for</code> loops. I’ll try to pull off the feat of introducing these concepts and making them relevant to you in a single session. It would seem a few people have been waiting just for the loops, since they’re widely used elsewhere.</p>
 </div>
 <div id="conditional-execution-if" class="section level1">
 <h1><span class="header-section-number">2</span> Conditional execution <code>if</code></h1>
@@ -405,19 +405,15 @@ Max-Planck-Institute for Demographic Research</div></h4>
 if (mean(x) &gt; 0){
   print(&quot;I&#39;m feeling lucky&quot;)    
 } </code></pre>
-<pre><code>## [1] &quot;I&#39;m feeling lucky&quot;</code></pre>
 <p>Only if the condition is <code>TRUE</code>, does <code>R</code> print the result. The function <code>print()</code> is used to explicitly show an R-object in the console, like a character-string. The message <code>I&#39;m feeling lucky</code> may or may not print to the console. It depends on the random numbers you got. In our case, we got</p>
 <pre class="r"><code>mean(x)</code></pre>
-<pre><code>## [1] 0.6908648</code></pre>
+<pre><code>## [1] -0.1211514</code></pre>
 <p>I’ll give more ad hoc examples of this basic idea in class.</p>
 <p>The part that goes in the parenthesis after <code>if</code> just needs to evaluate to a single value of <code>TRUE</code> in order to execute the code afterwards.</p>
 <pre class="r"><code>if (mean(x) &gt; 0) {
   print(&quot;I&#39;m feeling lucky&quot;)
   print(x)
 }</code></pre>
-<pre><code>## [1] &quot;I&#39;m feeling lucky&quot;
-##  [1]  0.9529157 -0.7600165  1.1613690  1.0501124  0.8367131 -0.8428397
-##  [7]  1.3241583  1.3012789  0.1099653  1.7749918</code></pre>
 <p>The curly brackets delimit the code that the <code>if</code> condition applies to, in much the same way es they demarcate the insides of a function. You can also place various lines of code inside the curly brackets.</p>
 <p>In case you want to do something different if the condition is not met, you can add a second <code>else</code> clause. This would give an alternative code chunk to execute if the condition evaluates to <code>FALSE</code>:</p>
 <pre class="r"><code>if (mean(x) &gt; 0){
@@ -427,7 +423,7 @@ if (mean(x) &gt; 0){
 } else {
   print(&quot;Today is just not my day&quot;)
 }</code></pre>
-<pre><code>## [1] &quot;I&#39;m feeling lucky&quot;</code></pre>
+<pre><code>## [1] &quot;Today is just not my day&quot;</code></pre>
 <p>You can, of course, have more than one condition using the operators <code>&amp;</code> (and) and <code>|</code> (or).</p>
 <pre class="r"><code>random1 &lt;- rnorm(1)
 random2 &lt;- rnorm(1)
@@ -436,11 +432,11 @@ if (random1 &gt; 0 &amp; random2 &gt; 0) {
 } else {
     print(&quot;At least one number is not positive&quot;)
 }</code></pre>
-<pre><code>## [1] &quot;Both random numbers are positive&quot;</code></pre>
+<pre><code>## [1] &quot;At least one number is not positive&quot;</code></pre>
 <p>Effectively,</p>
 <pre class="r"><code>random1; random2</code></pre>
-<pre><code>## [1] 1.241581</code></pre>
-<pre><code>## [1] 1.177164</code></pre>
+<pre><code>## [1] -0.2694094</code></pre>
+<pre><code>## [1] 0.1013651</code></pre>
 <p>We often use <code>if</code> statements to make code able to flexibly handle different cases. If the code is simple, you can also evaluate many such conditions at once using <code>ifelse()</code>, For instance,</p>
 <pre class="r"><code>education &lt;- c(&quot;Secondary&quot;, &quot;Tertiary&quot;, &quot;Secondary&quot;,
                &quot;Secondary&quot;, &quot;Tertiary&quot;, &quot;Primary&quot;)
@@ -451,8 +447,16 @@ ifelse(education == &quot;Tertiary&quot;, 1, 0)</code></pre>
     ifelse(education == &quot;Secondary&quot;, 1, 0))</code></pre>
 <pre><code>## [1] 1 2 1 1 2 0</code></pre>
 <p>Sometimes we use <code>ifelse()</code> to recode variables if there aren’t too many unique values to recode. Otherwise, use <code>case_when()</code> from the <code>tidyverse</code>, which is a better suited to this situation. This example comes from the <code>case_when()</code> documentation. NB, I remember playing this game as a kid. The game works like this: You sit in a circle and take turns counting in sequence, if the number you’re on is evenly divisible by five, you say “fizz” instead of the number, and if it’s evenly divisible by seven you say “buzz”, and if it’s divisble by both you say “fizz buzz”. It has to be fast, but if anyone makes a mistake everyone has to start over.</p>
-<pre class="r"><code>library(tidyverse)
-x &lt;- 1:50
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>## ── Attaching packages ─────────────────────────────────── tidyverse 1.2.1 ──</code></pre>
+<pre><code>## ✔ ggplot2 3.2.0     ✔ purrr   0.3.2
+## ✔ tibble  2.1.3     ✔ dplyr   0.8.3
+## ✔ tidyr   0.8.3     ✔ stringr 1.4.0
+## ✔ readr   1.3.1     ✔ forcats 0.4.0</code></pre>
+<pre><code>## ── Conflicts ────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ dplyr::filter() masks stats::filter()
+## ✖ dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>x &lt;- 1:50
 case_when(
   x %% 35 == 0 ~ &quot;fizz buzz&quot;,  # look we&#39;re using modulo again!! %%
   x %% 5 == 0 ~ &quot;fizz&quot;,
@@ -472,7 +476,7 @@ case_when(
 <p>Did you see what happened there? Aside from the logical testing, what kind of output did we produce? <span class="math inline">\(x\)</span> was an integer vector, and what we got back was a character vector. Inside vectors we can’t mix data types, so <code>R</code> has to coerce to the lowest (human readable!) common denominator, which is a character string.</p>
 <p>Other friends for logical testing are <code>all()</code> and <code>any()</code></p>
 <pre class="r"><code>(x &lt;- rpois(10,10))</code></pre>
-<pre><code>##  [1]  6 12 12  6  7 10  7 14  8 12</code></pre>
+<pre><code>##  [1] 11 13 14 14  8 11  9 14 10  7</code></pre>
 <pre class="r"><code>all(x &gt; 0)</code></pre>
 <pre><code>## [1] TRUE</code></pre>
 <pre class="r"><code>all(x &gt; 5)</code></pre>
@@ -480,19 +484,9 @@ case_when(
 <pre class="r"><code>any(x &gt;= 14) # at least one TRUE</code></pre>
 <pre><code>## [1] TRUE</code></pre>
 <p>Time out to find <code>if()</code> and friends used in the <code>DemoTools</code> package. NB: logical tests are a frequent source of bugs because sometimes we forget about how to handle certain conditions.</p>
-<table>
-<colgroup>
-<col width="100%"></col>
-</colgroup>
-<tbody>
-<tr class="odd">
-<td align="left"><strong>NOTE</strong></td>
-</tr>
-<tr class="even">
-<td align="left">Bear in mind that <code>if</code> conditions can consist in any statement that has <code>TRUE</code> or <code>FALSE</code> as a result. The code is only executed if the answer is <code>TRUE</code>, unless an <code>else</code> condition is included.</td>
-</tr>
-</tbody>
-</table>
+<p><strong>NOTE</strong></p>
+<p>Bear in mind that <code>if</code> conditions can consist in any statement that has <code>TRUE</code> or <code>FALSE</code> as a result. The code is only executed if the answer is <code>TRUE</code>, unless an <code>else</code> condition is included.</p>
+<p>*** time out to find if and else used in <code>DemoTools</code> ***</p>
 </div>
 <div id="repetitive-execution-for-loops" class="section level1">
 <h1><span class="header-section-number">3</span> Repetitive execution: <code>for</code>-loops</h1>
@@ -521,10 +515,10 @@ for (i in countries) {
 <p>Let’s say you have a vector of random numbers, and you want to compute the cumulative sum. A <code>for</code>-loop could be used to perform this task.</p>
 <pre class="r"><code>vec &lt;- sort(runif(20))
 vec</code></pre>
-<pre><code>##  [1] 0.03501968 0.04921689 0.12996321 0.24918604 0.25872322 0.37883899
-##  [7] 0.45331493 0.47800602 0.56341192 0.59277333 0.60678596 0.71495636
-## [13] 0.71903395 0.72581949 0.74837233 0.75077957 0.75836404 0.82115177
-## [19] 0.83078365 0.91200802</code></pre>
+<pre><code>##  [1] 0.09766287 0.17813975 0.26274955 0.30220637 0.36758079 0.49331978
+##  [7] 0.55980188 0.66862679 0.75686505 0.83014512 0.84483857 0.87944016
+## [13] 0.88460796 0.90391833 0.91005479 0.91094420 0.91160726 0.92518617
+## [19] 0.98820828 0.99616029</code></pre>
 <pre class="r"><code># Create an object with the first value of vec
 cumSum &lt;- rep(0, 20)
 # Store the cumulative sum
@@ -532,16 +526,16 @@ for (i in 1:length(vec)) {
   cumSum[i] &lt;- sum(vec[1:i])
 }
 cumSum</code></pre>
-<pre><code>##  [1]  0.03501968  0.08423657  0.21419979  0.46338583  0.72210904
-##  [6]  1.10094804  1.55426296  2.03226898  2.59568091  3.18845424
-## [11]  3.79524019  4.51019655  5.22923051  5.95505000  6.70342233
-## [16]  7.45420189  8.21256593  9.03371770  9.86450135 10.77650937</code></pre>
+<pre><code>##  [1]  0.09766287  0.27580262  0.53855218  0.84075855  1.20833933
+##  [6]  1.70165911  2.26146099  2.93008778  3.68695283  4.51709795
+## [11]  5.36193652  6.24137668  7.12598464  8.02990297  8.93995776
+## [16]  9.85090197 10.76250923 11.68769540 12.67590368 13.67206397</code></pre>
 <p>Just so you get the idea… You’ve seen the <code>cumsum()</code> function already, and it’s actually much more efficient.</p>
 <pre class="r"><code>cumsum(vec)</code></pre>
-<pre><code>##  [1]  0.03501968  0.08423657  0.21419979  0.46338583  0.72210904
-##  [6]  1.10094804  1.55426296  2.03226898  2.59568091  3.18845424
-## [11]  3.79524019  4.51019655  5.22923051  5.95505000  6.70342233
-## [16]  7.45420189  8.21256593  9.03371770  9.86450135 10.77650937</code></pre>
+<pre><code>##  [1]  0.09766287  0.27580262  0.53855218  0.84075855  1.20833933
+##  [6]  1.70165911  2.26146099  2.93008778  3.68695283  4.51709795
+## [11]  5.36193652  6.24137668  7.12598464  8.02990297  8.93995776
+## [16]  9.85090197 10.76250923 11.68769540 12.67590368 13.67206397</code></pre>
 </div>
 <div id="combining-if-and-for-loops" class="section level1">
 <h1><span class="header-section-number">4</span> Combining <code>if</code> and <code>for</code>-loops</h1>
