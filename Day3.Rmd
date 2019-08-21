@@ -31,7 +31,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Introduction
 
-In this lecture we will learn some basic programming tools. This may look rather foreign if you haven't seen code like this before. If you have, then you can know that conditional programming (`if`, `ifelse()`) works similar to anywhere else, as do `for` loops. I'll try to pull off the feat of introducing these concepts and making them relevant to you in a single session. 
+In this lecture we will learn some basic programming tools. This may look rather foreign if you haven't seen code like this before. If you have, then you can know that conditional programming (`if`, `ifelse()`) works similar to anywhere else, as do `for` loops. I'll try to pull off the feat of introducing these concepts and making them relevant to you in a single session. It would seem a few people have been waiting just for the loops, since they're widely used elsewhere.
 
 # Conditional execution `if`
 
@@ -138,11 +138,11 @@ any(x >= 14) # at least one TRUE
 
 Time out to find `if()` and friends used in the `DemoTools` package. NB: logical tests are a frequent source of bugs because sometimes we forget about how to handle certain conditions.
 
-------------------------------------------------------------------------
 **NOTE**
 
 Bear in mind that `if` conditions can consist in any statement that has `TRUE` or `FALSE` as a result. The code is only executed if the answer is `TRUE`, unless an `else` condition is included.
-------------------------------------------------------------------------
+
+*** time out to find if and else used in `DemoTools` ***
 
 # Repetitive execution: `for`-loops
 
