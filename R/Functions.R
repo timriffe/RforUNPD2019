@@ -8,6 +8,7 @@
 # want is to stick them all in here.
 
 library(magrittr)
+library(dplyr)
 # These are single purpose lifetable functions.
 mxax_to_qx <- function(mx, ax){
   qx            <- mx / (1 + (1 - ax) * mx)
@@ -70,4 +71,16 @@ Txlx_to_ex <- function(Tx, lx){
   return(ex)
 }
 
+LT_chunk <- function(chunk, radix){
+  LT_out <-
+    chunk %>% mutate(
+      qx = mxax_to_qx(mx = mx, ax = ax),
+      lx = px_to_lx(px = 1 - qx, radix = radix),
+      dx = lx_to_dx(lx = lx),
+      Lx = lxax_to_Lx(lx = lx, ax = ax),
+      Tx = Lx_to_Tx(Lx = Lx),
+      ex = Txlx_to_ex(Tx = Tx, lx = lx)
+    )
+  return(LT_out)
+}
 # end

@@ -376,9 +376,16 @@ Max-Planck-Institute for Demographic Research</div></h4>
 <ul>
 <li><a href="#introduction"><span class="toc-section-number">1</span> Introduction</a></li>
 <li><a href="#conditional-execution-if"><span class="toc-section-number">2</span> Conditional execution <code>if</code></a></li>
-<li><a href="#repetitive-execution-for-loops"><span class="toc-section-number">3</span> Repetitive execution: <code>for</code>-loops</a></li>
-<li><a href="#combining-if-and-for-loops"><span class="toc-section-number">4</span> Combining <code>if</code> and <code>for</code>-loops</a></li>
-<li><a href="#references"><span class="toc-section-number">5</span> References</a></li>
+<li><a href="#repetitive-execution-for-loops"><span class="toc-section-number">3</span> Repetitive execution: <code>for</code>-loops</a><ul>
+<li><a href="#some-words-on-for-loops."><span class="toc-section-number">3.1</span> Some words on <code>for</code> loops.</a><ul>
+<li><a href="#efficiency"><span class="toc-section-number">3.1.1</span> Efficiency</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#combining-if-and-for-loops"><span class="toc-section-number">4</span> Combining <code>if</code> and <code>for</code>-loops</a><ul>
+<li><a href="#collatz"><span class="toc-section-number">4.1</span> 1) Collatz</a></li>
+<li><a href="#coales-iterative-method-to-find-r"><span class="toc-section-number">4.2</span> 2) Coale’s iterative method to find <span class="math inline">\(r\)</span></a></li>
+</ul></li>
+<li><a href="#references">References</a></li>
 </ul>
 </div>
 
@@ -405,15 +412,19 @@ Max-Planck-Institute for Demographic Research</div></h4>
 if (mean(x) &gt; 0){
   print(&quot;I&#39;m feeling lucky&quot;)    
 } </code></pre>
+<pre><code>## [1] &quot;I&#39;m feeling lucky&quot;</code></pre>
 <p>Only if the condition is <code>TRUE</code>, does <code>R</code> print the result. The function <code>print()</code> is used to explicitly show an R-object in the console, like a character-string. The message <code>I&#39;m feeling lucky</code> may or may not print to the console. It depends on the random numbers you got. In our case, we got</p>
 <pre class="r"><code>mean(x)</code></pre>
-<pre><code>## [1] -0.1211514</code></pre>
+<pre><code>## [1] 0.02479219</code></pre>
 <p>I’ll give more ad hoc examples of this basic idea in class.</p>
 <p>The part that goes in the parenthesis after <code>if</code> just needs to evaluate to a single value of <code>TRUE</code> in order to execute the code afterwards.</p>
 <pre class="r"><code>if (mean(x) &gt; 0) {
   print(&quot;I&#39;m feeling lucky&quot;)
   print(x)
 }</code></pre>
+<pre><code>## [1] &quot;I&#39;m feeling lucky&quot;
+##  [1] -0.5626273 -0.7176003  0.2604802  1.5599151 -1.0169250 -1.0576305
+##  [7]  0.9466939 -0.7637998 -0.5929061  2.1923217</code></pre>
 <p>The curly brackets delimit the code that the <code>if</code> condition applies to, in much the same way es they demarcate the insides of a function. You can also place various lines of code inside the curly brackets.</p>
 <p>In case you want to do something different if the condition is not met, you can add a second <code>else</code> clause. This would give an alternative code chunk to execute if the condition evaluates to <code>FALSE</code>:</p>
 <pre class="r"><code>if (mean(x) &gt; 0){
@@ -423,7 +434,7 @@ if (mean(x) &gt; 0){
 } else {
   print(&quot;Today is just not my day&quot;)
 }</code></pre>
-<pre><code>## [1] &quot;Today is just not my day&quot;</code></pre>
+<pre><code>## [1] &quot;I&#39;m feeling lucky&quot;</code></pre>
 <p>You can, of course, have more than one condition using the operators <code>&amp;</code> (and) and <code>|</code> (or).</p>
 <pre class="r"><code>random1 &lt;- rnorm(1)
 random2 &lt;- rnorm(1)
@@ -432,11 +443,11 @@ if (random1 &gt; 0 &amp; random2 &gt; 0) {
 } else {
     print(&quot;At least one number is not positive&quot;)
 }</code></pre>
-<pre><code>## [1] &quot;At least one number is not positive&quot;</code></pre>
+<pre><code>## [1] &quot;Both random numbers are positive&quot;</code></pre>
 <p>Effectively,</p>
 <pre class="r"><code>random1; random2</code></pre>
-<pre><code>## [1] -0.2694094</code></pre>
-<pre><code>## [1] 0.1013651</code></pre>
+<pre><code>## [1] 0.9082491</code></pre>
+<pre><code>## [1] 2.132083</code></pre>
 <p>We often use <code>if</code> statements to make code able to flexibly handle different cases. If the code is simple, you can also evaluate many such conditions at once using <code>ifelse()</code>, For instance,</p>
 <pre class="r"><code>education &lt;- c(&quot;Secondary&quot;, &quot;Tertiary&quot;, &quot;Secondary&quot;,
                &quot;Secondary&quot;, &quot;Tertiary&quot;, &quot;Primary&quot;)
@@ -447,16 +458,8 @@ ifelse(education == &quot;Tertiary&quot;, 1, 0)</code></pre>
     ifelse(education == &quot;Secondary&quot;, 1, 0))</code></pre>
 <pre><code>## [1] 1 2 1 1 2 0</code></pre>
 <p>Sometimes we use <code>ifelse()</code> to recode variables if there aren’t too many unique values to recode. Otherwise, use <code>case_when()</code> from the <code>tidyverse</code>, which is a better suited to this situation. This example comes from the <code>case_when()</code> documentation. NB, I remember playing this game as a kid. The game works like this: You sit in a circle and take turns counting in sequence, if the number you’re on is evenly divisible by five, you say “fizz” instead of the number, and if it’s evenly divisible by seven you say “buzz”, and if it’s divisble by both you say “fizz buzz”. It has to be fast, but if anyone makes a mistake everyone has to start over.</p>
-<pre class="r"><code>library(tidyverse)</code></pre>
-<pre><code>## ── Attaching packages ─────────────────────────────────── tidyverse 1.2.1 ──</code></pre>
-<pre><code>## ✔ ggplot2 3.2.0     ✔ purrr   0.3.2
-## ✔ tibble  2.1.3     ✔ dplyr   0.8.3
-## ✔ tidyr   0.8.3     ✔ stringr 1.4.0
-## ✔ readr   1.3.1     ✔ forcats 0.4.0</code></pre>
-<pre><code>## ── Conflicts ────────────────────────────────────── tidyverse_conflicts() ──
-## ✖ dplyr::filter() masks stats::filter()
-## ✖ dplyr::lag()    masks stats::lag()</code></pre>
-<pre class="r"><code>x &lt;- 1:50
+<pre class="r"><code>library(tidyverse)
+x &lt;- 1:50
 case_when(
   x %% 35 == 0 ~ &quot;fizz buzz&quot;,  # look we&#39;re using modulo again!! %%
   x %% 5 == 0 ~ &quot;fizz&quot;,
@@ -476,14 +479,14 @@ case_when(
 <p>Did you see what happened there? Aside from the logical testing, what kind of output did we produce? <span class="math inline">\(x\)</span> was an integer vector, and what we got back was a character vector. Inside vectors we can’t mix data types, so <code>R</code> has to coerce to the lowest (human readable!) common denominator, which is a character string.</p>
 <p>Other friends for logical testing are <code>all()</code> and <code>any()</code></p>
 <pre class="r"><code>(x &lt;- rpois(10,10))</code></pre>
-<pre><code>##  [1] 11 13 14 14  8 11  9 14 10  7</code></pre>
+<pre><code>##  [1] 11  7 12 12  5  8 11 12 13  7</code></pre>
 <pre class="r"><code>all(x &gt; 0)</code></pre>
 <pre><code>## [1] TRUE</code></pre>
 <pre class="r"><code>all(x &gt; 5)</code></pre>
-<pre><code>## [1] TRUE</code></pre>
+<pre><code>## [1] FALSE</code></pre>
 <pre class="r"><code>any(x &gt;= 14) # at least one TRUE</code></pre>
-<pre><code>## [1] TRUE</code></pre>
-<p>Time out to find <code>if()</code> and friends used in the <code>DemoTools</code> package. NB: logical tests are a frequent source of bugs because sometimes we forget about how to handle certain conditions.</p>
+<pre><code>## [1] FALSE</code></pre>
+<p>Time out to find <code>if()</code> and friends used in the <code>DemoTools</code> package. NB: logical tests are a frequent source of bugs because sometimes we don’t foresee certain conditions that need to be handled.</p>
 <p><strong>NOTE</strong></p>
 <p>Bear in mind that <code>if</code> conditions can consist in any statement that has <code>TRUE</code> or <code>FALSE</code> as a result. The code is only executed if the answer is <code>TRUE</code>, unless an <code>else</code> condition is included.</p>
 <p>*** time out to find if and else used in <code>DemoTools</code> ***</p>
@@ -515,10 +518,10 @@ for (i in countries) {
 <p>Let’s say you have a vector of random numbers, and you want to compute the cumulative sum. A <code>for</code>-loop could be used to perform this task.</p>
 <pre class="r"><code>vec &lt;- sort(runif(20))
 vec</code></pre>
-<pre><code>##  [1] 0.09766287 0.17813975 0.26274955 0.30220637 0.36758079 0.49331978
-##  [7] 0.55980188 0.66862679 0.75686505 0.83014512 0.84483857 0.87944016
-## [13] 0.88460796 0.90391833 0.91005479 0.91094420 0.91160726 0.92518617
-## [19] 0.98820828 0.99616029</code></pre>
+<pre><code>##  [1] 0.03482340 0.08050321 0.08968292 0.09407044 0.14550395 0.18838001
+##  [7] 0.27782191 0.28535050 0.33429790 0.46960174 0.52420545 0.59105083
+## [13] 0.65975723 0.71486448 0.75846115 0.76412549 0.80429046 0.80751794
+## [19] 0.85197649 0.89270178</code></pre>
 <pre class="r"><code># Create an object with the first value of vec
 cumSum &lt;- rep(0, 20)
 # Store the cumulative sum
@@ -526,26 +529,126 @@ for (i in 1:length(vec)) {
   cumSum[i] &lt;- sum(vec[1:i])
 }
 cumSum</code></pre>
-<pre><code>##  [1]  0.09766287  0.27580262  0.53855218  0.84075855  1.20833933
-##  [6]  1.70165911  2.26146099  2.93008778  3.68695283  4.51709795
-## [11]  5.36193652  6.24137668  7.12598464  8.02990297  8.93995776
-## [16]  9.85090197 10.76250923 11.68769540 12.67590368 13.67206397</code></pre>
+<pre><code>##  [1] 0.0348234 0.1153266 0.2050095 0.2990800 0.4445839 0.6329639 0.9107858
+##  [8] 1.1961363 1.5304342 2.0000360 2.5242414 3.1152923 3.7750495 4.4899140
+## [15] 5.2483751 6.0125006 6.8167911 7.6243090 8.4762855 9.3689873</code></pre>
 <p>Just so you get the idea… You’ve seen the <code>cumsum()</code> function already, and it’s actually much more efficient.</p>
 <pre class="r"><code>cumsum(vec)</code></pre>
-<pre><code>##  [1]  0.09766287  0.27580262  0.53855218  0.84075855  1.20833933
-##  [6]  1.70165911  2.26146099  2.93008778  3.68695283  4.51709795
-## [11]  5.36193652  6.24137668  7.12598464  8.02990297  8.93995776
-## [16]  9.85090197 10.76250923 11.68769540 12.67590368 13.67206397</code></pre>
+<pre><code>##  [1] 0.0348234 0.1153266 0.2050095 0.2990800 0.4445839 0.6329639 0.9107858
+##  [8] 1.1961363 1.5304342 2.0000360 2.5242414 3.1152923 3.7750495 4.4899140
+## [15] 5.2483751 6.0125006 6.8167911 7.6243090 8.4762855 9.3689873</code></pre>
+<div id="some-words-on-for-loops." class="section level2">
+<h2><span class="header-section-number">3.1</span> Some words on <code>for</code> loops.</h2>
+<p>People have been noticing that operations done after <code>group_by()</code> in a pipeline are implicitly looped. And two observations have been raised. (i) doing it this way is quick to implement and requires far less data handling and book-keeping in the code, and it’s also more legibile, and it also flows naturally in a pipeline. All good. But not perfect. (ii) If one of the chunks breaks, how do you know which one, and where it went wrong? Oftentimes if this happens we arduously rewrite the same code as a for loop (so that it stops by itself when the error happens) and wonder to ourselves why we wrote so efficiently in the first place (the better is the enemy of the good). Next week I’ll talk more about debugging tools more generally and we’ll try to find ways to avoid this.</p>
+<p>For now let’s focus on the common themes around <em>to loop or not to loop</em>.</p>
+<div id="efficiency" class="section level3">
+<h3><span class="header-section-number">3.1.1</span> Efficiency</h3>
+<p>Depending on what you’re doing with them, a loop can be ineffient to execute. For example, yesterday we wrote these lines:</p>
+<pre class="r"><code>library(here)
+library(tidyverse)
+# I added LT_chunk to Functions.R
+source(here(&quot;R&quot;,&quot;Functions.R&quot;))
+# read it in
+HMD &lt;- readRDS(here(&quot;data&quot;,&quot;HMD.rds&quot;))
+# start pipeline
+HMDLT &lt;- HMD %&gt;% 
+  group_by(Country, Year, Sex) %&gt;% 
+  LT_chunk(radix = 100000)</code></pre>
+<p>To do this with a loop would be a bit arduous. We can either loop once over a single vector that indicates the unique combinations of Country, Year, and Sex, or we can nest loops to go over each of them.</p>
+<p>You could create a key column by <code>paste()</code>ing together the three grouping columns. Here’s the triple loop version, which takes a very long time to run. Mostly because we’re growing a big list object in there, so it reallocates a big object at each pass of the inner loop.</p>
+<pre class="r"><code># start the stack
+countries &lt;- unique(HMD$Country)
+sexes     &lt;- unique(HMD$Sex)
+# we&#39;ll have to detect years
+# so it&#39;ll be the inner loop
+# an empty bucket to put results in
+HMDLT &lt;- list()
+# i indexes the elements of the bucket
+i &lt;- 0
+for (ctry in countries){
+    for (sex in sexes){
+        years &lt;- filter(HMD, 
+                      Country == ctry,
+                      Sex == sex) %&gt;%
+               pull(Year) %&gt;% unique()
+        for (yr in years){
+            i &lt;- i + 1
+            chunk &lt;- filter(HMD, 
+                            Country == ctry,
+                            Sex == sex,
+                            Year == yr)
+            HMDLT[[i]] &lt;- LT_chunk(chunk, radix = 100000)
+        } # close year loop
+    } # close sex loop
+} # close ctry loop
+# HMDLT is a list, we can get back to a data.frame
+# in different ways. 
+# this comes from dplyr
+HMDLT &lt;- bind_rows(HMDLT)</code></pre>
+<p>The result will be identical. If it were quicker for me to write the for loop code then I’d maybe also prefer it. However, in this case, there is sometime inefficient about the way it’s programmed that makes it take a long time. Yes, we could profile it to make it run faster, probably by creating a dummy <code>HMDLT</code> object in advance of the proper size, and replacing chunks rather than growing the object. But this would take more preparation and book-keeping. I really think this particular kind of loop is totally unnecessary when implicit looping (e.g., <code>group_by()</code>) is so easily available.</p>
+<p>There are many more ways to do this exact operation in <code>R</code>, here’s one more, which I’ll show you only so that when you see it done elesewhere you’ll know what it’s doing. This is the now-out-of-date <em>split-apply-combine</em> strategy:</p>
+<pre class="r"><code>HMDLT &lt;- split(HMD, 
+               list(HMD$Country, HMD$Sex, HMD$Year), 
+               drop = TRUE)
+# this is the implicit loop:
+HMDLT &lt;- lapply(HMDLT, LT_chunk, radix = 100000)
+# bind list together into single data.frame
+HMDLT &lt;- bind_rows(HMDLT)</code></pre>
+<p>This in the end is quite similar to the single-loop approach, which executes at a similar pace to <code>lapply()</code> at the end of the day:</p>
+<pre class="r"><code>HMDLT &lt;- split(HMD, 
+               list(HMD$Country, HMD$Sex, HMD$Year), 
+               drop = TRUE)
+# here&#39;s that middle part replaced with an 
+# explicit loop
+for (i in 1:length(HMDLT)){
+    HMDLT[[i]] &lt;- LT_chunk(HMDLT[[i]], radix = 100000)
+}
+# bind list together into single data.frame
+HMDLT &lt;- bind_rows(HMDLT)</code></pre>
+<p>So my advice, if you want to loop, <em>try this last trick</em>, but otherwise the implicit looping available from <code>dplyr</code> (or <code>data.table</code>, which we didn’t cover) is quite nice. But this is a particular classic usage of looping for subsetting. Loops are also used in other ways.</p>
+<p>Sometimes a loop is absolutely necessary, as in the case of an iterative solution: each pass of the loop depends on the result of the previous one, but can only be calculated via the loop. Examples in practice are the HMD survivor ratio method (it has an iterative algorithm to adjust for secular survival improvements if I remember right), and a smallish HMD method for making the both-sex <span class="math inline">\(a(0)\)</span> consistent is also iterative. We do often optimize things using optimizers, in which case we’ve outsourced the for-loop. Under the hood flor-loops are turning the gears. Likewise for many general demogaphic decomposition methods (Horiuchi, Stepwise, Caswell), for-loops are used. In statistics in general they are widely used, although often buried and out of sight.</p>
+<p>To generalize, I find myself <em>not</em> using loop indices for purposes of indexing locations of things. If you’re a looper you should write what comes natural to you, but try to do so as clearly as possible.</p>
+</div>
+</div>
 </div>
 <div id="combining-if-and-for-loops" class="section level1">
 <h1><span class="header-section-number">4</span> Combining <code>if</code> and <code>for</code>-loops</h1>
+<div id="collatz" class="section level2">
+<h2><span class="header-section-number">4.1</span> 1) Collatz</h2>
 <p>The next function finds the Collatz number of a positive integer, due to the still-unproven Collatz conjecture, which (paraphrasing here) states that all positive integers can be reduced to 1 by following this iterative process: if the present iteration of the number is even, then divide by two, otherwise multiply by 3 and add 1 to it. Repeat as necessary until the number is reduced to 1. The number of steps it takes to get there is the integer’s Collatz number. These have funny patterns… that are hard to see without visualizing them… Let’s turn those words into a function together in class.</p>
 <pre class="r"><code>Collatz &lt;- function(...){
     ...
 }</code></pre>
 </div>
-<div id="references" class="section level1">
-<h1><span class="header-section-number">5</span> References</h1>
+<div id="coales-iterative-method-to-find-r" class="section level2">
+<h2><span class="header-section-number">4.2</span> 2) Coale’s iterative method to find <span class="math inline">\(r\)</span></h2>
+<p>Stable population theory has played an important role in demographic methods and demographic thought. Happy to expound if anyone is interested, but all you need to know for this problem is that there is a quantity that we call the <em>intrinsic growth rate</em> (a.k.a. Lotka’s r, Lotka’s parameter, the Malthusian parameter). If you have a fertility schedule and a mortality schedule, and if you assume that they remain unchanged, then it doesn’t matter what the population structure looks like when you start: there is only one stable population structure that it will head towards and it is uniquely determined by fertility and mortality (migration is assumed zero). Further, the population size each year either grows or shrinks at a constant rate, and that’s the intrinsic growth rate, <span class="math inline">\(r\)</span>. <span class="citation">Coale (1955)</span> (better <span class="citation">Coale (1957)</span>) came up with an <strong>iterative</strong> procedure to find it. There are other ways, but this one is pretty neat. Here’s a link if you want to see the paper: <a href="https://www.jstor.org/stable/2172513">https://www.jstor.org/stable/2172513</a></p>
+<p>The things you need: 1. <span class="math inline">\(L(x)\)</span>, which you can grab from any lifetable 2. <span class="math inline">\(f(x)^f\)</span> ASFR for girl births (strong assumption, don’t get me started) 3. <span class="math inline">\(x\)</span> a vector of ages. Make sure all three of these things are the same length (i.e. <span class="math inline">\(f(x)^f\)</span> in pre- and post-fertile ages is just 0)</p>
+<p>Steps to follow:</p>
+<ol style="list-style-type: decimal">
+<li>calculate <span class="math display">\[R(0) = \sum L(x)f(x)^f\]</span></li>
+<li>assume a parameter <span class="math inline">\(T = 29\)</span></li>
+<li>calculate a guess at <span class="math inline">\(r\)</span>, the first of several, call it <span class="math inline">\(r^i\)</span>, the <span class="math inline">\(i^{th}\)</span> guess: <span class="math display">\[r^i = \frac{log(R(0))}{T}\]</span></li>
+<li>Now in a for-loop we update <span class="math inline">\(r^i\)</span> in two steps.
+<ol style="list-style-type: lower-roman">
+<li>calculate a residual <span class="math display">\[\delta = \sum e^{(-r^i x)}f(x)^fL(x) - 1\]</span></li>
+<li>update <span class="math inline">\(r^i\)</span> using <span class="math display">\[r^{i+1}= r^i + \frac{\delta}{T-\frac{\delta}{r^i}}\]</span></li>
+</ol></li>
+<li>Repeat step 4 until <span class="math inline">\(\delta\)</span> is teeny tiny, i.e. until <span class="math display">\[1 = \sum e^{(-r^i x)}f(x)^fL(x)\]</span> Usually this takes less than 10 iterations, but you can let it go for more than that.</li>
+</ol>
+<p>When you get the loop written, wrap it in a function whose arguments are <span class="math inline">\(f(x)^f\)</span>, <span class="math inline">\(L(x)\)</span>, and <span class="math inline">\(x\)</span>, and which returns <span class="math inline">\(r\)</span>. I’ll think of a way for you to scale this up into a pipeline.</p>
+</div>
+</div>
+<div id="references" class="section level1 unnumbered">
+<h1>References</h1>
+<div id="refs" class="references">
+<div id="ref-coale1955calculation">
+<p>Coale, Ansley J. 1955. “The Calculation of Approximate Intrinsic Rates.” <em>Population Index</em>, 94–97.</p>
+</div>
+<div id="ref-coale1957new">
+<p>———. 1957. “A New Method for Calculating Lotka’s R–the Intrinsic Rate of Growth in a Stable Population.” <em>Population Studies</em>, 92–94.</p>
+</div>
+</div>
 </div>
 
 
