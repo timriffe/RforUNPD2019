@@ -62,17 +62,17 @@ A day will consist in interactive demonstration lasting around 3 hours in the mo
 
 [Session 4](Day4) (Thursday, 22 Aug)
 
-1. reading data from Excel
-2. Using `DemoTools`
-3. How to file requests, bug reports
-4. Exercise: Code review
+1. [reading data from Excel](Day4#reading-in-data-from-excel)
+2. [Complex Excel with data wrangling](Day4#a-more-involved-excel-example)
+3. [Using `DemoTools`](Day4#using-demotools)
+4. [How to file requests, bug reports](Dat4#reporting-demotools-bugs)
 
 [Session 5](Day5) (Friday, 23 Aug)
 
-1. Intro to statistics in `R`
+1. Reproducible reports
 2. Tidy statistics
-3. Modeling pipeline examples
-4. Reproducible reports
+3. Code review
+4. Spreadsheet to function
 
 ### Week 2
 The second week is dedicated for advanced users/programmers.

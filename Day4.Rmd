@@ -258,7 +258,6 @@ clean_logical(responses)
 It's aware of a bunch of languages, and you can also provide a lexicon of what counts and true and false using arguments. To learn more, explore the package help. Presumably the authors will release a vignette or webpage soon.
 
 # Using `DemoTools`
-
 We've looked a little bit at code from `DemoTools` to see examples for function-writing, and for use of `if` statements for conditional code execution. But we've not spoken about what's in that package. It's one of many packages that contain useful things for demographers.
 
 ## Installation
@@ -368,6 +367,7 @@ Scenarios %>%
             Myer = Myers(Pop, Age)) %>% 
   kable(digits = 2)
 ```
+
 Let's discuss this table. First, Myers and Whipple basically agree. But there are patterns that they don't detect too. h2, h3, and the original data would be rough-looking, even if we grouped to 5-year ages! Further, especially h3 would also show a sawtooth pattern, with five-year age groups on the 0s preferred over 5s. This last scenario recommends first treating with on of the `agesmth()` methods, described in the next section, before then going back to single ages.
 
 There are other functions one could use to similar effect:
@@ -376,7 +376,7 @@ There are other functions one could use to similar effect:
 An example of group + constrained split:
 ```{r}
 P5 <- groupAges(pop1m_pasex, Age=0:99)
-splitMono(P5, Age = seq(0,95,by=5))
+P1 <- splitMono(P5, Age = seq(0,95,by=5))
 ```
 
 ## age smoothing
@@ -398,54 +398,7 @@ data.frame(Age = seq(0,95,by=5),
                        color = scenario)) + 
   geom_line()
 ```
-## generate scenarios
-et's generate some heaping scenarios, using the function `heapify()`, designed for this purpose. We make a data object containing the original heaped data, a very very smooth version of it, and then we indice heaping in 3 different ways on the very very smooth version. We end in a tidy format.
-```{r}
-Scenarios <- data.frame(
-               Age = 0:99,
-               orig = pop1m_pasex,
-               SM = sprague(
-                      agesmth(pop1m_pasex,
-                              Age = 0:99,
-                              method = "Strong",
-                              OAG = FALSE,
-                          young.tail = "Arriaga"),
-                      OAG = FALSE
-                        )) %>% 
-  mutate(h1 = heapify(SM, Age, p0 = 1, p5 = 1),
-         h2 = heapify(SM, Age, p0 = 2, p5 = 2),
-         h3 = heapify(SM, Age, p0 = 2.5, p5 = 2)) %>% gather(key = "scenario",                                  value = "Pop",
-           orig:h3) %>% 
-  arrange(scenario, Age)
-```
-# visualize scenarios as single
-Let's look at the single age data, looks pretty bad! Except our excessively super duper smoothed baseline.
-```{r}
-Scenarios %>% 
-  ggplot(mapping = aes(x = Age,
-                       y = Pop,
-                       color = scenario)) +
-  geom_line() +
-  xlim(20, 80)
-  ylim(0, 2e5)
-```
-# visualize scenarios as 5-year ages
-How do these scenarios look after grouping to 5-year age intervals? Most of them no so bad. h3 reallt stands out, though. We can't see this well when looking at the awful single age data, so this step really does help judge which method is best suited.
-```{r}
-Scenarios %>% 
-  group_by(scenario) %>% 
-  mutate(A5 = calcAgeAbr(Age)) %>% 
-  ungroup() %>% 
-  group_by(scenario, A5) %>% 
-  summarize(P5 = sum(Pop)) %>% 
-  ungroup() %>% 
-  ggplot(mapping = aes(x = A5,
-                       y = P5,
-                       color = scenario)) + 
-  geom_line() + 
-  xlim(20,80) +
-  ylim(0, 2e5)
-```
+
 ## setting up a methods test
 You could do more systematic testing of smoothing methods this way. Here, Karup-King-Newton is applied, but you could add more methods in the `mutate()~ call at the end. This is fixed now. The line `A5 = Age - Age %% 5` was previosuly `calcAgeAbr()`, which groupds infants and children separately.
 ```{r}
@@ -460,7 +413,6 @@ KKN_test <-
   group_by(scenario) %>% 
   mutate(KKN = agesmth(P5, Age = A5, method = "kkn")) 
 ```
-
 
 ## abridged lifetable function
 This was taken from the help file for `LTabr()`. It reproduces a PAS spreadsheet. There are many other options to control how it gets done.
@@ -490,11 +442,11 @@ LTcolumn <- function(column = "ex", ...){
   LTabr(...)[,column]
 }
 ```
-# How to file a bug report (live)
-We give it a whirl, trying out some of the extrapolation methods. Interestingly this one gives unexpected output:`NaN` in the open age group for $a(x)$ and $e(x)$
+# Reporting `DemoTools` bugs
+We give it a whirl, trying out some of the extrapolation methods. Interestingly this one gives unexpected output:`NaN` in the open age group for $a(x)$ and $e(x)$.
 ```{r}
 # This seems to have induced a bug, so we saw how to file a usable bug report.
-LTabr(
+test <- LTabr(
     Deaths = Deaths[1:17], 
 		Exposures = Exposures[1:17], 
 		Age = Age[1:17],
@@ -505,26 +457,10 @@ LTabr(
 		extrapFrom = 75,
 		extrapFit = seq(40, 75, by = 5),
 	)
+tail(test)
 ```
-
-
-
-## Filing issues
-I expect some of you will use this package either heavily, in which case you're a de facto tester. I'd like to show you how to file bug reports in that case. We'll do a walk-through demo together, and then I'll add a writeup here. 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+We then filed the following potential bug report:
+[https://github.com/timriffe/DemoTools/issues/82](https://github.com/timriffe/DemoTools/issues/82)
 
 
 
