@@ -62,11 +62,10 @@ A day will consist in interactive demonstration lasting around 3 hours in the mo
 
 [Session 4](Day4) (Thursday, 22 Aug)
 
-1. Little programming things
+1. reading data from Excel
 2. Using `DemoTools`
-3. Using `DDSQLtools`
-4. How to file requests, bug reports
-5. Exercise: Code review 
+3. How to file requests, bug reports
+4. Exercise: Code review
 
 [Session 5](Day5) (Friday, 23 Aug)
 

@@ -42,20 +42,80 @@ This packge offers read functionality, and it's also platform independent, and y
 
 Let's grab the table from `Sheet 1`
 ```{r, message = FALSE}
-read_xlsx(here("data","eurostat.xlsx"), 
-                  sheet = "Sheet 1",
-                  range = "A8:X63",
-          na = ":") %>% 
+EURODTHS <-
+        read_xlsx(here("data","eurostat.xlsx"), 
+                  sheet = "Sheet 1", # sheets are straightforward,
+                                     # can also index by number
+                  range = "A8:X63",  # this was eyeballed
+          na = ":") %>%              # each stat agency seems to prefer
+                                     # different NA codes.. best to specify
   # select cols using names (character, to be sure)
-  select(c("TIME",as.character(2007:2018))) %>% 
+  select(c("TIME", as.character(2007:2018))) %>% 
   # TIME refered to the column headers,
   # whereas GEO refers to the row names,
   # which for us are a key variable.
   rename(GEO = TIME) %>% 
-  # remove the empty first row
+  # remove the empty first row with slice()
   slice(-1) %>% 
-  # finally let's get it tidy:
-  gather(key = "Year", value = "Deaths", -GEO)
+  # finally let's get it tidy (stack the Years, which are now in columns)
+  gather(key = "Year", value = "Deaths", -GEO) 
 ```
+
+## Tidycells
+Guess what everyone, you're lucky because a new package was released on Monday, `tidycells`. Literally this Monday, which supposedly handles the exact problem of reading strangely formatted spreadsheets and wrangling them into something sort-of tidy. Wait until it matures though, it seems. It didn't automatically handle the dataset above it seems.
+
+## TFR and FP data wrangling
+Yesterday afternoon I worked with Aisha to wrangle two spreadsheets into a single tidy gg-plottable dataset. Let's work through that from the top. To read in data, we'll use the `readxl` package also.
+
+These are the two datasets: follow these links and click to download the data.
+
+
+This exercise will introduce some new tidyverse functions
+
+Step 1: read in both datasets, skipping columns as needed, setting column classes.
+
+Step 2: wrange data to something tidy 
+
+Step 3: merge the two datasets
+
+Step 4: make a scatterplot of contraceptive use prevalence vs TFR, ideally with SDG regions colored using a pre-determined palette. 
+
+Getting the colors will require one more data merge, since neither dataset indicated SDG. So we'll need an SDG-ISO lookup table. Then we can see how to set colors manually in `ggplot2`.
+
+This is partially prepared and will be partially spontaneous problem-solving. So sit tight and let's see what Aisha brings in.
+
+# Using `DemoTools`
+
+We've looked a little bit at code from `DemoTools` to see examples for function-writing, and for use of `if` statements for conditional code execution. But we've not spoken about what's in that package. It's one of many packages that contain useful things for demographers.
+
+## installation
+This package is only on github for the time being, so to install it you'll need to use `devtools`. If there are problems for Windows users we'll have to solve them on the fly.
+
+```{r, eval = FALSE}
+# install if needed:
+# install.packages("devtools")
+library(devtools)
+install_github("timriffe/DemoTools")
+```
+
+And now you load it as normally:
+```{r}
+library(DemoTools)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # References 

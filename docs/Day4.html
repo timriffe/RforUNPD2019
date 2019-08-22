@@ -374,8 +374,14 @@ Max-Planck-Institute for Demographic Research</div></h4>
 
 <div id="TOC">
 <ul>
-<li><a href="#reading-in-data-from-excel"><span class="toc-section-number">1</span> reading in data from Excel</a></li>
-<li><a href="#references"><span class="toc-section-number">2</span> References</a></li>
+<li><a href="#reading-in-data-from-excel"><span class="toc-section-number">1</span> reading in data from Excel</a><ul>
+<li><a href="#tidycells"><span class="toc-section-number">1.1</span> Tidycells</a></li>
+<li><a href="#tfr-and-fp-data-wrangling"><span class="toc-section-number">1.2</span> TFR and FP data wrangling</a></li>
+</ul></li>
+<li><a href="#using-demotools"><span class="toc-section-number">2</span> Using <code>DemoTools</code></a><ul>
+<li><a href="#installation"><span class="toc-section-number">2.1</span> installation</a></li>
+</ul></li>
+<li><a href="#references"><span class="toc-section-number">3</span> References</a></li>
 </ul>
 </div>
 
@@ -389,37 +395,56 @@ library(here)
 library(readxl)</code></pre>
 <p>This packge offers read functionality, and it’s also platform independent, and you don’t actually need Excel installed to use it. I downloaded an example dataset from Eurostat. You can download it from the repository. Open the spreadsheet so you can see you it’s formatted: this one has some common formatting aspects that make it tricky to machine read, so hopefully it simulates what you might actually find.</p>
 <p>Let’s grab the table from <code>Sheet 1</code></p>
-<pre class="r"><code>read_xlsx(here(&quot;data&quot;,&quot;eurostat.xlsx&quot;), 
-                  sheet = &quot;Sheet 1&quot;,
-                  range = &quot;A8:X63&quot;,
-          na = &quot;:&quot;) %&gt;% 
+<pre class="r"><code>EURODTHS &lt;-
+        read_xlsx(here(&quot;data&quot;,&quot;eurostat.xlsx&quot;), 
+                  sheet = &quot;Sheet 1&quot;, # sheets are straightforward,
+                                     # can also index by number
+                  range = &quot;A8:X63&quot;,  # this was eyeballed
+          na = &quot;:&quot;) %&gt;%              # each stat agency seems to prefer
+                                     # different NA codes.. best to specify
   # select cols using names (character, to be sure)
-  select(c(&quot;TIME&quot;,as.character(2007:2018))) %&gt;% 
+  select(c(&quot;TIME&quot;, as.character(2007:2018))) %&gt;% 
   # TIME refered to the column headers,
   # whereas GEO refers to the row names,
   # which for us are a key variable.
   rename(GEO = TIME) %&gt;% 
-  # remove the empty first row
+  # remove the empty first row with slice()
   slice(-1) %&gt;% 
-  # finally let&#39;s get it tidy:
-  gather(key = &quot;Year&quot;, value = &quot;Deaths&quot;, -GEO)</code></pre>
-<pre><code>## # A tibble: 648 x 3
-##    GEO                                              Year   Deaths
-##    &lt;chr&gt;                                            &lt;chr&gt;   &lt;dbl&gt;
-##  1 European Union - 28 countries                    2007  4846423
-##  2 European Union - 27 countries (2007-2013)        2007  4794056
-##  3 Euro area (19 countries)                         2007  3092267
-##  4 Euro area (18 countries)                         2007  3046643
-##  5 Belgium                                          2007   100658
-##  6 Bulgaria                                         2007   113004
-##  7 Czechia                                          2007   104636
-##  8 Denmark                                          2007    55604
-##  9 Germany (until 1990 former territory of the FRG) 2007   827155
-## 10 Estonia                                          2007    17409
-## # … with 638 more rows</code></pre>
+  # finally let&#39;s get it tidy (stack the Years, which are now in columns)
+  gather(key = &quot;Year&quot;, value = &quot;Deaths&quot;, -GEO) </code></pre>
+<div id="tidycells" class="section level2">
+<h2><span class="header-section-number">1.1</span> Tidycells</h2>
+<p>Guess what everyone, you’re lucky because a new package was released on Monday, <code>tidycells</code>. Literally this Monday, which supposedly handles the exact problem of reading strangely formatted spreadsheets and wrangling them into something sort-of tidy. Wait until it matures though, it seems. It didn’t automatically handle the dataset above it seems.</p>
+</div>
+<div id="tfr-and-fp-data-wrangling" class="section level2">
+<h2><span class="header-section-number">1.2</span> TFR and FP data wrangling</h2>
+<p>Yesterday afternoon I worked with Aisha to wrangle two spreadsheets into a single tidy gg-plottable dataset. Let’s work through that from the top. To read in data, we’ll use the <code>readxl</code> package also.</p>
+<p>These are the two datasets: follow these links and click to download the data.</p>
+<p>This exercise will introduce some new tidyverse functions</p>
+<p>Step 1: read in both datasets, skipping columns as needed, setting column classes.</p>
+<p>Step 2: wrange data to something tidy</p>
+<p>Step 3: merge the two datasets</p>
+<p>Step 4: make a scatterplot of contraceptive use prevalence vs TFR, ideally with SDG regions colored using a pre-determined palette.</p>
+<p>Getting the colors will require one more data merge, since neither dataset indicated SDG. So we’ll need an SDG-ISO lookup table. Then we can see how to set colors manually in <code>ggplot2</code>.</p>
+<p>This is partially prepared and will be partially spontaneous problem-solving. So sit tight and let’s see what Aisha brings in.</p>
+</div>
+</div>
+<div id="using-demotools" class="section level1">
+<h1><span class="header-section-number">2</span> Using <code>DemoTools</code></h1>
+<p>We’ve looked a little bit at code from <code>DemoTools</code> to see examples for function-writing, and for use of <code>if</code> statements for conditional code execution. But we’ve not spoken about what’s in that package. It’s one of many packages that contain useful things for demographers.</p>
+<div id="installation" class="section level2">
+<h2><span class="header-section-number">2.1</span> installation</h2>
+<p>This package is only on github for the time being, so to install it you’ll need to use <code>devtools</code>. If there are problems for Windows users we’ll have to solve them on the fly.</p>
+<pre class="r"><code># install if needed:
+# install.packages(&quot;devtools&quot;)
+library(devtools)
+install_github(&quot;timriffe/DemoTools&quot;)</code></pre>
+<p>And now you load it as normally:</p>
+<pre class="r"><code>library(DemoTools)</code></pre>
+</div>
 </div>
 <div id="references" class="section level1">
-<h1><span class="header-section-number">2</span> References</h1>
+<h1><span class="header-section-number">3</span> References</h1>
 </div>
 
 
