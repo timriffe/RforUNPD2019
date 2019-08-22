@@ -61,6 +61,152 @@ EURODTHS <-
   gather(key = "Year", value = "Deaths", -GEO) 
 ```
 
+
+# A more involved Excel example
+That was rather satisfying wasn't it? How about something a little trickier? This one was raised by Aisha, and we worked half way through it on Wednesday. The rest of this was filled in live in session, and now I've gone through and annotated.
+
+## Download two spreadsheets
+Download from these two links and put the files straight in the `data` folder. (direct downloads):
+
+1. TFR data:
+[https://population.un.org/wpp/Download/Files/1_Indicators%20(Standard)/EXCEL_FILES/2_Fertility/WPP2019_FERT_F04_TOTAL_FERTILITY.xlsx](https://population.un.org/wpp/Download/Files/1_Indicators%20(Standard)/EXCEL_FILES/2_Fertility/WPP2019_FERT_F04_TOTAL_FERTILITY.xlsx)
+
+2. Contraceptive use data:
+[https://www.un.org/en/development/desa/population/publications/dataset/contraception/wcu2019/UNPD_WCU2019_Country_Data_Survey-Based.xlsx](https://www.un.org/en/development/desa/population/publications/dataset/contraception/wcu2019/UNPD_WCU2019_Country_Data_Survey-Based.xlsx)
+
+(Yes, there are ways to do this programmatically from `R`)
+
+## read in TFR dataset
+```{r, message = FALSE, warning=FALSE}
+path <- here("data", "WPP2019_FERT_F04_TOTAL_FERTILITY.xlsx")
+TFR <- read_xlsx(path,
+          sheet = "ESTIMATES",
+          skip = 16,
+          col_types = c(
+            rep("text", 7),
+            rep("numeric",14)),
+          na = "…") %>% 
+  gather(key = "Year",
+         value = "TFR",
+         8:21) %>% 
+  mutate(Year = substr(Year, 1, 4)) %>% 
+  rename("ISO" = "Country code") %>% 
+  filter(Year == "1990")
+```
+## read in family planning dataset
+```{r}
+path <- here("data", 
+"Table_Model-based_estimates_Countries_2019.xlsx")
+FP <- read_xlsx(path,
+          sheet = "FP Indicators",
+          skip = 4,
+          col_types = c(
+            rep("text",6),
+            "numeric","numeric","text"
+          ),
+          na = "..") %>% 
+  rename("MarStat" = "Marital status",
+         "ISO" = "ISO code",
+         "Med_UI" = "Median estimate and uncertainty intervals") %>% 
+  filter(Indicator == "CPmod",
+         Med_UI == "Median",
+         MarStat == "AW",
+         Year == "1990") 
+```
+## Join the datasets
+Now we have two joinable datasets as `data.frame`s, so let's see how to do that using `dplyr`.
+```{r, message = FALSE, warnings = FALSE}
+FP_TFR <- left_join(FP,
+                    TFR,
+                    by = "ISO")
+```
+## Join SDG codes
+```{r}
+# get ISO-SDG lookup
+ISOSDG <- read_xlsx(here("data","WPP2019_F01_LOCATIONS.xlsx"),
+          sheet = "Sheet2",
+          col_types = c("text","text"))
+
+FP_TFR <- left_join(FP_TFR,
+                    ISOSDG,
+                    by = "ISO")
+```
+## Get SDG colors and labels
+Now we make some helper objects for constructing the desired plot
+```{r}
+Colors <- c("#DEA0FD","#FF7F0E","#2ED9FF",
+"#3283FE","#FFEE33","#AAF400",
+"#1CBE4F","#B33E52")
+
+names(Colors) <- c(947,1833,921,1832,1830,927,1835,1829)
+
+labs <- c("Sub-Saharan Africa",
+"Northern Africa and Western Asia",
+"Central and Southern Asia",
+"Eastern and South-Eastern Asia",
+"Latin America and the Caribbean",
+"Australia/New Zealand",
+"Oceania*",
+"Europe and Northern America")
+names(labs) <- c(947,1833,921,1832,1830,927,1835,1829)
+```
+## Make the plot
+Now for the plot:
+```{r}
+FP_TFR %>% 
+  ggplot(mapping = aes(x = Percentage,
+                       y = TFR,
+                       color = SDG)) + 
+  geom_point() + 
+  scale_color_manual(labels = labs, 
+                     values  = Colors) +
+labs(x="Percent using\nmodern contraception",
+ title ="Contraceptive prevalence versus\nTotal fertility rate\n185 countries, 1990, All women"
+) + 
+  theme_bw()
+```
+
+## Hypothetical function using `ggplot2` in it:
+The trick is to be allowed to use strings as arguments to `aes()` and similar. For this there is a helper function, `aes_string()`.
+```{r}
+SDGscatter <- function(.data, 
+                       x = "Percentage", 
+                       y = "TFR"){
+  # 1) get standard colors:
+  Colors <- c("#DEA0FD","#FF7F0E","#2ED9FF",
+"#3283FE","#FFEE33","#AAF400",
+"#1CBE4F","#B33E52")
+codes <-  c(947,1833,921,1832,1830,927,1835,1829)
+names(Colors) <- codes
+
+labs <- c("Sub-Saharan Africa",
+"Northern Africa and Western Asia",
+"Central and Southern Asia",
+"Eastern and South-Eastern Asia",
+"Latin America and the Caribbean",
+"Australia/New Zealand",
+"Oceania*",
+"Europe and Northern America")
+names(labs) <- codes
+.data %>% 
+  ggplot(mapping = aes_string(x = x,
+                       y = y,
+                       color = "SDG")) + 
+  geom_point() + 
+  scale_color_manual(labels = labs, 
+                     values  = Colors) +
+  theme_bw()
+# labs(x="Percent using\nmodern contraception",
+#  title ="Contraceptive prevalence versus\nTotal fertility rate\n185 countries, 1990, All women"
+# )
+}
+# See it works:
+SDGscatter(FP_TFR)
+```
+
+For this one would just want to dynamically `paste()` to arrive at reasonable titles based on the variables selected for x and y.
+
+
 ## `Tidycells`
 Guess what everyone, you're lucky because a new package was released on Monday, `tidycells`. Literally this Monday, which supposedly handles the exact problem of reading strangely formatted spreadsheets and wrangling them into something sort-of tidy. Wait until it matures though, it seems. It didn't automatically handle the dataset above it seems.
 
@@ -110,26 +256,6 @@ responses <- c("no","yes","unknown","unk","Yes","No way")
 clean_logical(responses)
 ```
 It's aware of a bunch of languages, and you can also provide a lexicon of what counts and true and false using arguments. To learn more, explore the package help. Presumably the authors will release a vignette or webpage soon.
-
-## TFR and FP data wrangling
-Yesterday afternoon I worked with Aisha to wrangle two spreadsheets into a single tidy gg-plottable dataset. Let's work through that from the top. To read in data, we'll use the `readxl` package also.
-
-These are the two datasets: follow these links and click to download the data.
-
-
-This exercise will introduce some new tidyverse functions
-
-Step 1: read in both datasets, skipping columns as needed, setting column classes.
-
-Step 2: wrange data to something tidy 
-
-Step 3: merge the two datasets
-
-Step 4: make a scatterplot of contraceptive use prevalence vs TFR, ideally with SDG regions colored using a pre-determined palette. 
-
-Getting the colors will require one more data merge, since neither dataset had an SDG column. So we'll need an SDG-ISO lookup table. Then we can see how to set colors manually in `ggplot2`.
-
-This is partially prepared and will be partially spontaneous problem-solving. So sit tight and let's see what Aisha brings in.
 
 # Using `DemoTools`
 
@@ -192,7 +318,7 @@ Here's an example of roughness.
 Scenarios <- data.frame(Age = 0:99,
             orig = pop1m_pasex,
             SM = sprague(agesmth(pop1m_pasex, 
-				             Age, 
+				             Age = 0:99, 
 				             method = "Strong", 
 			               OAG = FALSE, 
 				             young.tail = "Arriaga"),
@@ -244,15 +370,144 @@ Scenarios %>%
 ```
 Let's discuss this table. First, Myers and Whipple basically agree. But there are patterns that they don't detect too. h2, h3, and the original data would be rough-looking, even if we grouped to 5-year ages! Further, especially h3 would also show a sawtooth pattern, with five-year age groups on the 0s preferred over 5s. This last scenario recommends first treating with on of the `agesmth()` methods, described in the next section, before then going back to single ages.
 
-## Smoothing
-Several methods designed to smooth data in 5-year age groups are available in the `agesmth()` function. We'll pull some examples from the help files. 
+There are other functions one could use to similar effect:
+`beers()`, `groupAges()` with `splitMono()`, `splitUniform()` (a utility)
 
-## Rescaling
- 
-Imagine data A has a single age profile you sort of trust, but data B has more trustworthy totals in N-year age groups. Then try the `rescaleAgeGroups()` function.
+An example of group + constrained split:
+```{r}
+P5 <- groupAges(pop1m_pasex, Age=0:99)
+splitMono(P5, Age = seq(0,95,by=5))
+```
 
-## More spontaneously and on request
-Maybe a worked example togeyher
+## age smoothing
+But what about for cases when even grouping to 5-year ages isn't enough?
+The function `agesmth()` contains several methods for this case.
+
+```{r}
+p1 <- agesmth(P5, 
+        Age = seq(0,95,by=5),
+        method = "Carrier-Farrag")
+data.frame(Age = seq(0,95,by=5),
+           P5 =P5,
+           p1 = p1) %>% 
+  gather(key ="scenario",
+         value = "Pop",
+         2:3) %>% 
+  ggplot(mapping = aes(x = Age,
+                       y= Pop,
+                       color = scenario)) + 
+  geom_line()
+```
+## generate scenarios
+et's generate some heaping scenarios, using the function `heapify()`, designed for this purpose. We make a data object containing the original heaped data, a very very smooth version of it, and then we indice heaping in 3 different ways on the very very smooth version. We end in a tidy format.
+```{r}
+Scenarios <- data.frame(
+               Age = 0:99,
+               orig = pop1m_pasex,
+               SM = sprague(
+                      agesmth(pop1m_pasex,
+                              Age = 0:99,
+                              method = "Strong",
+                              OAG = FALSE,
+                          young.tail = "Arriaga"),
+                      OAG = FALSE
+                        )) %>% 
+  mutate(h1 = heapify(SM, Age, p0 = 1, p5 = 1),
+         h2 = heapify(SM, Age, p0 = 2, p5 = 2),
+         h3 = heapify(SM, Age, p0 = 2.5, p5 = 2)) %>% gather(key = "scenario",                                  value = "Pop",
+           orig:h3) %>% 
+  arrange(scenario, Age)
+```
+# visualize scenarios as single
+Let's look at the single age data, looks pretty bad! Except our excessively super duper smoothed baseline.
+```{r}
+Scenarios %>% 
+  ggplot(mapping = aes(x = Age,
+                       y = Pop,
+                       color = scenario)) +
+  geom_line() +
+  xlim(20, 80)
+  ylim(0, 2e5)
+```
+# visualize scenarios as 5-year ages
+How do these scenarios look after grouping to 5-year age intervals? Most of them no so bad. h3 reallt stands out, though. We can't see this well when looking at the awful single age data, so this step really does help judge which method is best suited.
+```{r}
+Scenarios %>% 
+  group_by(scenario) %>% 
+  mutate(A5 = calcAgeAbr(Age)) %>% 
+  ungroup() %>% 
+  group_by(scenario, A5) %>% 
+  summarize(P5 = sum(Pop)) %>% 
+  ungroup() %>% 
+  ggplot(mapping = aes(x = A5,
+                       y = P5,
+                       color = scenario)) + 
+  geom_line() + 
+  xlim(20,80) +
+  ylim(0, 2e5)
+```
+## setting up a methods test
+You could do more systematic testing of smoothing methods this way. Here, Karup-King-Newton is applied, but you could add more methods in the `mutate()~ call at the end. This is fixed now. The line `A5 = Age - Age %% 5` was previosuly `calcAgeAbr()`, which groupds infants and children separately.
+```{r}
+KKN_test <- 
+  Scenarios %>% 
+  group_by(scenario) %>% 
+  mutate(A5 = Age - Age %% 5) %>% 
+  ungroup() %>% 
+  group_by(scenario, A5) %>% 
+  summarize(P5 = sum(Pop)) %>% 
+  ungroup() %>% 
+  group_by(scenario) %>% 
+  mutate(KKN = agesmth(P5, Age = A5, method = "kkn")) 
+```
+
+
+## abridged lifetable function
+This was taken from the help file for `LTabr()`. It reproduces a PAS spreadsheet. There are many other options to control how it gets done.
+```{r}
+#?LTabr
+Exposures <- c(100958,466275,624134,559559,446736,370653,301862,249409,247473,223014,172260,149338,127242,105715,79614,53660,
+		31021,16805,8000,4000,2000,1000)
+Deaths <- c(8674,1592,618,411,755,1098,1100,1357,1335,3257,2200,4023,2167,4578,2956,4212,2887,2351,1500,900,500,300)
+
+Age    <- c(0, 1, seq(5, 100, by = 5))
+AgeInt <- c(diff(Age), NA)
+
+PASLT <- LTabr(
+    Deaths = Deaths, 
+		Exposures = Exposures, 
+		Age = Age,
+		AgeInt = AgeInt,
+		axmethod = "pas",
+		IMR = .1,
+		region = "n",
+		Sex = "m")
+```
+## using demotools in custom utility functions
+You can make a helper function to calculate the lifetable but return only one column (more in keeping with the lightweight vector-output preference in the package)
+```{r}
+LTcolumn <- function(column = "ex", ...){
+  LTabr(...)[,column]
+}
+```
+# How to file a bug report (live)
+We give it a whirl, trying out some of the extrapolation methods. Interestingly this one gives unexpected output:`NaN` in the open age group for $a(x)$ and $e(x)$
+```{r}
+# This seems to have induced a bug, so we saw how to file a usable bug report.
+LTabr(
+    Deaths = Deaths[1:17], 
+		Exposures = Exposures[1:17], 
+		Age = Age[1:17],
+		AgeInt = AgeInt[1:17],
+		OAG = FALSE,
+		OAnew = 110,
+		extrapLaw = "gompertz",
+		extrapFrom = 75,
+		extrapFit = seq(40, 75, by = 5),
+	)
+```
+
+
 
 ## Filing issues
 I expect some of you will use this package either heavily, in which case you're a de facto tester. I'd like to show you how to file bug reports in that case. We'll do a walk-through demo together, and then I'll add a writeup here. 

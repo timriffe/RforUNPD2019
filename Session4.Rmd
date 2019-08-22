@@ -44,6 +44,17 @@ Now the object `EURO` is something plottable in `ggplot2`, or at least it's a ge
 # A more involved Excel example
 That was rather satisfying wasn't it? How about something a little trickier?
 
+## Download two spreadsheets
+Download from these two links and put the files straight in the `data` folder. (direct downloads):
+
+1. TFR data:
+[https://population.un.org/wpp/Download/Files/1_Indicators%20(Standard)/EXCEL_FILES/2_Fertility/WPP2019_FERT_F04_TOTAL_FERTILITY.xlsx](https://population.un.org/wpp/Download/Files/1_Indicators%20(Standard)/EXCEL_FILES/2_Fertility/WPP2019_FERT_F04_TOTAL_FERTILITY.xlsx)
+
+2. Contraceptive use data:
+[https://www.un.org/en/development/desa/population/publications/dataset/contraception/wcu2019/UNPD_WCU2019_Country_Data_Survey-Based.xlsx](https://www.un.org/en/development/desa/population/publications/dataset/contraception/wcu2019/UNPD_WCU2019_Country_Data_Survey-Based.xlsx)
+
+(Yes, there are ways to do this programmatically from `R`)
+
 ## read in TFR dataset
 ```{r, message = FALSE, warning=FALSE}
 path <- here("data", "WPP2019_FERT_F04_TOTAL_FERTILITY.xlsx")
@@ -145,8 +156,8 @@ SDGscatter <- function(.data,
   Colors <- c("#DEA0FD","#FF7F0E","#2ED9FF",
 "#3283FE","#FFEE33","#AAF400",
 "#1CBE4F","#B33E52")
-
-names(Colors) <- c(947,1833,921,1832,1830,927,1835,1829)
+codes <-  c(947,1833,921,1832,1830,927,1835,1829)
+names(Colors) <- codes
 
 labs <- c("Sub-Saharan Africa",
 "Northern Africa and Western Asia",
@@ -156,7 +167,7 @@ labs <- c("Sub-Saharan Africa",
 "Australia/New Zealand",
 "Oceania*",
 "Europe and Northern America")
-
+names(labs) <- codes
 .data %>% 
   ggplot(mapping = aes_string(x = x,
                        y = y,
@@ -172,7 +183,8 @@ labs <- c("Sub-Saharan Africa",
 # See it works:
 SDGscatter(FP_TFR)
 ```
-For this one would jsut want to dynamically `paste()` to arrive at reasonable titles based on the variables selected for x and y.
+
+For this one would just want to dynamically `paste()` to arrive at reasonable titles based on the variables selected for x and y.
 
 # A short tip for data cleaning.
 ```{r, eval = FALSE, message = FALSE, warning = FALSE}
