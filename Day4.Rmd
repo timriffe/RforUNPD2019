@@ -88,7 +88,7 @@ This is partially prepared and will be partially spontaneous problem-solving. So
 
 We've looked a little bit at code from `DemoTools` to see examples for function-writing, and for use of `if` statements for conditional code execution. But we've not spoken about what's in that package. It's one of many packages that contain useful things for demographers.
 
-## installation
+## Installation
 This package is only on github for the time being, so to install it you'll need to use `devtools`. If there are problems for Windows users we'll have to solve them on the fly.
 
 ```{r, eval = FALSE}
@@ -102,6 +102,17 @@ And now you load it as normally:
 ```{r}
 library(DemoTools)
 ```
+
+## What it has
+
+There are lots of old-school deterministic demographic methods in this package. At present they include operations for detecting potential problems in age structure and correcting for (some of) them. There is also fairly developed support for calculating abridged lifetables (standard 5-year age groups), including extrapolative closeouts, and assorted other things. The package also comes with some data, and examples in the help files show how to use the functions. There are also a couple tutorials: one on smoothing, and the other on age-heaping detection.
+
+Stuff to be added this year (major additions):
+
+1. Single age lifetable functionality
+2. Intercensal interpolation methods
+3. Model lifetable functions
+4. More tutorials, a web front, and maybe a cheat sheet
 
 
 

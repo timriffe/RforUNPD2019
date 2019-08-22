@@ -379,7 +379,8 @@ Max-Planck-Institute for Demographic Research</div></h4>
 <li><a href="#tfr-and-fp-data-wrangling"><span class="toc-section-number">1.2</span> TFR and FP data wrangling</a></li>
 </ul></li>
 <li><a href="#using-demotools"><span class="toc-section-number">2</span> Using <code>DemoTools</code></a><ul>
-<li><a href="#installation"><span class="toc-section-number">2.1</span> installation</a></li>
+<li><a href="#installation"><span class="toc-section-number">2.1</span> Installation</a></li>
+<li><a href="#what-it-has"><span class="toc-section-number">2.2</span> What it has</a></li>
 </ul></li>
 <li><a href="#references"><span class="toc-section-number">3</span> References</a></li>
 </ul>
@@ -433,7 +434,7 @@ library(readxl)</code></pre>
 <h1><span class="header-section-number">2</span> Using <code>DemoTools</code></h1>
 <p>We’ve looked a little bit at code from <code>DemoTools</code> to see examples for function-writing, and for use of <code>if</code> statements for conditional code execution. But we’ve not spoken about what’s in that package. It’s one of many packages that contain useful things for demographers.</p>
 <div id="installation" class="section level2">
-<h2><span class="header-section-number">2.1</span> installation</h2>
+<h2><span class="header-section-number">2.1</span> Installation</h2>
 <p>This package is only on github for the time being, so to install it you’ll need to use <code>devtools</code>. If there are problems for Windows users we’ll have to solve them on the fly.</p>
 <pre class="r"><code># install if needed:
 # install.packages(&quot;devtools&quot;)
@@ -441,6 +442,17 @@ library(devtools)
 install_github(&quot;timriffe/DemoTools&quot;)</code></pre>
 <p>And now you load it as normally:</p>
 <pre class="r"><code>library(DemoTools)</code></pre>
+</div>
+<div id="what-it-has" class="section level2">
+<h2><span class="header-section-number">2.2</span> What it has</h2>
+<p>There are lots of old-school deterministic demographic methods in this package. At present they include operations for detecting potential problems in age structure and correcting for (some of) them. There is also fairly developed support for calculating abridged lifetables (standard 5-year age groups), including extrapolative closeouts, and assorted other things. The package also comes with some data, and examples in the help files show how to use the functions. There are also a couple tutorials: one on smoothing, and the other on age-heaping detection.</p>
+<p>Stuff to be added this year (major additions):</p>
+<ol style="list-style-type: decimal">
+<li>Single age lifetable functionality</li>
+<li>Intercensal interpolation methods</li>
+<li>Model lifetable functions</li>
+<li>More tutorials, a web front, and maybe a cheat sheet</li>
+</ol>
 </div>
 </div>
 <div id="references" class="section level1">
