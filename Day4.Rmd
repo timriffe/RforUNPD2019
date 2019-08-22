@@ -61,8 +61,55 @@ EURODTHS <-
   gather(key = "Year", value = "Deaths", -GEO) 
 ```
 
-## Tidycells
+## `Tidycells`
 Guess what everyone, you're lucky because a new package was released on Monday, `tidycells`. Literally this Monday, which supposedly handles the exact problem of reading strangely formatted spreadsheets and wrangling them into something sort-of tidy. Wait until it matures though, it seems. It didn't automatically handle the dataset above it seems.
+
+## `clean`
+Guess what everyone, you're lucky because a new package was released on Tuesday, `clean`. Literally this Tuesday, which gives tools for data cleaning. Let's take a look:
+
+```{r, eval = FALSE}
+install.packages("clean")
+```
+
+## numeric examples
+Sometimes if you read in data from an Excel spreadsheet, the number formatting is retained, such that the column is read as `character`, even though it's supposed to be representing a number. Coercion to numeric will result in `NA`. Compare:
+
+```{r}
+# one hundred thousand. 
+as.numeric("100.000") # wrong!
+as.numeric("100000")  # ok
+as.numeric("100,000") # doesn't know what to do, NA
+```
+Issues such as this can be dealt with using string operations, but even in the best of circumstances this is tedious, and that's where the clean package can help. Here are some situations:
+```{r}
+library(clean)
+# let's increase how many decimals print to the screen for this:
+options(digits=9)
+# space-separated thousands!
+clean_numeric(c("100 000", "234 111"))
+clean_numeric(c("100   000", "234   111"))
+
+# an absurd case
+clean_numeric(c("100 000bd.01", "234 zz111,02")) 
+
+# more common cases
+clean_numeric(c("100,000", "234,111"), remove = "\\.")
+clean_numeric(c("100.000", "234.111"), remove = "\\.")
+
+# remove commas, keep decimals
+clean_numeric(c("100,000.01", "234,111.02"), remove = "\\,")
+# remove dot thousand sep, keep comma as decimal
+clean_numeric(c("100.000,01", "234.111,02"), remove = "\\\\.")
+```
+For other cases, the `remove` argument needs to be modified. It used a character pattern system called `regex` (regular expressions), which is terse, but almost universal. That means you can google almost any situation and find the regex to handle it. Or you can try interactive tools to get the right regex, for example: [https://regexr.com/](https://regexr.com/)
+
+## logical examples
+There are also cleaning helpers for other kinds of data. Another nice one is for coverting things to logical:
+```{r}
+responses <- c("no","yes","unknown","unk","Yes","No way")
+clean_logical(responses)
+```
+It's aware of a bunch of languages, and you can also provide a lexicon of what counts and true and false using arguments. To learn more, explore the package help. Presumably the authors will release a vignette or webpage soon.
 
 ## TFR and FP data wrangling
 Yesterday afternoon I worked with Aisha to wrangle two spreadsheets into a single tidy gg-plottable dataset. Let's work through that from the top. To read in data, we'll use the `readxl` package also.
@@ -80,7 +127,7 @@ Step 3: merge the two datasets
 
 Step 4: make a scatterplot of contraceptive use prevalence vs TFR, ideally with SDG regions colored using a pre-determined palette. 
 
-Getting the colors will require one more data merge, since neither dataset indicated SDG. So we'll need an SDG-ISO lookup table. Then we can see how to set colors manually in `ggplot2`.
+Getting the colors will require one more data merge, since neither dataset had an SDG column. So we'll need an SDG-ISO lookup table. Then we can see how to set colors manually in `ggplot2`.
 
 This is partially prepared and will be partially spontaneous problem-solving. So sit tight and let's see what Aisha brings in.
 
@@ -99,7 +146,9 @@ install_github("timriffe/DemoTools")
 ```
 
 And now you load it as normally:
-```{r}
+```{r, message = FALSE}
+library(here)
+library(tidyverse)
 library(DemoTools)
 ```
 
@@ -113,6 +162,101 @@ Stuff to be added this year (major additions):
 2. Intercensal interpolation methods
 3. Model lifetable functions
 4. More tutorials, a web front, and maybe a cheat sheet
+
+## Age heaping indices
+We have a bunch of heaping indices, in case one or more are familiar to you. The example dataset is heavily heaped on the 0s and 5s, see:
+```{r}
+data.frame(Age=0:99, Pop = pop1m_pasex) %>% 
+  ggplot(mapping = aes(x = Age, y = Pop)) +
+  geom_line()
+```
+Just how bad? All of the indices will tell us it's bad, but they're on different scales, so not strictly comparable without some sort of transformation (which no one has bothered to think about). Anyway, here's Myers method, which is an overall judgement of an age range. The result is on a percent scale.
+```{r}
+Myers(pop1m_pasex, Age = 0:99)
+```
+Whipple is probably also familiar, and it lets you test one digit at a time. Except 0 and 5 can be tested together. These are on a ratio scale.
+```{r}
+Whipple(pop1m_pasex, Age = 0:99, digit = 0)
+Whipple(pop1m_pasex, Age = 0:99, digit = 5)
+Whipple(pop1m_pasex, Age = 0:99, digit = c(0,5))
+Whipple(pop1m_pasex, Age = 0:99, digit = 1)
+```
+Other methods include `Bachi()`, `Spoorenberg()` (Yes, your Spoorenberg!) and `Noumbissi()`. `KannistoHeap()` tests for heaping in old ages, for a single age at a time. `Jdanov()` is also tailored to old ages ending in 0 or 5. 
+
+In case you want to get a feel for the scale that one or more of these indices is working on, there is a utility called `heapify()` that *induces* heaping. 
+
+Finally, the function `zero_pref_sawtooth()` asks the particular question "is heaping worse on 0s than on 5s? So bad that it would make a zig-zag pattern even in 5-year grouped data?", while `five_year_roughness()` simiarly measures the overall roughness of the age distribution were it to be grouped to 5-year age groups. These last two quality indices are unique to this package and not in the literature. Their purpose is to help decide whether more aggressive smoothing over 5-year age groups is desirable before coming back to single ages.
+
+Here's an example of roughness.
+```{r}
+Scenarios <- data.frame(Age = 0:99,
+            orig = pop1m_pasex,
+            SM = sprague(agesmth(pop1m_pasex, 
+				             Age, 
+				             method = "Strong", 
+			               OAG = FALSE, 
+				             young.tail = "Arriaga"),
+		             OAG = FALSE)) %>% 
+  # perturb the structure:
+   mutate(h1 = heapify(SM, Age, p0 = 1, p5 = 1),
+          h2 = heapify(SM, Age, p0 = 2, p5 = 2),
+          h3 = heapify(SM, Age, p0 = 2.5, p5 = 2)) %>% 
+  # make it tidy:
+   gather(key = "scenario",
+          value = "Pop",
+          orig:h3) %>% 
+   arrange(scenario, Age)
+```
+
+Take a look, single ages. These are extreme.
+```{r}
+Scenarios %>% 
+   ggplot(mapping = aes(x = Age, y = Pop, color = scenario)) +
+   geom_line() + 
+   xlim(20,80) + 
+   ylim(0,2e5)
+```
+
+How do they look when grouped to 5-years though?
+```{r}
+Scenarios %>% 
+   group_by(scenario) %>% 
+   mutate(A5 = calcAgeAbr(Age)) %>% 
+   ungroup() %>% 
+   group_by(scenario, A5) %>% 
+   summarize(P5 = sum(Pop)) %>% 
+   ungroup() %>% 
+   ggplot(mapping = aes(x = A5, y = P5, color = scenario)) +
+   geom_line() +
+   xlim(20,80) + ylim(0,2e5)
+```
+
+
+```{r}
+library(knitr)
+Scenarios %>% 
+  group_by(scenario) %>% 
+  summarize(rough = five_year_roughness(Pop, Age),
+            sawtooth = zero_pref_sawtooth(Pop, Age),
+            Whipple = Whipple(Pop, Age, digit = c(0,5)),
+            Myer = Myers(Pop, Age)) %>% 
+  kable(digits = 2)
+```
+Let's discuss this table. First, Myers and Whipple basically agree. But there are patterns that they don't detect too. h2, h3, and the original data would be rough-looking, even if we grouped to 5-year ages! Further, especially h3 would also show a sawtooth pattern, with five-year age groups on the 0s preferred over 5s. This last scenario recommends first treating with on of the `agesmth()` methods, described in the next section, before then going back to single ages.
+
+## Smoothing
+Several methods designed to smooth data in 5-year age groups are available in the `agesmth()` function. We'll pull some examples from the help files. 
+
+## Rescaling
+ 
+Imagine data A has a single age profile you sort of trust, but data B has more trustworthy totals in N-year age groups. Then try the `rescaleAgeGroups()` function.
+
+## More spontaneously and on request
+Maybe a worked example togeyher
+
+## Filing issues
+I expect some of you will use this package either heavily, in which case you're a de facto tester. I'd like to show you how to file bug reports in that case. We'll do a walk-through demo together, and then I'll add a writeup here. 
+
 
 
 
