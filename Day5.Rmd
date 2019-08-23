@@ -29,6 +29,146 @@ bibliography: bibliography.bib
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Content to be added
+# Reports with markdown
+Here we'll focus on knitting to Word documents, since I'm assuming that it's used either by you directly or downstream.
+
+We'll see how to build up a template, how to toggle details about how `R` chunks get run and displayed, and how to control figures and tables. This will be done in a live demo, and I'll add in some notes here afterwards. This demo is largely derived from my own experience, and I learned the basics in this article: [https://rmarkdown.rstudio.com/articles_docx.html](https://rmarkdown.rstudio.com/articles_docx.html)
+
+# Descriptive stats (brief)
+
+We've used some functions like `mean()` and `sd()` already. Here are some more that one might like to be aware of:
+
+```{r}
+A <- data.frame(a = rpois(100,lambda = 5), 
+                b = rnorm(100,mean=5,sd=3))
+
+mean(A$a) ; colMeans(A) ; rowMeans(A)
+sd(A$a)
+var(A$a)
+min(A$a)
+max(A$a)
+median(A$a)
+range(A$a)
+quantile(A$b, probs = c(.1,.25,.5,.75,.9))
+summary(A) # all columns
+IQR(A$a)
+```
+
+There are also many ways to get table summaries, or visual summaries of a `data.frame`, too many to describe here, so I'll just show one that seems to have promise, `GGally`, which is rather new.
+```{r, eval = FALSE}
+install.packages("GGally")
+```
+
+```{r,message=FALSE}
+library(GGally)
+library(gapminder)
+ggpairs(gapminder[,-1], mapping = aes(color = continent))
+```
+
+I think you'll sense the utility in this.
+
+# Tidy models
+We've had a heavy focus on wrangling toward tidy data, visualizing it using `ggplot2`, and in learning how to write functions, and put them together for use in a tidy pipeline. We've not seen any of the statistical power of `R` per se, which would have been the protagonist in `R` introductions in some other contexts, and which might be one of your main reasons for wanting to use `R`. One nice thing about modelling in `R` is that there are some norms about how to write doen models, even when they're coming from different packages. Here I'll borrow material from the Healy book again. Statistical models in `R` usually produce a very large list output with everything you could possibly want inside it. They can be difficult to work with. The `broom` package sweeps up the things you most likey wants and sticks them in a tidy object for you.
+
+One package that will help us tidy 
+
+```{r, message = FALSE, warning = FALSE}
+library(tidyverse)
+library(gapminder)
+library(broom)
+library(socviz)
+```
+
+## model formulas
+
+Models always start with a standard formula, and it often follows the way formulas get written down on paper. A standard OLS regression is done with `lm()`. The first argument is called `formula`, and then the formula itself has a left-hand and a right-hand side. I won't pretend to be a statistician, but the basic idea is: The thing on the left (of `~`) is the thing predicted, and the stuff on the right (of `~`) is what you think explains variation in it. The stuff on the right could be additive `+` or multiplicative `*`, and other methods allow for more kinds of treatments, like multilevel models and so forth, and for that you'd want to dig into vignettes for specific methods to get a feel for it.
+
+```{r}
+out <- lm(formula = lifeExp ~ gdpPercap + pop + continent, data = gapminder)
+```
+
+A key feature of this which was ignored when I first learned this stuff, but which is clear as day right now, is that the data object required to do this is in a tidy format. That is, the rows of the dataset (`gapminder`) are the observations, and the columns are variables. And literally the terms of the fomula are the names of the columns that are (in this case a subset of) variables in our tidy dataset. So being able to wrangle data into tidy format is of value for this too. 
+
+The object that we've assigned to, `out`, is a complicated list:
+```{r}
+str(out)
+```
+But the basic output you're most likely after is in the summary table:
+```{r}
+summary(out)
+```
+Unfortunately many people expect to see tables like this, or only know to present model findings in this way. A dotplot would likely do a better job though. Also, showing model predictions visually is far more effective for communication than tables of coefficients, especially if you're able to translate model predictions into intuitive units (years of life, etc). There is a standard way to get model predictions, using a generic function called `predict()`, which works for many (most? all?) statistical models in `R`.
+
+The first thing you do is make fake datset with all the variable combinations for which you'd like predictions. You usually do so in a structeured way, with equal intervals. The `expand.grid()` function (base R) with produce a `data.frame` with all unique combinations of the vectors of variables that you give it. Say we want 100 equispaced points from the lowest to the highest GDP, the median population size, and each of the continents.
+```{r}
+gdp     <- seq(from = min(gapminder$gdpPercap),
+               to = max(gapminder$gdpPercap),
+               length = 100)
+pmed    <- median(gapminder$pop)
+conts   <- unique(gapminder$continent)
+pred_df <- expand.grid(gdpPercap = gdp, pop = pmed, continent = conts)
+```
+
+This `data.frame` is what we predict for:
+```{r}
+pred_out <- predict(object = out,
+                    newdata = pred_df,
+                    interval = "predict")
+head(pred_out) # nice!
+# same row order as pred_df, so we can bind them:
+pred_df <- cbind(pred_df, pred_out)
+head(pred_df)
+```
+
+Visualize the predictions:
+```{r}
+pred_df %>% 
+  filter(continent %in% c("Europe","Africa")) %>% 
+  ggplot(mapping = aes(x = gdpPercap,
+                       y = fit,
+                       ymin = lwr,
+                       ymax = upr,
+                       color = continent,
+                       fill = continent,
+                       group = continent)) +
+  geom_line() +
+  # new geom!
+  geom_ribbon(alpha = .2, color = FALSE) + 
+  scale_x_log10() +
+  # add gapminder points!, new dataset, new mapping!
+  geom_point(
+    filter(gapminder, continent %in% c("Europe","Africa")),
+    mapping = aes(x = gdpPercap,
+                  y = lifeExp,
+                  color = continent),
+    alpha = .5,
+    inherit.aes = FALSE)
+```
+## or coefs as dotplot:
+
+```{r}
+library(broom)
+library(socviz)
+out_conf <- tidy(out, conf.int = TRUE)
+
+out_conf <- subset(out_conf, term %nin% "(Intercept)")
+out_conf$nicelabs <- prefix_strip(out_conf$term, "continent")
+
+ggplot(out_conf, mapping = aes(
+  x = reorder(nicelabs, estimate),
+  y = estimate,
+  ymin = conf.low,
+  ymax = conf.high)) + 
+  # new geom!
+  geom_pointrange() + 
+  coord_flip() + 
+  labs(x = "", y = "OLS Estimate")
+```
+
+
+
+
+
+
 
 # References 
