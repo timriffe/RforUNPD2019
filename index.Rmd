@@ -75,11 +75,18 @@ A day will consist in interactive demonstration lasting around 3 hours in the mo
 4. Spreadsheet to function
 
 ### Week 2
-The second week is dedicated for advanced users/programmers.
+The second week is dedicated for advanced users/programmers. I've received suggested topics. These will be morning-only sessions. In the afternoons I'll be here, mostly working one-on-one with people. Let me know if you'd like a meeting. Could be anything, unrelated to `DemoTools`, demography, R, you name it.
 
-1. Focus on `DemoTools` and `DDSQLtools` with systematic and comprehensive applications to `MS-SQL DemoData` empirical data for population by age and sex, vital events and rates.
-2. Use of `git` and `github` for code repository and teamwork.
-3. One or two data visualization lectures.
+1. Monday: `R` package building. We'll build a simple package together, perhaps which contains UN color palettes and lookup tables and that sort of thing.
+
+2. Tuesday: git and github. We'll open github accounts for some of you. We'll commit Monday's package to a local repository, and we'll put it on github. We'll each fork a copy of it. And we'll walk through the ideas of committing, pushing, pulling, branching, and merging.
+
+3. Wednesday: Debugging. We'll see some different ways of debugging, using some features of RStudio mostly, but also some debugging functions.
+
+4. Thursday: DDSQLtools: for those interested in the `DDSQLtools` (`DemoTools` wrappers designed for `DemoData` specifically) we can talk about various aspects of it Thursday morning, how to move forward, etc.
+
+5. Friday: Undecided. I suggest code review. That means we take someone's code, put it on the projector, and go through it together. I suggest someone offering up code that works but that you sense could be more parsimonius.
+
 
 
 
